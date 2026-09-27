@@ -1,0 +1,3 @@
+- insert:
+    - id: output-renderer
+      name: '@missher/dsh-output-renderer'

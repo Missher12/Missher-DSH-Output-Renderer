@@ -1,0 +1,14 @@
+node_modules/
+lib/
+dist/
+verification/runtime*/
+verification/daily-backup/
+verification/.auth-url
+
+# Local credentials and validation state
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+verification/
