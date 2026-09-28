@@ -1,3 +1,5 @@
+> **源码已迁移 / Source moved:** [dsh-output-renderer](https://github.com/Missher12/Deepseek-harness-Cordis/tree/main/plugins/dsh-output-renderer)。后续开发在统一仓库维护。本仓库保留旧提交与下载记录，并只读归档。
+
 # DSH 输出外观
 
 独立、可卸载的 DeepSeek Harness Bundle。适配 **DSH 0.1.7-rc.2**。
