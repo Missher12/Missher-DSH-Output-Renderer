@@ -1,5 +1,37 @@
 # DSH 输出外观
 
+[← 桌面端与安装包](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [全部插件](https://github.com/Missher12/Missher-DeepseekHarness-Desktop/blob/main/plugins/README.zh.md) · [通用安装指南](https://github.com/Missher12/Missher-DeepseekHarness-Desktop/blob/main/docs/cookbook/install-cordis-plugins.zh.md)
+
+## 新手上手：输出外观
+
+把助手回答显示为清晰阅读、柔和卡片、深想简答或任务清单，并调整字号、间距与流式动效。
+
+| 你需要知道的事 | 说明 |
+| --- | --- |
+| 插件包名 | `@missher/dsh-output-renderer` |
+| 当前源码版本 | `0.1.3-rc.3` |
+| 装好后在哪里使用 | 设置 → 输出外观 |
+| 下载 / 源码 | [下载 0.1.3-rc.3 安装包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.3-rc.3) |
+
+### 安装、启用与第一次使用
+
+1. 先从[桌面端主页](https://github.com/Missher12/Missher-DeepseekHarness-Desktop)下载适合电脑的应用，完成模型配置。这个仓库是可选插件，不是独立桌面应用。
+2. 阅读[通用安装指南](https://github.com/Missher12/Missher-DeepseekHarness-Desktop/blob/main/docs/cookbook/install-cordis-plugins.zh.md)及本页原有安装说明，核对宿主与插件版本。桌面版使用“插件 → 添加插件”；Web/CLI 使用自己的目标配置组，不混用两种安装位置。
+3. 安装后按宿主提示启用并重新加载，进入上表列出的入口。更新已有插件前保留配置和数据，不同时启用旧包名与新包名。
+4. 在设置中切换布局，观察预览，再打开一条已有回复。思考正文、工具详情和代码块仍应可读。
+
+### 使用前了解这些边界
+
+只改变显示方式；不会提高模型生成速度，也不会改写模型的回答内容。
+
+如果页面或功能没出现，先检查当前应用版本、插件是否启用以及加载错误。反馈时附版本、复现步骤和已脱敏错误；不要上传 API Key、真实会话、账号 Cookie 或学习数据库。Git 中的代码更新不会自动替换电脑上已安装的插件。
+
+### 继续阅读
+
+下文保留本插件的详细行为、配置、开发和验证说明。跨平台是否实际通过，以对应版本的验证记录为准；桌面安装包能启动，不代表全部插件和外部服务都已验收。
+
+---
+
 自家插件不再限制 DSH 宿主版本号；运行时按实际接口能力工作。开发依赖版本用于复现构建，不是安装门槛。既有验证基线为 0.2.0-rc.1 与 0.2.0-rc.2；本轮使用 0.2.0-rc.2，其他版本尚未验证。
 
 独立、可卸载的 DeepSeek Harness Bundle。适配 **DSH 0.2.0-rc.1 / 0.2.0-rc.2**。
@@ -33,7 +65,7 @@
 
 ## 安装与移除
 
-公共流程、独立测试 profile 和常见错误见[安装指南](https://github.com/Missher12/Missher-DSH-Inter/blob/main/docs/cookbook/install-cordis-plugins.zh.md)。
+公共流程、独立测试 profile 和常见错误见[安装指南](https://github.com/Missher12/Missher-DeepseekHarness-Desktop/blob/main/docs/cookbook/install-cordis-plugins.zh.md)。
 
 桌面版：进入 **插件 → 添加插件**，在“包名或地址”中粘贴本地 `missher-dsh-output-renderer-0.1.3-rc.3.tgz` 的完整路径，然后点“安装”。安装后进入 **设置 → 输出外观**。桌面版的 `desktop` profile 由 Electron 专管，不能通过 CLI 安装。
 
@@ -50,7 +82,7 @@ dsh plugin --profile <目标配置名称> remove @missher/dsh-output-renderer
 
 ## 开发
 
-本目录在统一仓库中通过 `pnpm-workspace.yaml` 使用同仓库 SDK。按[开发指南](https://github.com/Missher12/Missher-DSH-Inter/blob/main/docs/cookbook/build-cordis-plugins.zh.md)先构建宿主，再完成本插件依赖安装、类型检查、构建、测试和打包。不要把原独立目录的运行链接当作新源码入口。
+本目录在统一仓库中通过 `pnpm-workspace.yaml` 使用同仓库 SDK。按[开发指南](https://github.com/Missher12/Missher-DeepseekHarness-Desktop/blob/main/docs/cookbook/build-cordis-plugins.zh.md)先构建宿主，再完成本插件依赖安装、类型检查、构建、测试和打包。不要把原独立目录的运行链接当作新源码入口。
 
 `scripts/launch-isolated.mjs` 使用本目录下的隔离 HOME/DSH_HOME；需设置 `DSH_SOURCE_DIR`。可通过 `DSH_OUTPUT_TEST_FIXTURE=1` 启用仅本地的合成流验证。该测试入口和测试适配器不进入安装包。
 
