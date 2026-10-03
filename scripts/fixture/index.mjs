@@ -41,9 +41,9 @@ export async function apply(ctx) {
         yield { type: 'finish', reason: { kind: 'tool-calls' } }
         return
       }
-      const text = '## 四种布局，内容一致\n\n这里只改变呈现方式。**思考全文显示**，工具和文件继续使用 DSH 的原生能力。\n\n'
+      const text = '## 四种单列风格，内容一致\n\n这里只改变呈现方式。**思考全文显示**，工具和文件继续使用 DSH 的原生能力。\n\n'
         + '```ts\nconst result = await loadSessions({\n  limit: 30,\n  cursor: nextCursor,\n});\n```\n\n'
-        + '| 方案 | 用途 |\n| --- | --- |\n| 简洁阅读 | 连续阅读 |\n| 分区卡片 | 分区对照 |\n| 执行时间线 | 查看过程 |\n| 左右分栏 | 同时查看过程与结果 |\n\n'
+        + '| 方案 | 用途 |\n| --- | --- |\n| 清晰阅读 | 连续阅读 |\n| 柔和卡片 | 思考与正文分组 |\n| 深想简答 | 完整过程与独立答复 |\n| 任务清单 | 实际步骤与输出状态 |\n\n'
         + `[查看本地演示文件](${resolve('output-sample.txt')})\n\n`
         + '完整性标记：中文、é、👩🏽‍💻、结尾 END_RENDER_OK。'
       yield { type: 'block-start', index: 1, blockType: 'text' }

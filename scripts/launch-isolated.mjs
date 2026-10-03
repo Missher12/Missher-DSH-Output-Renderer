@@ -4,7 +4,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 const source = process.env.DSH_SOURCE_DIR
-if (!source) throw new Error('DSH_SOURCE_DIR must identify the verified built 0.1.7-rc.2 tree')
+if (!source) throw new Error('DSH_SOURCE_DIR must identify the verified built 0.2.0-rc.1 or 0.2.0-rc.2 tree')
 const app = process.env.DSH_OUTPUT_TEST_APP
 const root = resolve('.')
 const work = resolve('verification', process.env.DSH_OUTPUT_TEST_RUN ?? 'runtime')
@@ -45,7 +45,9 @@ if (process.env.DSH_OUTPUT_TEST_FIXTURE === '1') {
 const composed = run(['--profile', profile, '--dump-config'])
 if (!composed.includes('output-renderer')) throw new Error('Bundle did not compose')
 await writeFile(join(work, 'composed.yml'), composed)
-const child = spawn(executable, [...prefix, '--profile', profile, '--no-open', '--host', '127.0.0.1', '--port', '0'], { cwd: work, env, stdio: ['ignore', 'pipe', 'pipe'] })
+const child = spawn(executable, [...prefix, '--profile', profile,
+  '--patch', resolve(source, 'apps/web/tests/pin-browse-picker.overlay.yml'), '--no-open', '--host', '127.0.0.1', '--port', '0'],
+  { cwd: work, env, stdio: ['ignore', 'pipe', 'pipe'] })
 await writeFile(join(work, 'pid.json'), JSON.stringify({ pid: child.pid, home: env.DSH_HOME, source, app, profile, spec }) + '\n')
 let log = ''
 const collect = data => {

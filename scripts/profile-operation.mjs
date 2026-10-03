@@ -11,6 +11,7 @@ if (!app || !targetHome || !profile || !['add', 'remove'].includes(operation)) {
 }
 if (profile === 'desktop') throw new Error('The desktop profile is managed by Electron; use Plugins → Add plugin in DSH')
 const id = '@missher/dsh-output-renderer'
+const version = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version
 const executable = join(app, 'Contents/MacOS/DeepSeek Harness')
 const cli = join(app, 'Contents/Resources/app.asar/dsh/node_modules/@deepseek-ai/dsh/lib/bin.js')
 const dir = join(targetHome, 'profiles', profile)
@@ -24,7 +25,7 @@ for (const name of ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'co
 const env = { ...process.env, ELECTRON_RUN_AS_NODE: '1', DSH_DESKTOP_NODE_EXECUTABLE: executable,
   DSH_HOME: targetHome, PATH: `${join(app, 'Contents/Resources/runtime/bin')}:${process.env.PATH}` }
 if (process.env.DSH_OUTPUT_TEST_HOME) env.HOME = resolve(process.env.DSH_OUTPUT_TEST_HOME)
-const args = operation === 'add' ? ['add', resolve(artifact ?? 'dist/missher-dsh-output-renderer-0.1.0.tgz'), '--offline'] : ['remove', id]
+const args = operation === 'add' ? ['add', resolve(artifact ?? `dist/missher-dsh-output-renderer-${version}.tgz`), '--offline'] : ['remove', id]
 const output = execFileSync(executable, ['--expose-internals', cli, 'plugin', '--profile', profile, ...args], { env, encoding: 'utf8', timeout: 90_000, stdio: ['ignore', 'pipe', 'pipe'] })
 writeFileSync(join(backup, 'operation.log'), output, { mode: 0o600 })
 const after = JSON.parse(readFileSync(manifestPath, 'utf8'))

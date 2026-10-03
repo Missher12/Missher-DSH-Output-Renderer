@@ -1,11 +1,15 @@
 # DSH 输出渲染
 
-用户于 2026-09-27 授权将四种预览布局全部接入设置，并优先实现随显示刷新率更新的输出与新增文字淡入。布局为 reader/cards/timeline/split；思考全文可见，工具详情保留原生操作。
+更新：2026-10-03。当前权威源码为统一仓库 `plugins/dsh-output-renderer`，候选版本 `0.1.3-rc.3`。用户从 HTML 预览中仅选择新增 A「深想简答」与 C「任务清单」；不实施其余提案。随后用户明确移除“紧凑日志”。旧 `Projects/04-Harness-Plugins/dsh-output-renderer` 只保留历史与日常安装链接，不回写。协调入口为 `/Users/missher/Documents/Deepseek-harness-Cordis/PROJECT_GOVERNANCE.md`。
 
-本目录是独立可卸载 Bundle，包名 @missher/dsh-output-renderer，仅此目录为本任务写入范围。权威宿主参考 /Users/missher/Documents/Deepseek- Harness-Inter，0.1.7-rc.2，已核验 HEAD e3409377ac873963595b76c0eb9afd8a8aa241af。该树的 Session Bridge/API/Workspace/module 等未提交工作属于其他任务，不修改、不构建、不覆盖。
+本插件是独立可卸载 Bundle，包名 `@missher/dsh-output-renderer`。只负责助手输出布局、完整思考、工具区域呈现及流式动效；已有图片交由宿主 `renderMessageImages`，不接管输入附件、模型能力、上下文压缩、用量统计、会话身份、媒体采集或持久学习。四种单列布局 reader/cards/process/checklist，间距 comfortable/tight、字号 standard/large 与 smooth/fade 独立选择，设置继续使用 `output-renderer` 命名空间，旧 split、timeline、compact 均映射 reader，读取不改写用户数据。
 
-实际日常 app 为 /Users/missher/Applications/DeepSeek Harness.app，0.1.7-rc.2；不在实现过程中改写 app.asar 或日常 profile。首先完成插件构建、离线测试、隔离 Host/profile 与真实 UI 验收，再交付安装包。核验记录写 VALIDATION.md，不将 rAF 调度等同于真实设备恒定 120/240 fps。
+process 保留全文，以过程线与末尾正文分隔体现层次，不修改模型提示词或摘要正文。checklist 使用 assistant-step 的实际 step/status；输出完成不等于工具执行成功。原生工具状态、详情和事件处理由宿主继续拥有。
 
-方案：使用公开 settings.section、configForms、conversation.chat.node 的优先级覆盖，仅替换 assistant-step 渲染，复用原生 Markdown、图片、路径与文件链接；原生工具/输入/权限不替换。CSS 以 data-dsh-output-renderer 限定，依赖此版本的数据属性，所有样式具有插件归属标记并随卸载恢复。设置独立持久化在 output-renderer 命名空间。
+通过公开 `conversation.chat.node` 的 assistant-step 和 `settings.section` 插槽注册。原生工具/文件/图片操作保留；完整思考例外要求展开含思考的过程容器并移除其折叠入口，纯工具组及工具条目仍独立折叠。全局样式受插件根属性约束，卸载清理样式与订阅，并保护其他拥有者后来写入的属性。聊天数据属性已在 0.2.0-rc.1 的实际 Web UI 核验，后续升级仍需重新确认。
 
-状态：四布局与两动效实现、13 项单元测试、实际 DSH 安装包运行时的隔离 UI 与卸载恢复均通过。日常安装被官方 CLI 的 desktop profile 专管规则拒绝；浏览器工具访问日常桌面监听地址也被阻止。未绕过入口，日常清单与安装前备份逐字节相同。需要用户从 DSH 内的“插件 → 添加插件”粘贴最终 tgz 完整路径安装。隔离预览已重新安装最终运行代码。具体交付记 DELIVERY.md。禁止打包 verification、测试适配器或任何运行数据。
+构建必须显式使用本插件的 Host/Client tsconfig，不能隐式继承统一仓库根 paths；独立包保留宿主提供的 Cordis/Schemastery，不新增兼容包。本轮修改输出布局、原生按钮设置页和局部字号/间距；思考全文与工具、附件操作保持。
+
+只写本插件目录与专属回执。本轮隔离候选在 `verification/audit-20261003/`，SDK 与宿主只读。构建使用本插件忽略目录下的隔离候选；不编辑共享宿主、根 package/lockfile、其他插件、生产 profile，不更新或重启日常 app，不 commit/push/tag/release。候选由协调者统一审核安装。
+
+本轮整理设置页两列排版与保存状态位置，修复纯思考停止提示、无思考清单收尾跳位、不可用设置持续加载和后台淡入清理；历史/淡入/减少动态模式跳过不需要的字符分段。当前验证状态见 VALIDATION.md；上一轮适配结果保留在其中的日期章节。浏览器操作不是原生 Electron 点击；真实供应商和硬件帧率未验证。详见 VALIDATION.md；包路径和 SHA-256 见 DELIVERY.md。历史记录不得冒充本轮或日常安装证据，测试适配器和运行数据不得入包。

@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { FrameText, type FrameClock } from '../src/client/frame-text.ts'
 
 class Clock implements FrameClock {
@@ -22,6 +22,62 @@ function fixture(initial = '') {
   return { clock, output, stream }
 }
 describe('display frame scheduling', () => {
+  test.each([
+    { name: 'settled', running: false, motion: 'smooth' as const, reduced: false },
+    { name: 'fade', running: true, motion: 'fade' as const, reduced: false },
+    { name: 'reduced motion', running: true, motion: 'smooth' as const, reduced: true },
+  ])('$name displays long text without building unused grapheme boundaries', ({ running, motion, reduced }) => {
+    const segment = vi.spyOn(Intl.Segmenter.prototype, 'segment')
+    try {
+      const initial = '历史文字。'.repeat(10_000)
+      const { stream, clock, output } = fixture(initial)
+      stream.update(initial, running, motion, reduced)
+      stream.update(initial + '追加正文👩🏽‍💻', running, motion, reduced)
+      clock.advance(16)
+      expect(output.at(-1)).toBe(initial + '追加正文👩🏽‍💻')
+      expect(segment.mock.calls.length).toBe(0)
+      expect(clock.callbacks.size).toBe(0)
+      stream.dispose()
+    } finally {
+      segment.mockRestore()
+    }
+  })
+
+  test('switching from fade to smooth preserves newly extended graphemes', () => {
+    const { stream, clock, output } = fixture()
+    stream.update('A', true, 'fade')
+    clock.advance(16)
+    expect(output.at(-1)).toBe('A')
+    stream.update('A👩', true, 'smooth')
+    clock.advance(16)
+    expect(output.at(-1)).toBe('A')
+    const text = 'A👩🏽‍💻é终'
+    stream.update(text, true, 'smooth')
+    for (let i = 0; i < 30; i++) clock.advance(1000 / 240)
+    expect(output.at(-1)).toBe('A👩🏽‍💻é')
+    stream.update(text, false, 'smooth')
+    expect(output.at(-1)).toBe(text)
+    expect(clock.callbacks.size).toBe(0)
+  })
+
+  test('smooth resumes after a fade flush without losing text or replaying stale boundaries', () => {
+    const { stream, clock, output } = fixture()
+    const first = '起始👩🏽‍💻'
+    stream.update(first, true, 'smooth')
+    clock.advance(16)
+    stream.update(first, true, 'fade')
+    clock.advance(16)
+    expect(output.at(-1)).toBe(first)
+    const text = first + '续é👨‍👩‍👧‍👦终'
+    stream.update(text, true, 'smooth')
+    for (let i = 0; i < 30; i++) clock.advance(1000 / 240)
+    expect(output.at(-1)).toBe(text.slice(0, -1))
+    expect(output.every(value => text.startsWith(value))).toBe(true)
+    stream.update(text, false, 'smooth')
+    expect(output.at(-1)).toBe(text)
+    expect(clock.callbacks.size).toBe(0)
+  })
+
   for (const hz of [60, 120, 240]) test(`smooth output follows ${hz} Hz and drains within a short frame budget`, () => {
     const { stream, clock, output } = fixture()
     const text = '按显示帧更新。'.repeat(180)

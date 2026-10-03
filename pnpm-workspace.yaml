@@ -1,0 +1,18 @@
+# Build this Bundle independently against the explicit harness-sdk development link.
+# Runtime dependency declarations remain in package.json.
+packages:
+  - .
+allowBuilds:
+  esbuild: true
+overrides:
+  '@deepseek-ai/cordis': 'link:./harness-sdk/vendor/cordis'
+  '@deepseek-ai/dsh-client-locale': 'link:./harness-sdk/packages/client/locale'
+  '@deepseek-ai/dsh-client-store': 'link:./harness-sdk/packages/client/store'
+  '@deepseek-ai/dsh-client-ui-chat': 'link:./harness-sdk/packages/client/ui-chat'
+  '@deepseek-ai/dsh-client-ui-primitives': 'link:./harness-sdk/packages/client/ui-primitives'
+  '@deepseek-ai/dsh-client-ui-renderer': 'link:./harness-sdk/packages/client/ui-renderer'
+  '@deepseek-ai/dsh-client-ui-settings': 'link:./harness-sdk/packages/client/ui-settings'
+  '@deepseek-ai/dsh-client-ui-slots': 'link:./harness-sdk/packages/client/ui-slots'
+  '@deepseek-ai/dsh-settings': 'link:./harness-sdk/packages/settings/settings'
+  '@deepseek-ai/dsh-util-workspace-path': 'link:./harness-sdk/packages/util/workspace-path'
+  '@deepseek-ai/schemastery': 'link:./harness-sdk/vendor/schemastery'

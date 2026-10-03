@@ -9,6 +9,7 @@ import { fileMediaUrl } from '@deepseek-ai/dsh-util-workspace-path'
 import type { PreferencesController } from './settings.ts'
 import type { Translate } from './locales.ts'
 import { StreamMarkdown } from './stream.tsx'
+import { StepLabel } from './StepLabel.tsx'
 
 export interface OutputInjected {
   hooks: { outputPreferences: ObservableSnapshot<ReturnType<PreferencesController['store']['getSnapshot']>> }
@@ -18,7 +19,7 @@ type Props = ChatNodeViewProps<'assistant-step'> & InjectFace<OutputInjected>
 
 export const Assistant = memo(function Assistant({ node, groupPart, useTurnData, openFile, renderMessageImages,
   fileMentions, useOutputPreferences, outputText, t }: Props) {
-  const { motion, layout } = useOutputPreferences(state => state.value)
+  const { motion, layout, density, textSize } = useOutputPreferences(state => state.value)
   const data = node.data
   const running = data.status === 'running'
   const turn = node.location.kind === 'turn' || node.location.kind === 'step' ? node.location.turn : undefined
@@ -44,9 +45,11 @@ export const Assistant = memo(function Assistant({ node, groupPart, useTurnData,
     if (block.kind === 'tool-call' || (groupPart === 'reasoning' && block.kind !== 'reasoning')
       || (groupPart === 'response' && block.kind === 'reasoning')) continue
     if (block.kind === 'reasoning') {
+      if (!block.text.trim()) continue
       reasoning.push(<StreamMarkdown key={index} text={block.text} running={running && index === data.blocks.length - 1}
         motion={motion} labels={labels} compact />)
     } else if (block.kind === 'text') {
+      if (!block.text.trim()) continue
       response.push(<StreamMarkdown key={index} text={block.text} running={running} motion={motion} labels={labels}
         mentions={mentions} pathImages={pathImages} />)
     } else if (block.kind === 'image') {
@@ -62,18 +65,26 @@ export const Assistant = memo(function Assistant({ node, groupPart, useTurnData,
         truncatedLabel={total => t('json.truncated', { total })} />)
     }
   }
-  const interrupted = data.status === 'interrupted' && groupPart !== 'reasoning'
+  const hasReasoning = data.blocks.some(block => block.kind === 'reasoning' && block.text.trim())
+  const hasResponse = data.blocks.some(block => block.kind === 'text' ? block.text.trim()
+    : block.kind !== 'reasoning' && block.kind !== 'tool-call')
+  const interrupted = data.status === 'interrupted' && (groupPart !== 'reasoning' || !hasResponse)
   if (!reasoning.length && !response.length && !interrupted) return null
-  return <div className="dsh-output-assistant" data-output-layout={layout} data-output-part={groupPart}
+  const checklistStep = layout === 'checklist' && (reasoning.length > 0
+    || !hasReasoning && (response.length > 0 || interrupted))
+  const showStopped = interrupted && (layout !== 'checklist' || !hasReasoning && !checklistStep)
+  return <div className={`dsh-output-assistant${checklistStep ? ' dsh-output-checklist-step' : ''}`} data-output-layout={layout} data-output-part={groupPart}
+    data-output-density={density} data-output-text-size={textSize}
     data-output-both={reasoning.length > 0 && response.length > 0 || undefined} data-output-running={running || undefined}>
+    {checklistStep && <StepLabel step={data.step} status={data.status} text={outputText} />}
     {reasoning.length > 0 && <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
       <div className="dsh-output-label">{outputText('thinking')}</div>
       <div data-reasoning-full>{reasoning}</div>
     </section>}
-    {(response.length > 0 || interrupted) && <section className="dsh-output-answer" aria-label={outputText('answer')}>
+    {response.length > 0 && <section className="dsh-output-answer" aria-label={outputText('answer')}>
       <div className="dsh-output-label dsh-output-answer-label">{outputText('answer')}</div>
       {response}
-      {interrupted && <span className="dsh-output-stopped">{outputText('stopped')}</span>}
     </section>}
+    {showStopped && <span className="dsh-output-stopped">{outputText('stopped')}</span>}
   </div>
 })

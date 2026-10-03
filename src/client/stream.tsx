@@ -1,5 +1,5 @@
 /** Stream presentation leaves Markdown DOM ownership with the native renderer. */
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { MarkdownText } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { MarkdownFileMentions, MarkdownLabels, MarkdownPathImages } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { Motion } from '../preferences.ts'
@@ -53,20 +53,37 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
   const overlay = useRef<HTMLDivElement>(null)
   const previous = useRef(running ? '' : null as string | null)
   const active = useRef(new Set<Animation>())
+  const clearFade = useCallback(() => {
+    for (const animation of active.current) animation.cancel()
+    active.current.clear()
+    overlay.current?.replaceChildren()
+  }, [])
 
   useLayoutEffect(() => {
     const buffer = new FrameText(text, {
       request: callback => requestAnimationFrame(callback), cancel: id => cancelAnimationFrame(id),
     }, setShown)
     controller.current = buffer
-    const visibility = () => { if (document.hidden) buffer.flush() }
-    document.addEventListener('visibilitychange', visibility)
     return () => {
       buffer.dispose()
       controller.current = null
-      document.removeEventListener('visibilitychange', visibility)
     }
   }, [])
+  useLayoutEffect(() => {
+    const visibility = () => {
+      if (!document.hidden) {
+        if (running && !reduced && motion === 'fade' && content.current) {
+          previous.current = readableNodes(content.current).map(node => node.data).join('')
+        }
+        return
+      }
+      previous.current = null
+      clearFade()
+      controller.current?.flush()
+    }
+    document.addEventListener('visibilitychange', visibility)
+    return () => document.removeEventListener('visibilitychange', visibility)
+  }, [running, motion, reduced, clearFade])
   useLayoutEffect(() => {
     controller.current?.update(text, running, motion, reduced || document.hidden)
   }, [text, running, motion, reduced])
@@ -75,11 +92,9 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
     const body = content.current
     const layer = overlay.current
     if (!body || !layer) return
-    if (!running || reduced || motion !== 'fade') {
+    if (!running || reduced || document.hidden || motion !== 'fade') {
       previous.current = null
-      for (const animation of active.current) animation.cancel()
-      active.current.clear()
-      layer.replaceChildren()
+      clearFade()
       return
     }
     const nodes = readableNodes(body)
@@ -116,7 +131,7 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
       offset = end
       if (count >= 64) break
     }
-  }, [shown, running, motion, reduced])
+  }, [shown, running, motion, reduced, clearFade])
   useLayoutEffect(() => {
     const animations = active.current
     const layer = overlay.current

@@ -6,14 +6,14 @@ import { preferences, type Preferences } from '../preferences.ts'
 export function createPreferences(form: ConfigForm<Preferences>) {
   const initial = form.getSnapshot()
   const store = createSnapshotStore({ value: preferences(initial.value), saving: false, error: false,
-    ready: initial.status === 'ready', writable: initial.writable && initial.mode === 'host' })
+    status: initial.status, ready: initial.status === 'ready', writable: initial.writable && initial.mode === 'host' })
   let disposed = false
   const sync = () => {
     if (disposed) return
     const snap = form.getSnapshot()
     const current = store.getSnapshot()
     store.set({ ...current, value: current.saving ? current.value : preferences(snap.value),
-      ready: snap.status === 'ready', writable: snap.writable && snap.mode === 'host' })
+      status: snap.status, ready: snap.status === 'ready', writable: snap.writable && snap.mode === 'host' })
   }
   const unsubscribe = form.subscribe(sync)
   return {
@@ -28,7 +28,7 @@ export function createPreferences(form: ConfigForm<Preferences>) {
       if (disposed) return
       const snap = form.getSnapshot()
       store.set({ value: preferences(snap.value), saving: false, error: !accepted,
-        ready: snap.status === 'ready', writable: snap.writable && snap.mode === 'host' })
+        status: snap.status, ready: snap.status === 'ready', writable: snap.writable && snap.mode === 'host' })
     },
     dispose() { disposed = true; unsubscribe() },
   }

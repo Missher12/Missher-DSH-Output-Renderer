@@ -12,3 +12,5 @@ verification/.auth-url
 !.env.example
 *.log
 verification/
+
+harness-sdk

@@ -9,7 +9,7 @@ export interface FrameClock {
 /**
  * Coalesce incoming chunks on the next display frame. Smooth mode drains its
  * backlog in at most 96 ms of visible frame time, independently of refresh rate.
- * Only the changing suffix is segmented; the final open grapheme waits for the
+ * Only smooth output segments the changing suffix; the final open grapheme waits for the
  * next chunk or settlement. Stop/correction always publishes exact source text.
  */
 export class FrameText {
@@ -24,18 +24,18 @@ export class FrameText {
   private running = false
   private motion: Motion = 'fade'
   private reduced = false
-  private readonly segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+  private segmented = false
+  private segmenter: Intl.Segmenter | undefined
 
   constructor(initial: string, private readonly clock: FrameClock, private readonly publish: (text: string) => void) {
     this.target = initial
     this.shown = initial
-    this.segment(initial, false)
   }
 
   update(text: string, running: boolean, motion: Motion, reduced = false): void {
     if (this.disposed) return
     const appended = text.startsWith(this.target)
-    this.segment(text, appended)
+    const changed = text !== this.target
     this.target = text
     this.running = running
     this.motion = motion
@@ -44,6 +44,8 @@ export class FrameText {
       this.flush()
       return
     }
+    if (motion !== 'smooth') this.clearSegments()
+    else if (text !== this.shown && (changed || !this.segmented)) this.segment(text, appended && this.segmented)
     if (this.target !== this.shown && this.frame === undefined) this.frame = this.clock.request(this.tick)
   }
 
@@ -53,6 +55,7 @@ export class FrameText {
     this.frame = undefined
     this.lastTime = undefined
     this.debtStart = undefined
+    this.clearSegments()
     this.emit(this.target)
   }
 
@@ -60,6 +63,7 @@ export class FrameText {
     this.disposed = true
     if (this.frame !== undefined) this.clock.cancel(this.frame)
     this.frame = undefined
+    this.clearSegments()
   }
 
   private emit(text: string): void {
@@ -69,6 +73,7 @@ export class FrameText {
   }
 
   private segment(text: string, appended: boolean): void {
+    this.segmenter ??= new Intl.Segmenter(undefined, { granularity: 'grapheme' })
     const start = appended ? this.openStart : 0
     if (appended) { while ((this.boundaries.at(-1) ?? 0) > start) this.boundaries.pop() }
     else this.boundaries = []
@@ -78,6 +83,14 @@ export class FrameText {
       this.boundaries.push(last + part.segment.length)
     }
     this.openStart = last
+    this.segmented = true
+  }
+
+  private clearSegments(): void {
+    if (!this.segmented) return
+    this.boundaries = []
+    this.openStart = 0
+    this.segmented = false
   }
 
   private readonly tick = (now: number): void => {
