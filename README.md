@@ -1,93 +1,69 @@
-# DSH 输出外观
+# Missher DSH Output Renderer · 输出外观
 
-[← 桌面端与安装包](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [全部插件](https://github.com/Missher12/Missher-DeepseekHarness-Desktop/blob/main/plugins/README.zh.md) · [通用安装指南](https://github.com/Missher12/Missher-DeepseekHarness-Desktop/blob/main/docs/cookbook/install-cordis-plugins.zh.md)
+[English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-## 新手上手：输出外观
+为 DeepSeek Harness 提供四种助手输出布局、完整思考展示，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，本次发行候选版本 **0.1.3-rc.4**。这是可卸载的界面插件，需要已有 DSH 宿主。
 
-把助手回答显示为清晰阅读、柔和卡片、深想简答或任务清单，并调整字号、间距与流式动效。
+rc.4 补齐公开发行的中英文说明、上游许可证和打包检查；运行代码与已验收的 rc.3 完全一致。
 
-| 你需要知道的事 | 说明 |
+## 功能
+
+| 布局 | 呈现方式 |
 | --- | --- |
-| 插件包名 | `@missher/dsh-output-renderer` |
-| 当前源码版本 | `0.1.3-rc.3` |
-| 装好后在哪里使用 | 设置 → 输出外观 |
-| 下载 / 源码 | [下载 0.1.3-rc.3 安装包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.3-rc.3) |
+| 清晰阅读 | 连续单列正文，弱化工具区域的视觉干扰 |
+| 柔和卡片 | 思考和正文用柔和背景分组 |
+| 深想简答 | 完整展示过程，末尾答复独立收尾 |
+| 任务清单 | 按实际助手步骤编号，显示输出中、输出完成或已停止 |
 
-### 安装、启用与第一次使用
+在 **设置 → 输出外观** 选择布局、14/16 px 字号、舒适/紧凑间距和动效，修改自动保存。四张选项卡片等高排列，窄窗口自动转为单列；可用“重播输出”查看动效。
 
-1. 先从[桌面端主页](https://github.com/Missher12/Missher-DeepseekHarness-Desktop)下载适合电脑的应用，完成模型配置。这个仓库是可选插件，不是独立桌面应用。
-2. 阅读[通用安装指南](https://github.com/Missher12/Missher-DeepseekHarness-Desktop/blob/main/docs/cookbook/install-cordis-plugins.zh.md)及本页原有安装说明，核对宿主与插件版本。桌面版使用“插件 → 添加插件”；Web/CLI 使用自己的目标配置组，不混用两种安装位置。
-3. 安装后按宿主提示启用并重新加载，进入上表列出的入口。更新已有插件前保留配置和数据，不同时启用旧包名与新包名。
-4. 在设置中切换布局，观察预览，再打开一条已有回复。思考正文、工具详情和代码块仍应可读。
+- 思考全文保持展开。含思考的过程组不再折叠，工具条目和纯工具组仍可独立展开/收起。
+- 代码、表格、图片和文件操作复用宿主组件。深想简答不自动摘要或截断正文；任务清单的“输出完成”不表示工具或任务执行成功。
+- 刷新率同步使用 `requestAnimationFrame`，没有固定 30/60 fps 上限；新增文字淡入只作用于新到达的文字。遵循系统“减少动态效果”，停止、结束和后台切换会清理缓冲及动画。
+- 布局不改变提示词、模型参数或生成速度。实际帧率受硬件、浏览器和 Markdown 复杂度影响，不承诺持续满帧。
 
-### 使用前了解这些边界
+## 安装、启停与卸载
 
-只改变显示方式；不会提高模型生成速度，也不会改写模型的回答内容。
+推荐使用 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 中的预构建 `.tgz`，版本以实际发布资产为准。rc.4 文件名为 `missher-dsh-output-renderer-0.1.3-rc.4.tgz`，校验文件为同名 `.tgz.sha256`。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。
 
-如果页面或功能没出现，先检查当前应用版本、插件是否启用以及加载错误。反馈时附版本、复现步骤和已脱敏错误；不要上传 API Key、真实会话、账号 Cookie 或学习数据库。Git 中的代码更新不会自动替换电脑上已安装的插件。
+1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.1.3-rc.4.tgz.sha256` 核对下载字节。
+2. 桌面版进入 **插件 → 添加插件**，填入下载文件的完整路径，安装并启用本插件。按宿主提示重新加载后，进入 **设置 → 输出外观**。
+3. 在插件管理中关闭本插件的启用开关即可停用；重新打开可启用。停用后恢复宿主原生输出。
+4. 在插件管理中选择本插件并点击 **卸载** 可移除。0.2.0-rc.2 升级已有包时可能要求先卸载再安装；先备份当前 profile 配置，并保留原版本 tgz。重装后的偏好保留行为由宿主管理，不保证卸载后仍保留。
 
-### 继续阅读
-
-下文保留本插件的详细行为、配置、开发和验证说明。跨平台是否实际通过，以对应版本的验证记录为准；桌面安装包能启动，不代表全部插件和外部服务都已验收。
-
----
-
-自家插件不再限制 DSH 宿主版本号；运行时按实际接口能力工作。开发依赖版本用于复现构建，不是安装门槛。既有验证基线为 0.2.0-rc.1 与 0.2.0-rc.2；本轮使用 0.2.0-rc.2，其他版本尚未验证。
-
-独立、可卸载的 DeepSeek Harness Bundle。适配 **DSH 0.2.0-rc.1 / 0.2.0-rc.2**。
-
-安装后进入 **设置 → 输出外观**，四款布局以两列排列，窄窗口自动改为单列。布局和动效可以独立选择并自动保存，保存状态显示在标题旁。
-
-| 布局 | 效果 |
-| --- | --- |
-| 清晰阅读 | 连续排版，弱化过程的视觉干扰 |
-| 柔和卡片 | 思考和正文以柔和背景分组，保持单列 |
-| 深想简答 | 完整展开过程，正文以清晰的分隔独立收尾 |
-| 任务清单 | 按会话中的实际步骤编号，显示输出中、输出完成或已停止 |
-
-- **阅读选项**：内容间距可选舒适或紧凑，正文可选 14 px 或 16 px；只调整助手输出与设置预览。
-- **刷新率同步**：用 `requestAnimationFrame` 消化收到的文本，按显示帧更新，无固定 30/60 fps 上限；停止或结束立即显示已收到的完整文字。
-- **新增文字淡入**：仅新文字使用 200 ms 淡入，旧内容保持稳定；重播按钮可直接试效果。
-- 思考全文始终可见；工具详情继续独立展开。代码、表格、图片、文件链接复用 DSH 原生组件。
-- 深想简答保留模型回复全文，不自动摘要或截短；回答长度由模型实际输出决定。任务清单显示模型步骤的输出状态，工具的成功或失败仍由原生记录显示。
-- 遵循系统“减少动态效果”，页面进入后台时显示已收全文并清理淡入遮罩；回到前台后只对新文字淡入。已完成回复和淡入模式省略不需要的字符分段。
-- 四款均显示中断状态。任务清单的步骤标题在回复完成后保持位置；连接不可保存设置时显示不可用状态。
-
-刷新率同步改善显示节奏，不提高模型生成速度。实际帧率仍取决于屏幕、浏览器负载、Markdown 复杂度和宿主数据更新；没有恒定硬件 120/240 fps 的保证。
-
-## 职责边界
-
-仅负责助手输出布局、思考与工具区域的呈现、流式动效及本插件设置。已有输出图片交给宿主原生回调；图片上传与限额、输入引用、模型能力配置、上下文数据及使用统计由各自组件负责。
-
-思考全文始终显示，因此会展开含思考的过程容器并移除其折叠入口；纯工具组与工具条目的详情操作仍由宿主提供。此行为是已有产品要求，不能因职责划分恢复思考折叠。
-
-旧 `split`、`timeline`、`compact` 配置均显示为清晰阅读；读取时不改写保存值。设置提供四种单列风格，布局、间距、字号和动效独立保存。
-
-## 安装与移除
-
-公共流程、独立测试 profile 和常见错误见[安装指南](https://github.com/Missher12/Missher-DeepseekHarness-Desktop/blob/main/docs/cookbook/install-cordis-plugins.zh.md)。
-
-桌面版：进入 **插件 → 添加插件**，在“包名或地址”中粘贴本地 `missher-dsh-output-renderer-0.1.3-rc.3.tgz` 的完整路径，然后点“安装”。安装后进入 **设置 → 输出外观**。桌面版的 `desktop` profile 由 Electron 专管，不能通过 CLI 安装。
-
-Web 或自建 profile 也可以用目标 DSH 的官方 CLI：
+Web/自建 profile 使用目标宿主的正式 CLI，替换下面的 profile 和文件路径：
 
 ```sh
-dsh plugin --profile <目标配置名称> add /完整路径/missher-dsh-output-renderer-0.1.3-rc.3.tgz
-dsh plugin --profile <目标配置名称> remove @missher/dsh-output-renderer
+dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.1.3-rc.4.tgz
+dsh plugin --profile my-web remove @missher/dsh-output-renderer
 ```
 
-使用独立命名空间 `output-renderer` 保存设置，默认“清晰阅读 + 新增文字淡入”。移除后恢复原生渲染，不删除会话、附件或其他插件设置。
+桌面 `desktop` profile 由 Electron 管理，请使用桌面插件界面。安装 Release 包不需要 Node/pnpm 开发环境或本地源码；不需要额外兼容包。
 
-这是针对 0.2.0-rc.1 / 0.2.0-rc.2 的实现，升级宿主前应重新验证聊天布局的数据属性与公开插槽。包不携带测试模型、API 凭据或运行数据。
+## 数据与权限
 
-## 开发
+插件通过宿主 ConfigForm 在 `output-renderer` 命名空间保存布局、动效、间距和字号；默认清晰阅读、新增文字淡入、舒适间距和 14 px。旧 `split`、`timeline`、`compact` 值只读映射为清晰阅读，不在读取时覆写原值。
 
-本目录在统一仓库中通过 `pnpm-workspace.yaml` 使用同仓库 SDK。按[开发指南](https://github.com/Missher12/Missher-DeepseekHarness-Desktop/blob/main/docs/cookbook/build-cordis-plugins.zh.md)先构建宿主，再完成本插件依赖安装、类型检查、构建、测试和打包。不要把原独立目录的运行链接当作新源码入口。
+插件读取已有助手内容用于显示，不创建独立会话库、不改写回复或附件，不调用模型服务，不新增遥测或 API 凭据配置。图片、文件和链接仍使用宿主的访问控制与原生操作。停用或卸载会清理本插件样式和订阅，不删除会话、附件或其他插件设置；插件偏好本身的清理由宿主决定。
 
-`scripts/launch-isolated.mjs` 使用本目录下的隔离 HOME/DSH_HOME；需设置 `DSH_SOURCE_DIR`。可通过 `DSH_OUTPUT_TEST_FIXTURE=1` 启用仅本地的合成流验证。该测试入口和测试适配器不进入安装包。
+## 宿主与平台范围
 
-验证范围与限制见 [VALIDATION.md](./VALIDATION.md)。
+| 检查范围 | 证据与限制 |
+| --- | --- |
+| macOS Intel，DSH 0.2.0-rc.2 | rc.4 已完成应用正式 CLI 全新隔离安装、配置合成和 Host 启动，运行文件与 rc.3 一致；设置保存、合成流、工具/文件操作、停止及历史重载沿用 rc.3 的历史 Web 验收 |
+| 0.2.0-rc.1 | 较早版本的历史验收基线，不代表 rc.4 本轮重新实测 |
+| 官方 rc.2 接口 | 静态对照上游 `dsh-v0.2.0-rc.2`：所用公开插槽、ConfigForm、助手属性及聊天 DOM 标记存在；没有发现必须依赖 Missher 专属接口的代码。纯官方发行版的运行验收未单独完成 |
+| Windows / Linux | 本插件未完成平台运行验收；桌面应用发布这些平台不等于插件已验收 |
+| 其他宿主版本 | 未实测，包括 0.2.1-alpha.1。宽松版本准入不是兼容性保证 |
 
-## 独立源码开发
+插件依赖 `conversation.chat.node` 的 `assistant-step`、`settings.section`、原生 Markdown/图片/文件回调和 rc.2 聊天 DOM 标记。React、Schemastery 及 DSH 客户端模块由宿主提供；开发 SDK 链接不会进入运行包。升级宿主后需重新核验这些接口，若设置页不出现，检查插件启用状态和宿主加载错误。
 
-运行包已包含 lib，使用时不需要开发环境。修改源码需 Node 和本仓库 packageManager 指定的 pnpm；先运行 `node scripts/link-harness.mjs /绝对路径/已构建的Missher-DSH-Inter`，再执行 `pnpm install --frozen-lockfile`，随后使用 package.json 中的 typecheck、build 和 test。SDK 链接只写本插件开发目录；harness-sdk 不提交、不进入安装包。
+完整证据见 [VALIDATION.md](./VALIDATION.md)。41 项逻辑测试、7 组受控 DOM 和历史 Web 检查属于不同层级；原生 Electron 点击、真实模型/图片端到端、完整本轮 Loader RPC 清单和持续硬件帧率未据此宣称通过。
+
+## 开发与署名
+
+当前独立源码仓库为 [Missher-DSH-Output-Renderer](https://github.com/Missher12/Missher-DSH-Output-Renderer)。克隆已带预构建 lib；开发 SDK 通过 `node scripts/link-harness.mjs /path/to/built-harness` 显式连接已构建的 0.2.0-rc.2 源码，随后用 pnpm 11 安装锁定开发依赖。构建环境要求以该 SDK 的 Node 要求为准。开发链接 `harness-sdk`、工作区 override 和测试适配器均不进入 tgz。
+
+执行 `pnpm typecheck`，并以 `pnpm test --maxWorkers=1` 串行运行测试。`pnpm build` 会写当前副本的 lib，因此维护时须在隔离副本构建；`pnpm pack:bundle` 只打包已准备好的 lib，并拒绝覆盖已有同名包。不要重建日常安装链接指向的目录。
+
+本插件使用 [MIT License](./LICENSE)，包含 DeepSeek Harness 的 workspace-path 辅助代码；原版权声明与完整许可见 [NOTICE.md](./NOTICE.md) 和 [上游 MIT 原文](./licenses/deepseek-harness-MIT.txt)。反馈请附宿主/插件版本、复现步骤和脱敏错误，不提交真实会话或凭据。

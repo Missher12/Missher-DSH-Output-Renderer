@@ -1,5 +1,21 @@
 # 验证记录
 
+## 2026-10-05 · MARKET rc.4 包装交付
+
+`0.1.3-rc.4` 只补充公开发行包装、中英文说明、上游 MIT 原文和署名。运行文件固定为已验收 rc.3 字节：`lib/index.js` SHA-256 `f9228fd3020670cca0d33eede8c7d283ebec519c53ab59d363dfb52336b6309a`，`lib/client.js` SHA-256 `bc7ce7dcd0440a71d8f699e5b739dd840fbc1ffe26176b8d8b9a192c7e0df05a`。本次没有重新构建或运行类型、逻辑、浏览器测试，下方 41 项测试和 Web 结果保留原日期。
+
+| 层级 | 本轮证据 |
+| --- | --- |
+| 包内容 | 最终包仅包含 manifest、Bundle patch、两个冻结运行文件、中英文 README、本文、LICENSE、NOTICE 和上游 MIT 原文，共 10 个文件；无 src/tests、开发 SDK、会话或凭据。独立 release 目录打包，既有候选不覆盖。 |
+| 应用 CLI 安装 | macOS Intel 上实际 0.2.0-rc.2 应用的正式 CLI 在全新 HOME/DSH_HOME 的 output-preview profile 安装 rc.4，Bundle 清单与配置合成包含 output-renderer；安装后两份运行文件与冻结 rc.3 逐字节一致。共享 peer 提示仍存在，不将该提示称为已消除。 |
+| Host 启动 | 沙盒内应用 CLI 与 SDK CLI 启动均出现 exit 13/unsettled top-level await，独立本机监听检查明确返回 EPERM。获准在另一全新隔离目录运行应用 CLI 后，Host 成功启动并仅监听 127.0.0.1；完成检查后正常停止。本轮没有读取完整 Loader RPC 清单，也没有浏览器点击，不能据启动日志声称全部 Loader 条目或前端交互通过。 |
+| 接口与许可证 | 静态对照本机上游 dsh-v0.2.0-rc.2 / 639ed015397290b3745d163aafe02ffee4aa3f84，所需公开插槽、助手属性和聊天 DOM 标记存在；上游 MIT 原文与该基线一致。未发现必须依赖 Missher 专属接口的代码，不代表纯官方发行版运行验收。 |
+| 变更隔离 | 本地工作树另有用户新要求的 src/tests UI 修订，作为 rc.5 候选独立保留；未进入 rc.4 运行包及其精准提交。日常 profile、会话和安装字节未写入。 |
+
+安装及启动使用先前冻结的 rc.4 候选；最终 release 仅更新说明文件，manifest、Bundle patch、许可证及运行文件与安装对象一致。包路径和校验值见本次交付记录及同名 .sha256；原候选 SHA-256 2f32d07c67dee039e55bbef0292e5b3363e61ebb05c309c43ea0770ecab148bc 保留，不再作为最终公开资产。
+
+本机证据位于 verification/market-20261005/，其中 rc4-runtime-approved/ 是成功的独立运行目录；两个失败尝试仅作环境诊断。尚未完成公开下载回读、市场投稿或合并、纯官方发行版、Windows/Linux、原生 Electron、真实模型/图片端到端及持续硬件帧率验收。
+
 ## 2026-10-03 · 全面复核与排版优化
 
 候选 `0.1.3-rc.3`。沿用四款布局和两种动效，修复停止、历史收尾、设置不可用和后台清理的实际问题。设置页改为等高两列卡片，说明文字均衡换行，保存状态移至标题旁；内容区小于等于 460 px 时自动单列。
