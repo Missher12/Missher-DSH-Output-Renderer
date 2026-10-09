@@ -131,7 +131,7 @@ A 只调整完整过程与末尾答复的视觉层次，不修改提示词或裁
 
 首轮 DOM 检查的布局切换失败来自测试夹具只改变闭包值、未通知 memo 组件重新渲染；已保留首次报告并修正夹具的 props 通知，复跑全部 7 组通过。没有为通过检查修改业务源码。当前证据中的 `client-boundaries.first-attempt.*` 与最终 `client-boundaries.*` 可区分此过程。
 
-仅更新 README、PROJECT_CONTEXT、DELIVERY、本文及协调回执。业务源码、测试源码、版本、原 lib 与 dist 均未修改；未构建或覆盖旧包、未写生产 profile、未重启应用、未执行 Git 写操作。完整职责与检查边界见 `/Users/missher/Documents/Deepseek-harness-Cordis/coordination/2026-09-28/render.md`。
+仅更新 README、PROJECT_CONTEXT、DELIVERY、本文及协调回执。业务源码、测试源码、版本、原 lib 与 dist 均未修改；未构建或覆盖旧包、未写生产 profile、未重启应用、未执行 Git 写操作。完整职责与检查边界见 本机 2026-09-28 协调回执（不随发行包分发）。
 
 ## 2026-09-27 实现验收（历史）
 
