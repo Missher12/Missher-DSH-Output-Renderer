@@ -22,6 +22,7 @@ function readableNodes(root: HTMLElement): Text[] {
   const nodes: Text[] = []
   let item
   while ((item = walker.nextNode())) {
+    if (item.parentElement?.closest('[data-code-block-banner],button,[role="button"],[aria-hidden="true"]')) continue
     if (item.parentElement?.closest('p,li,h1,h2,h3,h4,h5,h6,pre code,td,th')) nodes.push(item as Text)
   }
   return nodes
@@ -101,7 +102,10 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
     const next = nodes.map(node => node.data).join('')
     const old = previous.current
     previous.current = next
-    if (old === null || next === old || !next.startsWith(old) || typeof layer.animate !== 'function') return
+    if (old === null || next === old) return
+    // Corrections and Markdown reparsing can move or remove previously shaded glyphs.
+    if (!next.startsWith(old)) { clearFade(); return }
+    if (typeof layer.animate !== 'function') return
     const from = Math.max(old.length, next.length - 640)
     const rect = layer.getBoundingClientRect()
     let offset = 0

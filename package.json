@@ -1,6 +1,6 @@
 {
   "name": "@missher/dsh-output-renderer",
-  "version": "0.1.3-rc.4",
+  "version": "0.1.3-rc.5",
   "description": "Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text.",
   "type": "module",
   "license": "MIT",

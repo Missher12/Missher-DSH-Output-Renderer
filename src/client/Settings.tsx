@@ -41,11 +41,14 @@ export function Settings({ useOutputPreferences, setPreference, t }: Props) {
     frame.current = requestAnimationFrame(tick)
   }
   const disabled = state.saving || !state.ready || !state.writable
+  const statusKey = state.status === 'loading' ? 'loading'
+    : state.status === 'unavailable' || !state.writable ? 'unavailable'
+      : state.error ? 'failed' : state.saving ? 'saving' : 'saved'
   return <div className="dsh-output-settings">
     <div className="dsh-output-settings-header">
       <h2>{t('section')}</h2>
-      <div className="dsh-output-settings-status" role="status" data-error={state.error || undefined}>
-        {state.error ? t('failed') : state.status === 'loading' ? t('loading') : !state.writable || state.status === 'unavailable' ? t('unavailable') : state.saving ? t('saving') : t('saved')}
+      <div className="dsh-output-settings-status" role="status" data-error={statusKey === 'failed' || undefined}>
+        {t(statusKey)}
       </div>
     </div>
     <p className="dsh-output-intro">{t('intro')}</p>
