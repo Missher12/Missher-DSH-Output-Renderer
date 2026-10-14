@@ -1,10 +1,10 @@
 # Missher DSH Output Renderer
 
-[简体中文](./README.md) · [Prebuilt downloads](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [Desktop app](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [Issues](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
+[简体中文](./README.md) · [Prebuilt downloads](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/latest) · [Desktop app](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [Issues](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the current prerelease is **0.1.3-rc.5**. This removable UI plugin requires an existing DSH host.
+Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the current formal release is **0.1.3-rc.5**. This removable UI plugin requires an existing DSH host.
 
-rc.5 is an independent UI update. It adjusts heading hierarchy, label spacing and narrow settings rows, and fixes stale fade masks, toolbar text inclusion and connection-status priority. It inherits rc.4 packaging and licensing with changed runtime code. The 47 tests, type checks and isolated Host loading passed. Real-page visual acceptance, native interactions and sustained frame rates remain unverified, so this is a prerelease.
+rc.5 is an independent UI update. It adjusts heading hierarchy, label spacing and narrow settings rows, and fixes stale fade masks, toolbar text inclusion and connection-status priority. It inherits rc.4 packaging and licensing with changed runtime code. The 47 tests, type checks and isolated Host loading passed. Full real-page visual acceptance, native interactions and sustained frame rates remain unverified. The current GitHub Release is not marked as a prerelease; its original rc.5 identity and these validation limits are preserved.
 
 ## Features
 
@@ -24,7 +24,7 @@ Use **Settings → Output appearance** to choose the layout, 14/16 px text, comf
 
 ## Install, enable, disable and uninstall
 
-Use a prebuilt `.tgz` from [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases); available release assets determine what is published. The rc.5 filename is `missher-dsh-output-renderer-0.1.3-rc.5.tgz`, with a matching `.tgz.sha256` file. The installation steps below use the downloaded tgz directly and do not depend on npm package-name resolution.
+Use a prebuilt `.tgz` from [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/latest); available release assets determine what is published. The rc.5 filename is `missher-dsh-output-renderer-0.1.3-rc.5.tgz`, with a matching `.tgz.sha256` file. The installation steps below use the downloaded tgz directly and do not depend on npm package-name resolution.
 
 1. Download the chosen tgz and checksum file. For rc.5, verify with `shasum -a 256 -c missher-dsh-output-renderer-0.1.3-rc.5.tgz.sha256`.
 2. In the desktop app, open **Plugins → Add plugin**, enter the downloaded file's full path, then install and enable the plugin. Follow any reload prompt and open **Settings → Output appearance**.
@@ -48,17 +48,20 @@ It reads existing assistant content for display, creates no separate session dat
 
 ## Host and platform scope
 
+Maintenance targets a reasonable DSH version range and continued adaptation to the latest release. Support depends on public slots, UI callbacks and chat DOM capabilities; a tested baseline is not the only intended compatible version. This archive retains historical exact Cordis / Schemastery peers. Dependency resolution and interface compatibility need separate verification; documentation changes do not broaden dependencies or establish all-version support.
+
 | Scope | Evidence and limits |
 | --- | --- |
 | Intel macOS, DSH 0.2.0-rc.2 | rc.5 passed fresh isolated app CLI installation, configuration composition, Host startup and runtime hash checks; 47 tests and seven controlled DOM groups passed. Real-page visual acceptance was blocked in this run |
 | 0.2.0-rc.1 | A historical baseline for earlier versions; not a new rc.5 platform run |
 | Official rc.2 interfaces | Static comparison with upstream `dsh-v0.2.0-rc.2` confirms the required public slots, ConfigForm, assistant props and chat DOM markers. No required Missher-only interface was identified. A separate runtime acceptance test of the unmodified official distribution has not been completed |
-| Windows / Linux | No plugin-specific runtime acceptance. Desktop downloads for those platforms do not establish plugin acceptance |
+| Ubuntu / Missher Desktop `0.2.1-alpha.2.20261014.1` | Installed and active, with public runtime files matching the installation. Full visual and interaction acceptance remains a separate layer |
+| Other platforms | Full native plugin acceptance is unverified. Desktop availability does not prove all plugin features |
 | Other host versions | Untested, including 0.2.1-alpha.1. Permissive version admission is not a compatibility guarantee |
 
-The renderer uses `conversation.chat.node` / `assistant-step`, `settings.section`, native Markdown/image/file callbacks and version-related rc.2 chat DOM markers. The host supplies React, Schemastery and DSH client modules; development SDK links are excluded from the runtime package. Recheck these interfaces after host upgrades. If the settings entry is absent, check whether the plugin is enabled and inspect host loading errors.
+The renderer uses `conversation.chat.node` / `assistant-step`, `settings.section`, native Markdown/image/file callbacks and the corresponding chat DOM markers; rc.2 is a previously inspected baseline. The host supplies React, Schemastery and DSH client modules; development SDK links are excluded from the runtime package. Recheck these interfaces after host upgrades. If the settings entry is absent, check whether the plugin is enabled and inspect host loading errors.
 
-See [VALIDATION.md](./VALIDATION.md) for dated evidence. The current 47 logic tests, seven controlled DOM groups and historical Web checks are separate evidence layers. They do not establish native Electron clicking, real-model/image end-to-end behavior, a full current Loader RPC inventory or sustained hardware frame rates.
+See [VALIDATION.md](./VALIDATION.md) for dated evidence and [Latest](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/latest) for the formal download. Existing archives and tags retain their build-time snapshots; this documentation update does not repack them. The current 47 logic tests, seven controlled DOM groups and historical Web checks are separate evidence layers. They do not establish native Electron clicking, real-model/image end-to-end behavior, a full current Loader RPC inventory or sustained hardware frame rates.
 
 ## Development and attribution
 

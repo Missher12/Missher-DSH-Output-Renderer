@@ -1,10 +1,10 @@
 # Missher DSH Output Renderer · 输出外观
 
-[English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
+[English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/latest) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-为 DeepSeek Harness 提供四种助手输出布局、完整思考展示，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，当前预发布版本 **0.1.3-rc.5**。这是可卸载的界面插件，需要已有 DSH 宿主。
+为 DeepSeek Harness 提供四种助手输出布局、完整思考展示，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，当前正式交付版本 **0.1.3-rc.5**。这是可卸载的界面插件，需要已有 DSH 宿主。
 
-rc.5 是独立 UI 更新：统一标题层次、标签留白及窄栏设置排版，修复正文修正后的淡入遮罩、工具栏误参与动效和连接状态提示。继承 rc.4 包装与许可证；运行代码已有变化。47 项测试、类型检查与隔离 Host 加载已通过；本轮真实页面视觉、原生交互与持续帧率仍未验收，发布为预发布版本。
+rc.5 是独立 UI 更新：统一标题层次、标签留白及窄栏设置排版，修复正文修正后的淡入遮罩、工具栏误参与动效和连接状态提示。继承 rc.4 包装与许可证；运行代码已有变化。47 项测试、类型检查与隔离 Host 加载已通过；完整真实页面视觉、原生交互与持续帧率仍未验收。GitHub 当前 Release 未标记预发布，保留原始 rc.5 版本名及这些验证边界。
 
 ## 功能
 
@@ -24,7 +24,7 @@ rc.5 是独立 UI 更新：统一标题层次、标签留白及窄栏设置排�
 
 ## 安装、启停与卸载
 
-推荐使用 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 中的预构建 `.tgz`，版本以实际发布资产为准。rc.5 文件名为 `missher-dsh-output-renderer-0.1.3-rc.5.tgz`，校验文件为同名 `.tgz.sha256`。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。
+推荐使用 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/latest) 中的预构建 `.tgz`，版本以实际发布资产为准。rc.5 文件名为 `missher-dsh-output-renderer-0.1.3-rc.5.tgz`，校验文件为同名 `.tgz.sha256`。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。
 
 1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.1.3-rc.5.tgz.sha256` 核对下载字节。
 2. 桌面版进入 **插件 → 添加插件**，填入下载文件的完整路径，安装并启用本插件。按宿主提示重新加载后，进入 **设置 → 输出外观**。
@@ -48,17 +48,20 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 ## 宿主与平台范围
 
+兼容维护以支持合理的 DSH 版本范围并持续适配最新版为目标。按公开插槽、UI 回调与聊天 DOM 能力判断；测试基线不是唯一可用版本。当前包仍有 Cordis / Schemastery 的历史精确 peer 声明，依赖解析和接口回归需分别核对，文档更新不等于放宽依赖或验证了所有版本。
+
 | 检查范围 | 证据与限制 |
 | --- | --- |
 | macOS Intel，DSH 0.2.0-rc.2 | rc.5 已完成正式 CLI 全新隔离安装、配置合成、Host 启动和运行文件哈希比对；47 项测试及 7 组受控 DOM 通过。本轮未完成真实页面视觉复验 |
 | 0.2.0-rc.1 | 较早版本的历史验收基线，不代表 rc.5 本轮重新实测 |
 | 官方 rc.2 接口 | 静态对照上游 `dsh-v0.2.0-rc.2`：所用公开插槽、ConfigForm、助手属性及聊天 DOM 标记存在；没有发现必须依赖 Missher 专属接口的代码。纯官方发行版的运行验收未单独完成 |
-| Windows / Linux | 本插件未完成平台运行验收；桌面应用发布这些平台不等于插件已验收 |
+| Ubuntu / Missher Desktop `0.2.1-alpha.2.20261014.1` | 已安装并激活，公开包运行文件与本机一致；完整视觉和交互验收仍单独记录 |
+| 其他平台 | 未完成完整插件原生验收；桌面应用发布不等于插件所有功能已验收 |
 | 其他宿主版本 | 未实测，包括 0.2.1-alpha.1。宽松版本准入不是兼容性保证 |
 
-插件依赖 `conversation.chat.node` 的 `assistant-step`、`settings.section`、原生 Markdown/图片/文件回调和 rc.2 聊天 DOM 标记。React、Schemastery 及 DSH 客户端模块由宿主提供；开发 SDK 链接不会进入运行包。升级宿主后需重新核验这些接口，若设置页不出现，检查插件启用状态和宿主加载错误。
+插件依赖 `conversation.chat.node` 的 `assistant-step`、`settings.section`、原生 Markdown/图片/文件回调和相应聊天 DOM 标记；rc.2 是已检查的历史基线。React、Schemastery 及 DSH 客户端模块由宿主提供；开发 SDK 链接不会进入运行包。升级宿主后需重新核验这些接口，若设置页不出现，检查插件启用状态和宿主加载错误。
 
-完整证据见 [VALIDATION.md](./VALIDATION.md)。本轮 47 项逻辑测试、7 组受控 DOM 和历史 Web 检查属于不同层级；原生 Electron 点击、真实模型/图片端到端、完整本轮 Loader RPC 清单和持续硬件帧率未据此宣称通过。
+历史验证证据见 [VALIDATION.md](./VALIDATION.md)。当前正式下载以 [Latest](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/latest) 为准；既有归档和标签保持构建时快照，未因文档更新重新打包。本轮 47 项逻辑测试、7 组受控 DOM 和历史 Web 检查属于不同层级；原生 Electron 点击、真实模型/图片端到端、完整本轮 Loader RPC 清单和持续硬件帧率未据此宣称通过。
 
 ## 开发与署名
 
