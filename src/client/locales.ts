@@ -24,6 +24,7 @@ export const en = {
   saving: 'Saving…', saved: 'Saved', loading: 'Loading settings…', unavailable: 'Settings cannot be saved on this connection.',
   failed: 'Could not save. The previous setting has been restored.',
   thinking: 'Thinking', answer: 'Response', stopped: 'Stopped', preview: 'Preview', replay: 'Replay output',
+  imagesUnavailable: 'Image preview is unavailable in this host version.',
   sample: 'Every style keeps the complete answer.\n\nAdjust spacing and text size to read comfortably. New text appears smoothly; code, files and tool actions remain available.',
   copy: 'Copy', copied: 'Copied', code: 'Code', wrap: 'Wrap', unwrap: 'Unwrap', footnotes: 'Footnotes',
 }
@@ -50,6 +51,7 @@ export const zh: Record<keyof typeof en, string> = {
   saving: '正在保存…', saved: '已保存', loading: '正在读取设置…', unavailable: '当前连接无法保存设置。',
   failed: '保存失败，已恢复此前的设置。',
   thinking: '思考过程', answer: '回复', stopped: '已停止', preview: '效果预览', replay: '重播输出',
+  imagesUnavailable: '当前宿主版本不提供图片预览。',
   sample: '所有风格都保留完整回复。\n\n调整间距与字号，让长文更易阅读。新增文字平滑出现，代码、文件与工具操作保持可用。',
   copy: '复制', copied: '已复制', code: '代码', wrap: '自动换行', unwrap: '取消换行', footnotes: '脚注',
 }

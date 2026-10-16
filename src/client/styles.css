@@ -62,7 +62,10 @@ html[data-dsh-output-renderer="checklist"] [data-chat-group-key] [data-chat-flow
 .dsh-output-settings .dsh-output-choice { min-width: 0; height: auto; align-items: stretch; justify-content: flex-start; display: flex; flex-direction: column; gap: 6px; padding: 14px; text-align: left; white-space: normal; }
 .dsh-output-options .dsh-output-choice { display: grid; grid-template-columns: 48px minmax(0,1fr); align-items: center; gap: 14px; min-height: 96px; }
 .dsh-output-choice-copy { min-width: 0; display: grid; gap: 4px; }
-.dsh-output-choice-copy .dsh-output-description { text-wrap: balance; }
+/* Keep CJK words whole while there is room: balanced or greedy breaking can otherwise split a
+   short term such as "编号" across two lines inside a settings card. Narrow containers reset this
+   below so a long run can never overflow a very small column. */
+.dsh-output-settings .dsh-output-description { word-break: keep-all; }
 .dsh-output-settings button[aria-pressed="true"] { border-color: var(--dsw-alias-link); background: color-mix(in srgb, var(--dsw-alias-link) 6%, var(--dsw-alias-bg-layer-1)); }
 .dsh-output-settings button:focus-visible { outline: 2px solid var(--dsw-alias-link); outline-offset: 3px; }
 .dsh-output-choice-name { font-size: 13px; line-height: 1.5; font-weight: 500; }
@@ -96,7 +99,11 @@ html[data-dsh-output-renderer="checklist"] [data-chat-group-key] [data-chat-flow
 .dsh-output-preview-tools { margin-top: 10px; font-size: 13px; line-height: 1.7; color: var(--dsw-alias-label-secondary); }
 .dsh-output-preview-tools summary { cursor: pointer; }
 .dsh-output-preview-tools p { margin: 8px 0 0; }
-@container (max-width: 460px) { .dsh-output-options, .dsh-output-motions { grid-template-columns: minmax(0,1fr); } }
+@container (max-width: 460px) {
+  .dsh-output-options, .dsh-output-motions { grid-template-columns: minmax(0,1fr); }
+  /* A single narrow column must be free to break anywhere; whole CJK words would overflow it. */
+  .dsh-output-settings .dsh-output-description { word-break: normal; }
+}
 @container (max-width: 320px) {
   .dsh-output-fields { padding-inline: 12px; }
   .dsh-output-fields .dsh-output-field { align-items: flex-start; }
@@ -105,5 +112,29 @@ html[data-dsh-output-renderer="checklist"] [data-chat-group-key] [data-chat-flow
   .dsh-output-options .dsh-output-choice { grid-template-columns: 36px minmax(0,1fr); gap: 10px; padding: 12px; }
   .dsh-output-preview { padding: 12px; }
   .dsh-output-preview-header { flex-wrap: wrap; }
+}
+/* Below this width the decorative thumbnail, its gap and the card padding leave the copy under
+   ~8 CJK characters — the state measured at a 101 px settings column inside a 390 px viewport.
+   The thumbnail stacks above the copy instead of holding a text column, and every padding this
+   plugin owns is reduced. Nothing is clipped and no host rule is overridden outside this container. */
+@container (max-width: 200px) {
+  .dsh-output-settings-header { gap: 4px 8px; }
+  .dsh-output-settings-header > * { min-width: 0; }
+  .dsh-output-settings h2, .dsh-output-settings-status { overflow-wrap: break-word; }
+  .dsh-output-settings .dsh-output-choice { min-height: 0; padding: 10px; }
+  .dsh-output-options .dsh-output-choice { grid-template-columns: minmax(0,1fr); gap: 8px; }
+  .dsh-output-mini { min-height: 24px; padding: 2px 0; }
+  .dsh-output-choice-copy { gap: 2px; }
+  .dsh-output-choice-name, .dsh-output-description { overflow-wrap: break-word; }
+  .dsh-output-fields { padding-inline: 8px; }
+  .dsh-output-fields .dsh-output-field { padding: 10px 0; }
+  /* The status capsule is `nowrap` by host design; in this column it must wrap to stay readable. */
+  .dsh-output-fields .dsh-output-field > :last-child { max-width: 100%; min-width: 0; white-space: normal; }
+  .dsh-output-controls { gap: 6px; }
+  /* A wrapped label must grow its control instead of overflowing the fixed control height. */
+  .dsh-output-controls > * { height: auto; min-height: 28px; max-width: 100%; min-width: 0; }
+  .dsh-output-preview { padding: 8px; }
+  .dsh-output-preview-header { gap: 6px; margin-bottom: 12px; }
+  .dsh-output-preview-header > * { max-width: 100%; min-width: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .dsh-output-fade-layer { display: none; } }

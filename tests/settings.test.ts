@@ -104,3 +104,89 @@ test.each(['split', 'timeline', 'compact'] as const)('legacy %s loads in the Hos
   expect(accepted.density.get()).toBe('tight')
   expect(accepted.textSize.get()).toBe('large')
 })
+
+/** Legacy hosts may send a discriminator outside the union this build knows about. */
+const legacyMode = (value: string) => value as ConfigFormSnapshot<Preferences>['mode']
+
+type NewerSnapshot = Omit<ConfigFormSnapshot<Preferences>, 'mode'>
+
+/**
+ * Official alpha.5 snapshot shape: `mode` is gone, so `writable` is the whole contract. The
+ * pinned rc.2 development SDK still declares the field, hence the cast — the point of these
+ * cases is that an absent field is the newer contract, not a missing capability.
+ */
+function newerForm(accept = true, initial: Partial<NewerSnapshot> = {}) {
+  let snapshot: NewerSnapshot = { value: { ...DEFAULTS }, base: DEFAULTS, user: {}, revision: 0,
+    writable: true, status: 'ready', ...initial }
+  const subscribers = new Set<() => void>()
+  const writes: [string, unknown][] = []
+  const api = {
+    getSnapshot: () => snapshot,
+    subscribe: (listener: () => void) => { subscribers.add(listener); return () => { subscribers.delete(listener) } },
+    async set(field: string, value: unknown) {
+      writes.push([field, value])
+      if (accept) snapshot = { ...snapshot, value: { ...snapshot.value, [field]: value } as Preferences, revision: (snapshot.revision ?? 0) + 1 }
+      subscribers.forEach(listener => listener())
+      return accept
+    },
+    async mutate() { return false }, async unset() { return false },
+  } as unknown as ConfigForm<Preferences>
+  return { api, writes,
+    sync: (value: Partial<NewerSnapshot>) => { snapshot = { ...snapshot, ...value }; subscribers.forEach(listener => listener()) } }
+}
+
+test('an alpha.5 snapshot without mode follows the Host writable flag', async () => {
+  const host = newerForm()
+  const control = createPreferences(host.api)
+  expect(control.store.getSnapshot()).toMatchObject({ status: 'ready', ready: true, writable: true })
+  await control.set('layout', 'cards')
+  expect(host.writes).toEqual([['layout', 'cards']])
+  expect(control.store.getSnapshot()).toMatchObject({ value: { layout: 'cards' }, error: false, saving: false })
+  control.dispose()
+})
+
+test('an alpha.5 snapshot without mode still refuses writes when the Host read-only flag is set', async () => {
+  const host = newerForm(true, { writable: false })
+  const control = createPreferences(host.api)
+  expect(control.store.getSnapshot()).toMatchObject({ ready: true, writable: false })
+  await control.set('layout', 'cards')
+  expect(host.writes).toEqual([])
+  control.dispose()
+})
+
+test('a refused alpha.5 write restores accepted appearance and exposes failure', async () => {
+  const host = newerForm(false)
+  const control = createPreferences(host.api)
+  await control.set('layout', 'cards')
+  expect(control.store.getSnapshot()).toMatchObject({ value: DEFAULTS, error: true, saving: false })
+  control.dispose()
+})
+
+test('an alpha.5 snapshot that arrives after loading starts saving again', async () => {
+  const host = newerForm(true, { value: undefined, status: 'loading', writable: false })
+  const control = createPreferences(host.api)
+  expect(control.store.getSnapshot()).toMatchObject({ status: 'loading', ready: false, writable: false })
+  await control.set('layout', 'cards')
+  expect(host.writes).toEqual([])
+  host.sync({ value: DEFAULTS, status: 'ready', writable: true })
+  await control.set('layout', 'cards')
+  expect(control.store.getSnapshot()).toMatchObject({ status: 'ready', ready: true, value: { layout: 'cards' } })
+  control.dispose()
+})
+
+test.each(['memory', 'host ', '', 'remote'])('a declared non-host legacy mode %j stays read-only even when the flag claims writable', async mode => {
+  const host = form(true, { writable: true, mode: legacyMode(mode) })
+  const control = createPreferences(host.api)
+  expect(control.store.getSnapshot()).toMatchObject({ ready: true, writable: false })
+  await control.set('layout', 'cards')
+  expect(host.writes).toEqual([])
+  control.dispose()
+})
+
+test('a declared host mode keeps writing while the flag stays writable', async () => {
+  const host = form(true, { writable: true, mode: 'host' })
+  const control = createPreferences(host.api)
+  await control.set('layout', 'cards')
+  expect(host.writes).toEqual([['layout', 'cards']])
+  control.dispose()
+})

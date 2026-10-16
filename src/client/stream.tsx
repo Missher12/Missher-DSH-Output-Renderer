@@ -42,7 +42,11 @@ function backgroundAt(node: HTMLElement): string {
  * Compositor opacity layers cover only newly appended glyph rectangles. No text
  * node splitting, HTML mutation, or reanimation of already-read paragraphs.
  * Ranges are measured once per received/rendered chunk, never per animation frame.
+ * Live shades are held in a Map so the cap can drop a mask and its node synchronously:
+ * a native `cancel()` reports back through `oncancel` asynchronously, which is too late to bound growth.
  */
+const FADE_SHADE_LIMIT = 96
+
 export function StreamMarkdown({ text, running, motion, labels, mentions, pathImages, compact = false }: {
   text: string; running: boolean; motion: Motion; labels: MarkdownLabels
   mentions?: MarkdownFileMentions | undefined; pathImages?: MarkdownPathImages | undefined; compact?: boolean
@@ -53,10 +57,14 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
   const content = useRef<HTMLDivElement>(null)
   const overlay = useRef<HTMLDivElement>(null)
   const previous = useRef(running ? '' : null as string | null)
-  const active = useRef(new Set<Animation>())
+  const active = useRef(new Map<Animation, HTMLElement>())
   const clearFade = useCallback(() => {
-    for (const animation of active.current) animation.cancel()
+    const shades = [...active.current]
     active.current.clear()
+    for (const [animation, shade] of shades) {
+      shade.remove()
+      animation.cancel()
+    }
     overlay.current?.replaceChildren()
   }, [])
 
@@ -124,11 +132,22 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
             top: `${part.top - rect.top}px`, width: `${part.width}px`, height: `${part.height}px`, background })
           layer.append(shade)
           const animation = shade.animate([{ opacity: 0.85 }, { opacity: 0 }], { duration: 200, easing: 'ease-out', fill: 'forwards' })
-          active.current.add(animation)
-          const clear = () => { shade.remove(); active.current.delete(animation) }
+          const clear = () => {
+            if (active.current.get(animation) !== shade) return
+            active.current.delete(animation)
+            shade.remove()
+          }
+          active.current.set(animation, shade)
           animation.onfinish = clear
           animation.oncancel = clear
-          if (active.current.size > 96) active.current.values().next().value?.cancel()
+          // Retire the oldest mask here and now; waiting for its cancel event would let the cap drift.
+          while (active.current.size > FADE_SHADE_LIMIT) {
+            const oldest = active.current.entries().next().value
+            if (oldest === undefined) break
+            active.current.delete(oldest[0])
+            oldest[1].remove()
+            oldest[0].cancel()
+          }
         }
         range.detach()
       }
@@ -137,19 +156,23 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
     }
   }, [shown, running, motion, reduced, clearFade])
   useLayoutEffect(() => {
-    const animations = active.current
-    const layer = overlay.current
+    const retire = () => {
+      for (const [animation, shade] of [...active.current]) {
+        shade.remove()
+        animation.cancel()
+      }
+      active.current.clear()
+    }
     let width = content.current?.getBoundingClientRect().width
     const resize = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(entries => {
       const next = entries[0]?.contentRect.width
       if (next === width) return
       width = next
-      for (const animation of animations) animation.cancel()
-      animations.clear()
-      layer?.replaceChildren()
+      retire()
+      overlay.current?.replaceChildren()
     })
     if (content.current) resize?.observe(content.current)
-    return () => { resize?.disconnect(); for (const animation of animations) animation.cancel(); animations.clear() }
+    return () => { resize?.disconnect(); retire() }
   }, [])
   return <div className="dsh-output-stream" data-output-motion={motion}>
     <div ref={content} data-output-text>

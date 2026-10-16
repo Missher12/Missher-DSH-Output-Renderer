@@ -15,13 +15,34 @@ export interface OutputInjected {
   hooks: { outputPreferences: ObservableSnapshot<ReturnType<PreferencesController['store']['getSnapshot']>> }
   outputText: Translate
 }
-type Props = ChatNodeViewProps<'assistant-step'> & InjectFace<OutputInjected>
+type ChatProps = ChatNodeViewProps<'assistant-step'> & InjectFace<OutputInjected>
+/** Image group currency the running Chat owner hands down; identical in both supported hosts. */
+type ImageGroup = Parameters<ChatProps['renderMessageImages']>[0]['images']
+/**
+ * The one shared-gallery call this file needs. The host seat stays generic — it is typed for the
+ * Factory names its own SDK registers, and the pinned rc.2 development SDK does not register
+ * `conversation.images.content` at all. So this signature is never intersected into the registered
+ * component's props: beside the host's own seat `Props` declares only an optional `unknown`
+ * Factory seat, which accepts whatever signature either host actually hands out, and the runtime
+ * probe narrows the local function here. That call also receives a `fallback`, because the host
+ * answers an unregistered Factory name with `fallback ?? null` and an unregistered gallery must
+ * never look like an answer that simply had no images.
+ */
+type SharedGalleryCall = (
+  name: 'conversation.images.content',
+  props: { images: ImageGroup; loadImage: ChatProps['loadImage']; align: 'start' | 'end' },
+  options: { fallback: ReactNode },
+) => ReactNode
+type Props = ChatProps & { renderFactorySlot?: unknown }
 
 export const Assistant = memo(function Assistant({ node, groupPart, useTurnData, openFile, renderMessageImages,
-  fileMentions, useOutputPreferences, outputText, t }: Props) {
+  renderFactorySlot, loadImage, fileMentions, useOutputPreferences, outputText, t }: Props) {
   const { motion, layout, density, textSize } = useOutputPreferences(state => state.value)
   const data = node.data
   const running = data.status === 'running'
+  // Only the final block can still grow. Earlier blocks are closed by the block after them,
+  // so frame buffering must settle them instead of holding their last grapheme until the step ends.
+  const streamingIndex = running ? data.blocks.length - 1 : -1
   const turn = node.location.kind === 'turn' || node.location.kind === 'step' ? node.location.turn : undefined
   const tail = useTurnData('turn-tail')
   const owner = useMemo<TurnTailOwnerProps | undefined>(() => {
@@ -38,6 +59,31 @@ export const Assistant = memo(function Assistant({ node, groupPart, useTurnData,
     catch (_error) { return undefined }
     return fileMediaUrl(document.baseURI, path)
   } }), [])
+  /**
+   * Render one image group through whichever gallery the running host publishes.
+   * The rc.2 closure is preferred: it routes through the Chat owner's own
+   * `conversation.message.images` Slot, so replacing that Slot keeps working.
+   * Official alpha.5 dropped the closure and publishes the shared
+   * `conversation.images.content` Content Factory instead; calling the Factory
+   * deliberately bypasses Slot replacement and always reaches the host gallery.
+   * A host that publishes no gallery at all gets this note in place of the images —
+   * losing a picture silently would misrepresent the reply.
+   */
+  const imagesNote = <span className="dsh-output-stopped">{outputText('imagesUnavailable')}</span>
+  const renderImages = useMemo(() => {
+    if (typeof renderMessageImages === 'function') {
+      return (images: ImageGroup): ReactNode => renderMessageImages({ images, align: 'start' })
+    }
+    if (typeof renderFactorySlot === 'function' && typeof loadImage === 'function') {
+      // The seat is generic over the host's own Factory names, so the single call this file makes
+      // is narrowed locally through `unknown` rather than by narrowing the public props type.
+      const factory = renderFactorySlot as unknown as SharedGalleryCall
+      const load = loadImage
+      return (images: ImageGroup): ReactNode =>
+        factory('conversation.images.content', { images, loadImage: load, align: 'start' }, { fallback: imagesNote })
+    }
+    return undefined
+  }, [renderMessageImages, renderFactorySlot, loadImage, imagesNote])
   const reasoning: ReactNode[] = []
   const response: ReactNode[] = []
   for (let index = 0; index < data.blocks.length; index++) {
@@ -46,11 +92,11 @@ export const Assistant = memo(function Assistant({ node, groupPart, useTurnData,
       || (groupPart === 'response' && block.kind === 'reasoning')) continue
     if (block.kind === 'reasoning') {
       if (!block.text.trim()) continue
-      reasoning.push(<StreamMarkdown key={index} text={block.text} running={running && index === data.blocks.length - 1}
+      reasoning.push(<StreamMarkdown key={index} text={block.text} running={index === streamingIndex}
         motion={motion} labels={labels} compact />)
     } else if (block.kind === 'text') {
       if (!block.text.trim()) continue
-      response.push(<StreamMarkdown key={index} text={block.text} running={running} motion={motion} labels={labels}
+      response.push(<StreamMarkdown key={index} text={block.text} running={index === streamingIndex} motion={motion} labels={labels}
         mentions={mentions} pathImages={pathImages} />)
     } else if (block.kind === 'image') {
       const first = index
@@ -59,7 +105,7 @@ export const Assistant = memo(function Assistant({ node, groupPart, useTurnData,
         const next = data.blocks[++index]!
         if (next.kind === 'image') images.push({ attachment: next.attachment })
       }
-      response.push(<Fragment key={first}>{renderMessageImages({ images, align: 'start' })}</Fragment>)
+      response.push(<Fragment key={first}>{renderImages ? renderImages(images) : imagesNote}</Fragment>)
     } else {
       response.push(<JsonBlock key={index} label={t('message.unknownBlock')} payload={block.block}
         truncatedLabel={total => t('json.truncated', { total })} />)
