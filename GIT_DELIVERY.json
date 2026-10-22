@@ -3,7 +3,7 @@
   "date": "2026-10-22",
   "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
   "sourceBaseCommit": "186aadd5644c6671c87b581b29138bff9bbcb19d",
-  "status": "runtime source and targeted community RC.2 Web UI accepted; documentation-only correction package pending",
+  "status": "source, unchanged runtime, targeted community RC.2 Web UI and final 0.1.5 archive accepted; release/install separate",
   "runtimeFiles": [
     {
       "path": "lib/index.js",
@@ -65,5 +65,9 @@
     "commit": "186aadd5644c6671c87b581b29138bff9bbcb19d",
     "releasePublished": false,
     "reason": "Correct unsupported official-host provenance wording without rewriting public tag"
-  }
+  },
+  "archive": "missher-dsh-output-renderer-0.1.5.tgz",
+  "sha256": "78e44b45e723c41e59f45c35b4312d182fdf217a937ff7e06236ff918dcc1e0d",
+  "bytes": 42103,
+  "members": 10
 }
