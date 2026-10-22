@@ -3,7 +3,7 @@
   "date": "2026-10-22",
   "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
   "sourceBaseCommit": "186aadd5644c6671c87b581b29138bff9bbcb19d",
-  "status": "source, unchanged runtime, targeted community RC.2 Web UI and final 0.1.5 archive accepted; release/install separate",
+  "status": "formal Release published; Ubuntu daily installation and active plugin verified; other native platforms unverified",
   "runtimeFiles": [
     {
       "path": "lib/index.js",
@@ -69,5 +69,27 @@
   "archive": "missher-dsh-output-renderer-0.1.5.tgz",
   "sha256": "78e44b45e723c41e59f45c35b4312d182fdf217a937ff7e06236ff918dcc1e0d",
   "bytes": 42103,
-  "members": 10
+  "members": 10,
+  "published": true,
+  "release": {
+    "url": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.5",
+    "id": 420309764,
+    "tag": "v0.1.5",
+    "commit": "04edc228daf885eddf291f9aadf8e9cf2e1ae464",
+    "draft": false,
+    "prerelease": false,
+    "anonymousDownloadsMatched": true
+  },
+  "installation": {
+    "platform": "Ubuntu",
+    "version": "0.1.5",
+    "exactArchiveMembersMatched": 10,
+    "enabled": true,
+    "fiberPhase": "active",
+    "preferencesPreserved": true,
+    "coldRollbackBackupVerified": true,
+    "hostChanged": false,
+    "otherPluginVersionsChanged": false,
+    "scope": "Local installed community RC.2; not a claim for unmodified official Host or every platform"
+  }
 }
