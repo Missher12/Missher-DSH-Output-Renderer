@@ -6,6 +6,19 @@
 .dsh-output-label { margin-bottom: 8px; font-size: var(--dsh-content-font-size-secondary, 13px); line-height: 1.5; color: var(--dsw-alias-label-secondary); font-weight: 500; }
 .dsh-output-reasoning { padding-left: 16px; border-left: 0.5px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-secondary); }
 .dsh-output-reasoning [data-reasoning-full] { display: grid; gap: var(--output-space); }
+/* Concise chat folds the reasoning behind a lightweight status row. The row and the body are
+   shared by the live seat and the settings preview, so both fold identically. Concise chat adds no
+   card box, shadow, or repeated answer label; the other layouts keep their own chrome. */
+.dsh-output-thinking { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.dsh-output-thinking-toggle { align-self: flex-start; display: flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; margin: 0; padding: 2px 4px 2px 0; border: 0; border-radius: var(--dsw-radius-xs); background: none; color: var(--dsw-alias-label-secondary); font: inherit; font-size: var(--dsh-content-font-size-secondary, 13px); line-height: 1.5; text-align: left; cursor: pointer; }
+.dsh-output-thinking-toggle:hover { color: var(--dsw-alias-label-primary); }
+.dsh-output-thinking-toggle:focus-visible { outline: 2px solid var(--dsw-alias-link); outline-offset: 2px; }
+.dsh-output-thinking-arrow { flex: none; width: 0; height: 0; border-left: 4px solid currentColor; border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent; transition: transform .12s ease; }
+.dsh-output-thinking-toggle[aria-expanded="true"] .dsh-output-thinking-arrow { transform: rotate(90deg); }
+.dsh-output-thinking-state { min-width: 0; overflow-wrap: break-word; }
+/* This body is plugin-owned, never a host row: keep it hidden against any host or global display rule. */
+.dsh-output-assistant .dsh-output-thinking-body[hidden] { display: none !important; }
+.dsh-output-thinking-body > .dsh-output-reasoning { padding-left: 0; border-left: 0; }
 .dsh-output-answer { display: flex; flex-direction: column; gap: var(--output-space); }
 .dsh-output-answer-label { display: none; margin-bottom: 0; }
 .dsh-output-assistant [data-output-text] > div { font-size: var(--output-size); line-height: var(--output-leading); }
@@ -21,8 +34,6 @@
 .dsh-output-stream { position: relative; min-width: 0; }
 .dsh-output-fade-layer { position: absolute; inset: 0; pointer-events: none; user-select: none; overflow: clip; contain: layout style; }
 .dsh-output-stopped { align-self: flex-start; padding: 0 6px; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-secondary); font-size: 12px; }
-.dsh-output-assistant[data-output-layout="cards"] > section { border: 0.5px solid var(--dsw-alias-border-l3); border-radius: var(--dsw-radius-md); background: color-mix(in srgb, var(--dsw-alias-label-primary) 3%, var(--dsw-alias-bg-layer-1)); padding: var(--output-space) 18px; }
-.dsh-output-assistant[data-output-layout="cards"] .dsh-output-answer-label { display: block; }
 .dsh-output-assistant[data-output-layout="process"] .dsh-output-reasoning { border-left-width: 2px; }
 .dsh-output-assistant[data-output-layout="process"] .dsh-output-answer { border-top: 0.5px solid var(--dsw-alias-border-l2); padding-top: var(--output-space); }
 .dsh-output-assistant[data-output-layout="process"] .dsh-output-answer-label,
@@ -43,8 +54,6 @@ html[data-dsh-output-renderer] [data-chat-group-key][hidden] { display: block !i
 html[data-dsh-output-renderer] [data-chat-flow-kind="turn-process"] { display: none !important; }
 html[data-dsh-output-renderer] [data-chat-group-key]:has(.dsh-output-reasoning) > div:first-child { display: none; }
 html[data-dsh-output-renderer] [data-chat-group-key]:has(.dsh-output-reasoning) > [data-step-process-body] { display: block !important; content-visibility: visible !important; max-height: none; overflow: visible; mask-image: none; scrollbar-gutter: auto; }
-html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-reasoning) { padding: 16px 18px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: var(--dsw-radius-md); background: color-mix(in srgb, var(--dsw-alias-label-primary) 3%, var(--dsw-alias-bg-layer-1)); }
-html[data-dsh-output-renderer="cards"] [data-chat-group-key] .dsh-output-reasoning { border: 0; padding: 0; background: none; }
 html[data-dsh-output-renderer="process"] [data-chat-group-key]:has(.dsh-output-reasoning),
 .dsh-output-preview-process[data-output-layout="process"] { padding-left: 16px; border-left: 2px solid var(--dsw-alias-border-l2); }
 html[data-dsh-output-renderer="process"] [data-chat-group-key] .dsh-output-reasoning,
@@ -75,8 +84,12 @@ html[data-dsh-output-renderer="checklist"] [data-chat-group-key] [data-chat-flow
 .dsh-output-mini i { display: block; height: 3px; width: 88%; border-radius: var(--dsw-radius-xs); background: var(--dsw-alias-border-l2); }
 .dsh-output-mini i:first-child { width: 55%; }
 .dsh-output-mini i:last-child { width: 72%; }
+/* Concise-chat sketch: one short state row, then two plain answer lines — no card fill. */
 [data-choice="cards"] .dsh-output-mini { gap: 3px; }
-[data-choice="cards"] .dsh-output-mini i { height: 6px; background: var(--dsw-alias-interactive-bg-active); }
+[data-choice="cards"] .dsh-output-mini i { height: 3px; background: var(--dsw-alias-border-l2); }
+[data-choice="cards"] .dsh-output-mini i:first-child { width: 40%; background: var(--dsw-alias-label-secondary); }
+[data-choice="cards"] .dsh-output-mini i:nth-child(2) { width: 92%; }
+[data-choice="cards"] .dsh-output-mini i:last-child { width: 64%; }
 [data-choice="process"] .dsh-output-mini { padding-left: 8px; border-left: 2px solid var(--dsw-alias-border-l2); }
 [data-choice="process"] .dsh-output-mini i:last-child { width: 45%; background: var(--dsw-alias-label-secondary); }
 [data-choice="checklist"] .dsh-output-mini { padding-left: 12px; }
@@ -137,4 +150,4 @@ html[data-dsh-output-renderer="checklist"] [data-chat-group-key] [data-chat-flow
   .dsh-output-preview-header { gap: 6px; margin-bottom: 12px; }
   .dsh-output-preview-header > * { max-width: 100%; min-width: 0; }
 }
-@media (prefers-reduced-motion: reduce) { .dsh-output-fade-layer { display: none; } }
+@media (prefers-reduced-motion: reduce) { .dsh-output-fade-layer { display: none; } .dsh-output-thinking-arrow { transition: none; } }

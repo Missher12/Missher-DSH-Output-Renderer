@@ -7,6 +7,7 @@ import type { PreferencesController } from './settings.ts'
 import { LAYOUTS, MOTIONS, DENSITIES, TEXT_SIZES } from '../preferences.ts'
 import { StreamMarkdown } from './stream.tsx'
 import { StepLabel } from './StepLabel.tsx'
+import { ThinkingDisclosure, useThinkingOpen } from './Thinking.tsx'
 
 export interface SettingsInjected extends OutputInjected { setPreference: PreferencesController['set'] }
 type Props = PropsRuntime<'settings.section'> & PropsLocale<'missher.output-renderer'> & InjectFace<SettingsInjected>
@@ -14,6 +15,11 @@ type Props = PropsRuntime<'settings.section'> & PropsLocale<'missher.output-rend
 export function Settings({ useOutputPreferences, setPreference, t }: Props) {
   const state = useOutputPreferences(value => value)
   const processPreview = state.value.layout === 'process' || state.value.layout === 'checklist'
+  // Only the concise layout folds; the others keep the fully expanded process they preview today.
+  const concise = state.value.layout === 'cards'
+  // The preview choice is keyed by the sample, not by layout or replay, so switching layouts or
+  // replaying the sample does not silently reopen or re-close what the user chose.
+  const [previewThinkingOpen, togglePreviewThinking] = useThinkingOpen('settings-preview', false)
   const sampleText = t(processPreview ? 'processSample' : 'sample')
   const [sample, setSample] = useState(sampleText)
   const [playing, setPlaying] = useState(false)
@@ -65,7 +71,7 @@ export function Settings({ useOutputPreferences, setPreference, t }: Props) {
       </div>
     </fieldset>
     <div className="dsh-output-fields">
-      <div className="dsh-output-field"><div><span>{t('thinking')}</span><p className="dsh-output-description">{t('thinkingHint')}</p></div><Tag tone="neutral">{t('alwaysOpen')}</Tag></div>
+      <div className="dsh-output-field"><div><span>{t('thinking')}</span><p className="dsh-output-description">{t(concise ? 'thinkingHintConcise' : 'thinkingHint')}</p></div><Tag tone="neutral">{t(concise ? 'collapsedDefault' : 'alwaysOpen')}</Tag></div>
       <fieldset className="dsh-output-field" disabled={disabled}>
         <legend>{t('density')}</legend>
         <div className="dsh-output-controls">
@@ -91,7 +97,7 @@ export function Settings({ useOutputPreferences, setPreference, t }: Props) {
       </div>
     </fieldset>
     <section className="dsh-output-preview" aria-label={t('preview')}>
-      <div className="dsh-output-preview-header"><span>{t('preview')}</span><Button variant="outline" size="sm" onClick={replay}>{t('replay')}</Button></div>
+      <div className="dsh-output-preview-header"><span>{t('preview')} · {t('previewSample')}</span><Button variant="outline" size="sm" onClick={replay}>{t('replay')}</Button></div>
       {processPreview && <div className="dsh-output-preview-process" data-output-layout={state.value.layout}>
         {(['processNote', 'verificationNote'] as const).map((note, index) => <div key={note}>
           <div className={`dsh-output-assistant${state.value.layout === 'checklist' ? ' dsh-output-checklist-step' : ''}`}
@@ -104,7 +110,14 @@ export function Settings({ useOutputPreferences, setPreference, t }: Props) {
       </div>}
       <div className="dsh-output-assistant" data-output-layout={state.value.layout} data-output-both={!processPreview || undefined}
         data-output-density={state.value.density} data-output-text-size={state.value.textSize}>
-        {!processPreview && <section className="dsh-output-reasoning"><div className="dsh-output-label">{t('thinking')}</div><p>{t('note')}</p></section>}
+        {!processPreview && (concise
+          // Same shared component as the live seat, so the preview really folds and unfolds. The
+          // sample line describes folding; the fully expanded layouts below keep the old note.
+          ? <ThinkingDisclosure id="dsh-output-thinking-preview" status="settled" text={t}
+              open={previewThinkingOpen} onToggle={togglePreviewThinking}>
+              <section className="dsh-output-reasoning" aria-label={t('thinking')}><p>{t('noteConcise')}</p></section>
+            </ThinkingDisclosure>
+          : <section className="dsh-output-reasoning"><div className="dsh-output-label">{t('thinking')}</div><p>{t('note')}</p></section>)}
         <section className="dsh-output-answer"><div className="dsh-output-label dsh-output-answer-label">{t('answer')}</div>
           <StreamMarkdown text={sample} running={playing} motion={state.value.motion} labels={labels} />
         </section>

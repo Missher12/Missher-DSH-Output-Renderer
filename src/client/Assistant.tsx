@@ -10,6 +10,7 @@ import type { PreferencesController } from './settings.ts'
 import type { Translate } from './locales.ts'
 import { StreamMarkdown } from './stream.tsx'
 import { StepLabel } from './StepLabel.tsx'
+import { ThinkingDisclosure, useThinkingOpen, type ThinkingStatus } from './Thinking.tsx'
 
 export interface OutputInjected {
   hooks: { outputPreferences: ObservableSnapshot<ReturnType<PreferencesController['store']['getSnapshot']>> }
@@ -35,7 +36,7 @@ type SharedGalleryCall = (
 ) => ReactNode
 type Props = ChatProps & { renderFactorySlot?: unknown }
 
-export const Assistant = memo(function Assistant({ node, groupPart, useTurnData, openFile, renderMessageImages,
+export const Assistant = memo(function Assistant({ node, groupPart, sessionId, useTurnData, openFile, renderMessageImages,
   renderFactorySlot, loadImage, fileMentions, useOutputPreferences, outputText, t }: Props) {
   const { motion, layout, density, textSize } = useOutputPreferences(state => state.value)
   const data = node.data
@@ -43,6 +44,16 @@ export const Assistant = memo(function Assistant({ node, groupPart, useTurnData,
   // Only the final block can still grow. Earlier blocks are closed by the block after them,
   // so frame buffering must settle them instead of holding their last grapheme until the step ends.
   const streamingIndex = running ? data.blocks.length - 1 : -1
+  // "简洁对话" reads as one column and folds the reasoning by default; the other layouts stay fully open.
+  const concise = layout === 'cards'
+  // The step status is not the thinking status: a running step that already appended text or a tool
+  // call has finished its reasoning. Only the last block of a running step can still be growing.
+  const reasoningLast = data.blocks[data.blocks.length - 1]?.kind === 'reasoning'
+  const reasoningActive = running && reasoningLast
+  // Keyed by seat identity, never by content: a delta, a new block or a status change keeps the
+  // user's choice, while another session or step starts collapsed.
+  const [thinkingOpen, toggleThinking] = useThinkingOpen(`${sessionId}:${data.turn}:${data.step}`, false)
+  const thinkingBodyId = `dsh-output-thinking-${sessionId}-${data.turn}-${data.step}`.replace(/[^A-Za-z0-9_-]/gu, '-')
   const turn = node.location.kind === 'turn' || node.location.kind === 'step' ? node.location.turn : undefined
   const tail = useTurnData('turn-tail')
   const owner = useMemo<TurnTailOwnerProps | undefined>(() => {
@@ -114,19 +125,41 @@ export const Assistant = memo(function Assistant({ node, groupPart, useTurnData,
   const hasReasoning = data.blocks.some(block => block.kind === 'reasoning' && block.text.trim())
   const hasResponse = data.blocks.some(block => block.kind === 'text' ? block.text.trim()
     : block.kind !== 'reasoning' && block.kind !== 'tool-call')
-  const interrupted = data.status === 'interrupted' && (groupPart !== 'reasoning' || !hasResponse)
+  // Exactly one interruption notice. The fold row owns it only when the reasoning itself was the
+  // last real block of an interrupted step — the same phase test as `reasoningActive`, not "no answer
+  // text yet": a step that stopped after a tool call or an empty text block has already closed its
+  // reasoning. Everything else is assigned per seat responsibility, so no two seats claim it.
+  const rowOwnsStop = concise && hasReasoning && data.status === 'interrupted' && reasoningLast
+  const reasoningSeatOwnsStop = hasReasoning && !hasResponse
+  const seatOwnsStop = !rowOwnsStop && (groupPart === undefined ? true
+    : groupPart === 'reasoning' ? reasoningSeatOwnsStop : !reasoningSeatOwnsStop)
+  const interrupted = data.status === 'interrupted'
+    && (concise ? seatOwnsStop : groupPart !== 'reasoning' || !hasResponse)
   if (!reasoning.length && !response.length && !interrupted) return null
   const checklistStep = layout === 'checklist' && (reasoning.length > 0
     || !hasReasoning && (response.length > 0 || interrupted))
   const showStopped = interrupted && (layout !== 'checklist' || !hasReasoning && !checklistStep)
+  // Never claim the thinking is in progress once the block has closed; a settled row describes the
+  // reasoning output, not task or tool success.
+  const thinkingStatus: ThinkingStatus = rowOwnsStop ? 'interrupted'
+    : reasoningActive ? 'running' : 'settled'
   return <div className={`dsh-output-assistant${checklistStep ? ' dsh-output-checklist-step' : ''}`} data-output-layout={layout} data-output-part={groupPart}
     data-output-density={density} data-output-text-size={textSize}
     data-output-both={reasoning.length > 0 && response.length > 0 || undefined} data-output-running={running || undefined}>
     {checklistStep && <StepLabel step={data.step} status={data.status} text={outputText} />}
-    {reasoning.length > 0 && <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
-      <div className="dsh-output-label">{outputText('thinking')}</div>
-      <div data-reasoning-full>{reasoning}</div>
-    </section>}
+    {reasoning.length > 0 && (concise
+      // The row carries the interruption only when the reasoning itself stopped there; otherwise it
+      // names a finished process and the single stopped chip stays with the response seat.
+      ? <ThinkingDisclosure id={thinkingBodyId} status={thinkingStatus} text={outputText}
+          open={thinkingOpen} onToggle={toggleThinking}>
+          <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
+            <div data-reasoning-full>{reasoning}</div>
+          </section>
+        </ThinkingDisclosure>
+      : <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
+          <div className="dsh-output-label">{outputText('thinking')}</div>
+          <div data-reasoning-full>{reasoning}</div>
+        </section>)}
     {response.length > 0 && <section className="dsh-output-answer" aria-label={outputText('answer')}>
       <div className="dsh-output-label dsh-output-answer-label">{outputText('answer')}</div>
       {response}

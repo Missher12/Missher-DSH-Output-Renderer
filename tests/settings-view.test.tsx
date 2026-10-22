@@ -50,3 +50,46 @@ test('saving status remains neutral after retrying a failed change', () => {
   expect(renderStatus({ saving: true, error: false })).toEqual({ text: zh.saving, error: false })
   expect(renderStatus({ saving: false, error: false })).toEqual({ text: zh.saved, error: false })
 })
+
+/** Full settings markup, so the preview itself can be inspected. */
+function renderSettings(value: Partial<State>) {
+  const state: State = { value: DEFAULTS, status: 'ready', ready: true, writable: true, saving: false, error: false, ...value }
+  const props: Props = {
+    close: unused, useOutputPreferences: selector => selector(state), setPreference: async () => {},
+    t: key => zh[key], outputText: key => zh[key],
+    useWorkspaces: unused, useSessions: unused, useSessionStatus: unused, useSessionRetainInfo: unused,
+  }
+  return renderToStaticMarkup(<Settings {...props} />)
+}
+
+test('the concise preview folds through the same shared control the live seat uses', () => {
+  const html = renderSettings({ value: { ...DEFAULTS, layout: 'cards' } })
+  expect(html).toContain('dsh-output-thinking-toggle')
+  expect(html).toContain('aria-expanded="false"')
+  expect(html).toContain(zh.previewSample)
+  expect(html).toContain(zh.collapsedDefault)
+  expect(html).not.toContain(zh.alwaysOpen)
+  expect(html).toContain(zh.thinkingHintConcise)
+  // The concise sample describes folding; it must not keep the fully-expanded note.
+  expect(html).toContain(zh.noteConcise)
+  expect(html).not.toContain(zh.note)
+  // The preview is labelled sample content; it never claims a live thinking phase.
+  expect(html).toContain(zh.thinkingSettled)
+  expect(html).not.toContain(zh.thinkingRunning)
+})
+
+test.each(['reader', 'process', 'checklist'] as const)('%s still previews the reasoning fully expanded', layout => {
+  const html = renderSettings({ value: { ...DEFAULTS, layout } })
+  expect(html).not.toContain('dsh-output-thinking-toggle')
+  expect(html).toContain(zh.thinkingHint)
+  expect(html).toContain(zh.alwaysOpen)
+  // Only the reader preview reuses the fully-expanded note. The process previews carry their own
+  // two real sample notes, which is the evidence these layouts actually need.
+  if (layout === 'reader') {
+    expect(html).toContain(zh.note)
+  } else {
+    expect(html).toContain(zh.processNote)
+    expect(html).toContain(zh.verificationNote)
+    expect(html).not.toContain(zh.note)
+  }
+})

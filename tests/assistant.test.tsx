@@ -43,10 +43,15 @@ function props(layout: Layout, blocks: Data['blocks'], status: Data['status'] = 
   }
 }
 
-test.each(LAYOUTS)('%s identifies a reasoning-only interruption without inventing an answer card', layout => {
+test.each(LAYOUTS)('%s identifies a reasoning-only interruption exactly once', layout => {
   const html = renderToStaticMarkup(<Assistant {...props(layout, [{ kind: 'reasoning', text: '保留已经收到的思考。' }])} groupPart="reasoning" />)
   expect(html).toContain('保留已经收到的思考。')
-  expect(html.match(/已停止/gu)).toHaveLength(1)
+  // One notice owns the interruption: the concise fold row when the reasoning stopped there,
+  // otherwise the detached stopped label. Never two wordings for one interruption.
+  const stopped = html.match(/已停止/gu) ?? []
+  const interruptedRow = html.match(/思考中断/gu) ?? []
+  expect(stopped.length + interruptedRow.length).toBe(1)
+  expect(stopped).toHaveLength(layout === 'cards' ? 0 : 1)
   expect(html).not.toContain('class="dsh-output-answer"')
 })
 

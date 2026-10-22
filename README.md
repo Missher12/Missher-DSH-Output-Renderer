@@ -2,9 +2,13 @@
 
 [English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-为 DeepSeek Harness 提供四种助手输出布局、完整思考展示，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，当前版本 **0.1.3**。这是可卸载的界面插件，需要已有 DSH 宿主。
+为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **0.1.4**。这是可卸载的界面插件，需要已有 DSH 宿主。
 
-`0.1.3` 是兼容性与接口适配更新：放宽 Cordis 与 Schemastery 的准入范围以覆盖 `4.0.5` / `3.18.5` 正式版及其 `-alpha.1` 预发布，兼容宿主快照不再携带 `mode` 的设置契约，图片改走宿主发布的图片 Factory，并把原生输出的接管标记绑定到助手槽位的真实注册生命周期；另修复极窄设置面板的响应式排版。本版本已通过独立验收：冻结副本两端类型检查、四个受影响测试文件 53 项、构建，以及官方 npm `0.2.1-alpha.5` 与社区扩展 `0.2.0-rc.2` 两套宿主的真实 Loader、受控插槽生命周期与真实 Web 页面复核。历史 `0.1.3-rc.5` 记录仍见 [VALIDATION.md](./VALIDATION.md)。正式发布状态见 [0.1.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.3)；发布不会自动更新各设备的已装插件。
+`0.1.4` 将“柔和卡片”替换为“简洁对话”：单列回答，思考默认收起，点击即可查看；流式输出及完成时保留你的展开选择，回答、图片与原生工具仍可直接访问。旧的 `layout: cards` 设置自动采用这一外观，其他布局与偏好保持原行为。状态来自实际输出阶段，不编造思考时长或摘要。
+
+本版本通过两端类型检查、35项相关组件测试、构建及官方 `0.2.1-rc.2` 上的实际 Web 交互检查。390px宽度下聊天没有横向溢出；设置页受宿主侧栏挤压，内容区较窄、换行较多。完整证据及旧版兼容记录见 [VALIDATION.md](./VALIDATION.md)。包的发布情况以 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 为准，设备安装状态需另行核对。
+
+下面两张图片保留自0.1.3，展示设置入口和“深想简答”布局；其中“柔和卡片”现已替换。
 
 ![官方 DSH 0.2.1-alpha.5 Web 页面上的输出外观设置（隔离 profile 中的合成测试内容）](https://raw.githubusercontent.com/Missher12/Missher-DSH-Output-Renderer/v0.1.3/docs/images/output-settings-alpha5.png)
 
@@ -17,22 +21,22 @@
 | 布局 | 呈现方式 |
 | --- | --- |
 | 清晰阅读 | 连续单列正文，弱化工具区域的视觉干扰 |
-| 柔和卡片 | 思考和正文用柔和背景分组 |
+| 简洁对话 | 单列回答，思考默认收起，按需展开，弱化卡片边框和背景 |
 | 深想简答 | 完整展示过程，末尾答复独立收尾 |
 | 任务清单 | 按实际助手步骤编号，显示输出中、输出完成或已停止 |
 
 在 **设置 → 输出外观** 选择布局、14/16 px 字号、舒适/紧凑间距和动效，修改自动保存。四张选项卡片等高排列，窄窗口自动转为单列；可用“重播输出”查看动效。
 
-- 思考全文保持展开。含思考的过程组不再折叠，工具条目和纯工具组仍可独立展开/收起。
+- 简洁对话默认收起思考，按需展开完整内容；其他布局沿用原来的展示方式。工具条目和纯工具组可独立展开/收起。
 - 代码、表格、图片和文件操作复用宿主组件。深想简答不自动摘要或截断正文；任务清单的“输出完成”不表示工具或任务执行成功。
 - 刷新率同步使用 `requestAnimationFrame`，没有固定 30/60 fps 上限；新增文字淡入只作用于新到达的文字。遵循系统“减少动态效果”，停止、结束和后台切换会清理缓冲及动画。
 - 布局不改变提示词、模型参数或生成速度。实际帧率受硬件、浏览器和 Markdown 复杂度影响，不承诺持续满帧。
 
 ## 安装、启停与卸载
 
-推荐使用 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 中的预构建 `.tgz`，版本以实际发布资产为准。`0.1.3` 文件名为 `missher-dsh-output-renderer-0.1.3.tgz`，校验文件为同名 `.tgz.sha256`。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
+推荐使用 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 中的预构建 `.tgz`，版本以实际发布资产为准。`0.1.4` 文件名为 `missher-dsh-output-renderer-0.1.4.tgz`，校验文件为同名 `.tgz.sha256`。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
 
-1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.1.3.tgz.sha256` 核对下载字节。
+1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.1.4.tgz.sha256` 核对下载字节。
 2. 桌面版进入 **插件 → 添加插件**，填入下载文件的完整路径，安装并启用本插件。按宿主提示重新加载后，进入 **设置 → 输出外观**。
 3. 在插件管理中关闭本插件的启用开关即可停用；重新打开可启用。停用后恢复宿主原生输出。
 4. 在插件管理中选择本插件并点击 **卸载** 可移除。升级请优先使用当前 Missher 桌面端的“更新插件”入口，选择新版 tgz；先备份 profile 配置并保留原版本 tgz。较早宿主若没有更新入口，可按该宿主支持的替换或重新安装流程操作，并保留配置备份；缺少更新按钮不表示插件只支持新宿主。卸载后的偏好保留行为由宿主管理。
@@ -40,7 +44,7 @@
 Web/自建 profile 使用目标宿主的正式 CLI，替换下面的 profile 和文件路径：
 
 ```sh
-dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.1.3.tgz
+dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.1.4.tgz
 dsh plugin --profile my-web remove @missher/dsh-output-renderer
 ```
 
@@ -56,8 +60,9 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 | 检查范围 | 证据与限制 |
 | --- | --- |
-| 官方 npm alpha.5（`0.2.1-alpha.5`，Cordis `4.0.5` / Schemastery `3.18.5`） | 本版本已通过真实 Loader 与设置；服务场景含正常保存、缺少 settings、缺少 configure；真实前端 SlotRegistry 受控生命周期；真实 Web 页面复核四布局、图片、原生放大/工具展开、保存失败回退、停止保留、36 轮历史加载、流式淡入与滚离底部；390 px 设置面板与 1280 px 词语分行均复验 |
-| Missher 社区扩展 rc.2（`0.2.0-rc.2`，Cordis `4.0.4` / Schemastery `3.18.4`） | 本版本已通过同一组真实 Loader/设置场景、受控插槽生命周期与真实 Web 页面复核（四布局内容一致、刷新持久化、原生图片放大、窄屏与卸载） |
+| 官方 `0.2.1-rc.2` | 0.1.4已验：折叠与键盘操作、流中展开保持、实际状态和中断、正文/图片/原生工具、设置预览/保存/刷新/失败回退、暗色窄栏、停用恢复。浏览器使用隔离的本地合成数据。 |
+| 官方 npm alpha.5（`0.2.1-alpha.5`，Cordis `4.0.5` / Schemastery `3.18.5`） | 0.1.3历史证据：已通过真实 Loader 与设置；服务场景含正常保存、缺少 settings、缺少 configure；真实前端 SlotRegistry 受控生命周期；真实 Web 页面复核四布局、图片、原生放大/工具展开、保存失败回退、停止保留、36 轮历史加载、流式淡入与滚离底部；390 px 设置面板与 1280 px 词语分行均复验 |
+| Missher 社区扩展 rc.2（`0.2.0-rc.2`，Cordis `4.0.4` / Schemastery `3.18.4`） | 0.1.3历史证据：已通过同一组真实 Loader/设置场景、受控插槽生命周期与真实 Web 页面复核（四布局内容一致、刷新持久化、原生图片放大、窄屏与卸载） |
 | Missher 社区 alpha.2（`0.2.1-alpha.2`） | 仅完成只读静态对照；本轮未做动态复验，该配套包的聊天折叠动画与本插件强制展开思考的样式交互仍未实测 |
 | 0.2.0-rc.1 | 较早版本的历史验收基线，不代表任何当前候选重新实测 |
 | Windows / 当前 macOS | 本轮未测。验收在 Linux 上的独立 Host 与真实 Web 浏览器中进行，未操作原生 Electron 日常界面 |
