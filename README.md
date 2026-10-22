@@ -2,11 +2,13 @@
 
 [English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **0.1.4**。这是可卸载的界面插件，需要已有 DSH 宿主。
+为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **0.1.5**。这是可卸载的界面插件，需要已有 DSH 宿主。
 
-`0.1.4` 将“柔和卡片”替换为“简洁对话”：单列回答，思考默认收起，点击即可查看；流式输出及完成时保留你的展开选择，回答、图片与原生工具仍可直接访问。旧的 `layout: cards` 设置自动采用这一外观，其他布局与偏好保持原行为。状态来自实际输出阶段，不编造思考时长或摘要。
+`0.1.5` 将“柔和卡片”替换为“简洁对话”：单列回答，思考默认收起，点击即可查看；流式输出及完成时保留你的展开选择，回答、图片与原生工具仍可直接访问。旧的 `layout: cards` 设置自动采用这一外观，其他布局与偏好保持原行为。状态来自实际输出阶段，不编造思考时长或摘要。
 
-本版本通过两端类型检查、35项相关组件测试、构建及官方 `0.2.1-rc.2` 上的实际 Web 交互检查。390px宽度下聊天没有横向溢出；设置页受宿主侧栏挤压，内容区较窄、换行较多。完整证据及旧版兼容记录见 [VALIDATION.md](./VALIDATION.md)。包的发布情况以 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 为准，设备安装状态需另行核对。
+0.1.5仅修正文档中的宿主来源与发布版本元数据，两份运行文件与已验0.1.4候选逐字节一致。已推送的v0.1.4仅保留源码历史，没有正式Release；此前“官方原样RC.2”表述不准确。
+
+本次实现通过两端类型检查、35项相关组件测试、构建及本机社区发行版 `0.2.1-rc.2` 上的实际 Web 交互检查。390px宽度下聊天没有横向溢出；设置页受宿主侧栏挤压，内容区较窄、换行较多。完整证据及旧版兼容记录见 [VALIDATION.md](./VALIDATION.md)。包的发布情况以 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 为准，设备安装状态需另行核对。
 
 下面两张图片保留自0.1.3，展示设置入口和“深想简答”布局；其中“柔和卡片”现已替换。
 
@@ -34,9 +36,9 @@
 
 ## 安装、启停与卸载
 
-推荐使用 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 中的预构建 `.tgz`，版本以实际发布资产为准。`0.1.4` 文件名为 `missher-dsh-output-renderer-0.1.4.tgz`，校验文件为同名 `.tgz.sha256`。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
+推荐使用 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 中的预构建 `.tgz`，版本以实际发布资产为准。`0.1.5` 文件名为 `missher-dsh-output-renderer-0.1.5.tgz`，校验文件为同名 `.tgz.sha256`。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
 
-1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.1.4.tgz.sha256` 核对下载字节。
+1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.1.5.tgz.sha256` 核对下载字节。
 2. 桌面版进入 **插件 → 添加插件**，填入下载文件的完整路径，安装并启用本插件。按宿主提示重新加载后，进入 **设置 → 输出外观**。
 3. 在插件管理中关闭本插件的启用开关即可停用；重新打开可启用。停用后恢复宿主原生输出。
 4. 在插件管理中选择本插件并点击 **卸载** 可移除。升级请优先使用当前 Missher 桌面端的“更新插件”入口，选择新版 tgz；先备份 profile 配置并保留原版本 tgz。较早宿主若没有更新入口，可按该宿主支持的替换或重新安装流程操作，并保留配置备份；缺少更新按钮不表示插件只支持新宿主。卸载后的偏好保留行为由宿主管理。
@@ -44,7 +46,7 @@
 Web/自建 profile 使用目标宿主的正式 CLI，替换下面的 profile 和文件路径：
 
 ```sh
-dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.1.4.tgz
+dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.1.5.tgz
 dsh plugin --profile my-web remove @missher/dsh-output-renderer
 ```
 
@@ -60,7 +62,7 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 | 检查范围 | 证据与限制 |
 | --- | --- |
-| 官方 `0.2.1-rc.2` | 0.1.4已验：折叠与键盘操作、流中展开保持、实际状态和中断、正文/图片/原生工具、设置预览/保存/刷新/失败回退、暗色窄栏、停用恢复。浏览器使用隔离的本地合成数据。 |
+| 本机社区发行版 `0.2.1-rc.2` | 0.1.4已验：折叠与键盘操作、流中展开保持、实际状态和中断、正文/图片/原生工具、设置预览/保存/刷新/失败回退、暗色窄栏、停用恢复。浏览器使用隔离的本地合成数据。 |
 | 官方 npm alpha.5（`0.2.1-alpha.5`，Cordis `4.0.5` / Schemastery `3.18.5`） | 0.1.3历史证据：已通过真实 Loader 与设置；服务场景含正常保存、缺少 settings、缺少 configure；真实前端 SlotRegistry 受控生命周期；真实 Web 页面复核四布局、图片、原生放大/工具展开、保存失败回退、停止保留、36 轮历史加载、流式淡入与滚离底部；390 px 设置面板与 1280 px 词语分行均复验 |
 | Missher 社区扩展 rc.2（`0.2.0-rc.2`，Cordis `4.0.4` / Schemastery `3.18.4`） | 0.1.3历史证据：已通过同一组真实 Loader/设置场景、受控插槽生命周期与真实 Web 页面复核（四布局内容一致、刷新持久化、原生图片放大、窄屏与卸载） |
 | Missher 社区 alpha.2（`0.2.1-alpha.2`） | 仅完成只读静态对照；本轮未做动态复验，该配套包的聊天折叠动画与本插件强制展开思考的样式交互仍未实测 |
