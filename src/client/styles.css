@@ -6,19 +6,43 @@
 .dsh-output-label { margin-bottom: 8px; font-size: var(--dsh-content-font-size-secondary, 13px); line-height: 1.5; color: var(--dsw-alias-label-secondary); font-weight: 500; }
 .dsh-output-reasoning { padding-left: 16px; border-left: 0.5px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-secondary); }
 .dsh-output-reasoning [data-reasoning-full] { display: grid; gap: var(--output-space); }
-/* Concise chat folds the reasoning behind a lightweight status row. The row and the body are
-   shared by the live seat and the settings preview, so both fold identically. Concise chat adds no
-   card box, shadow, or repeated answer label; the other layouts keep their own chrome. */
-.dsh-output-thinking { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.dsh-output-thinking-toggle { align-self: flex-start; display: flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; margin: 0; padding: 2px 4px 2px 0; border: 0; border-radius: var(--dsw-radius-xs); background: none; color: var(--dsw-alias-label-secondary); font: inherit; font-size: var(--dsh-content-font-size-secondary, 13px); line-height: 1.5; text-align: left; cursor: pointer; }
-.dsh-output-thinking-toggle:hover { color: var(--dsw-alias-label-primary); }
-.dsh-output-thinking-toggle:focus-visible { outline: 2px solid var(--dsw-alias-link); outline-offset: 2px; }
-.dsh-output-thinking-arrow { flex: none; width: 0; height: 0; border-left: 4px solid currentColor; border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent; transition: transform .12s ease; }
-.dsh-output-thinking-toggle[aria-expanded="true"] .dsh-output-thinking-arrow { transform: rotate(90deg); }
-.dsh-output-thinking-state { min-width: 0; overflow-wrap: break-word; }
+/* Concise chat shows no thinking body: the answer plus one low-key summary of real tool activity.
+   The summary is collapsed by default; failed, interactive and unknown calls never enter it and keep
+   their native row. Rows stay small, low contrast and free of raw tool payloads. */
+/* The live-Turn dock above the composer: the input card's responsive width (outer clearance removed
+   first, like the InputBar wrapper), centered, with the card's own 16px text padding inside. Bounded so
+   an expanded list can never push the input out. */
+.dsh-output-activity-dock { box-sizing: border-box; width: calc(100% - 2 * var(--dsh-composer-side-clearance, 16px)); max-width: var(--dsh-composer-card-max-width, 712px); margin-inline: auto; padding-inline: 16px; display: flex; flex-direction: column; min-width: 0; max-height: min(40vh, 360px); overflow: hidden; }
+.dsh-output-activity-dock .dsh-output-activity { min-height: 0; }
+.dsh-output-activity { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.dsh-output-activity-toggle { align-self: flex-start; display: flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; margin: 0; padding: 2px 4px 2px 0; border: 0; border-radius: var(--dsw-radius-xs); background: none; color: var(--dsw-alias-label-secondary); font: inherit; font-size: var(--dsh-content-font-size-secondary, 13px); line-height: 1.5; text-align: left; cursor: pointer; }
+.dsh-output-activity-toggle:hover { color: var(--dsw-alias-label-primary); }
+.dsh-output-activity-toggle:focus-visible { outline: 2px solid var(--dsw-alias-link); outline-offset: 2px; }
+/* Thin-line chevron, same colour as the phrase. */
+.dsh-output-activity-arrow { flex: none; margin-left: 2px; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); transition: transform .12s ease; }
+.dsh-output-activity-toggle[aria-expanded="true"] .dsh-output-activity-arrow { transform: rotate(45deg); }
+.dsh-output-activity-leading { display: inline-flex; flex: none; align-self: center; color: var(--dsw-alias-label-tertiary); }
+.dsh-output-activity-summary { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.dsh-output-activity-segment-text { min-width: 0; overflow-wrap: break-word; }
+.dsh-output-activity-segment-text + .dsh-output-activity-segment-text { margin-left: 2px; }
 /* This body is plugin-owned, never a host row: keep it hidden against any host or global display rule. */
-.dsh-output-assistant .dsh-output-thinking-body[hidden] { display: none !important; }
-.dsh-output-thinking-body > .dsh-output-reasoning { padding-left: 0; border-left: 0; }
+.dsh-output-assistant .dsh-output-activity-body[hidden] { display: none !important; }
+/* A long activity list must never push the composer out of view. */
+.dsh-output-activity-body { max-height: min(32vh, 260px); overflow-y: auto; overscroll-behavior: contain; }
+.dsh-output-activity-list { list-style: none; margin: 2px 0 0; padding: 0; display: grid; gap: 3px; }
+.dsh-output-activity-row { display: flex; align-items: baseline; gap: 6px; min-width: 0; font-size: 13px; line-height: 22px; color: var(--dsw-alias-label-secondary); }
+.dsh-output-activity-icon { display: inline-flex; flex: none; align-self: center; color: var(--dsw-alias-label-tertiary); }
+.dsh-output-activity-verb { flex: none; }
+/* A target is a control only when a real action exists; otherwise it stays plain light text. */
+/* Running preview in concise chat: at most three lines, never a fake final answer. */
+/* Process preview only: a higher-specificity rule beats the later `.dsh-output-answer` flex rule. */
+.dsh-output-assistant .dsh-output-answer.dsh-output-preview-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.dsh-output-assistant .dsh-output-answer.dsh-output-preview-text > * { margin-block: 0; }
+.dsh-output-activity-target { display: inline-block; max-width: 100%; margin: 0; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+button.dsh-output-activity-target { text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+button.dsh-output-activity-target:hover { text-decoration: underline; }
+button.dsh-output-activity-target:focus-visible { outline: 2px solid var(--dsw-alias-link); outline-offset: 2px; }
+.dsh-output-activity-row[data-output-activity-status="running"] .dsh-output-activity-target { color: var(--dsw-alias-label-secondary); }
 .dsh-output-answer { display: flex; flex-direction: column; gap: var(--output-space); }
 .dsh-output-answer-label { display: none; margin-bottom: 0; }
 .dsh-output-assistant [data-output-text] > div { font-size: var(--output-size); line-height: var(--output-leading); }
@@ -54,6 +78,13 @@ html[data-dsh-output-renderer] [data-chat-group-key][hidden] { display: block !i
 html[data-dsh-output-renderer] [data-chat-flow-kind="turn-process"] { display: none !important; }
 html[data-dsh-output-renderer] [data-chat-group-key]:has(.dsh-output-reasoning) > div:first-child { display: none; }
 html[data-dsh-output-renderer] [data-chat-group-key]:has(.dsh-output-reasoning) > [data-step-process-body] { display: block !important; content-visibility: visible !important; max-height: none; overflow: visible; mask-image: none; scrollbar-gutter: auto; }
+/* An empty seat must not leave a gap in the flow. */
+html[data-dsh-output-renderer] .dsh-output-assistant:empty { display: none; }
+/* Concise chat keeps one native process body open where this Bundle's seat renders inside it. Which
+   Turn's process rows and header are retired is decided per Turn from the loaded Chat Nodes and
+   installed as a stylesheet keyed by those Nodes' own keys; a Turn with a failed call, an unknown
+   shell exit or a pending question keeps its native rows. */
+html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant) > [data-step-process-body] { display: block !important; content-visibility: visible !important; max-height: none; overflow: visible; mask-image: none; scrollbar-gutter: auto; }
 html[data-dsh-output-renderer="process"] [data-chat-group-key]:has(.dsh-output-reasoning),
 .dsh-output-preview-process[data-output-layout="process"] { padding-left: 16px; border-left: 2px solid var(--dsw-alias-border-l2); }
 html[data-dsh-output-renderer="process"] [data-chat-group-key] .dsh-output-reasoning,
@@ -150,4 +181,4 @@ html[data-dsh-output-renderer="checklist"] [data-chat-group-key] [data-chat-flow
   .dsh-output-preview-header { gap: 6px; margin-bottom: 12px; }
   .dsh-output-preview-header > * { max-width: 100%; min-width: 0; }
 }
-@media (prefers-reduced-motion: reduce) { .dsh-output-fade-layer { display: none; } .dsh-output-thinking-arrow { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .dsh-output-fade-layer { display: none; } .dsh-output-activity-arrow { transition: none; } }

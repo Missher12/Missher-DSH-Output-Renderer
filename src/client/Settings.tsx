@@ -7,7 +7,14 @@ import type { PreferencesController } from './settings.ts'
 import { LAYOUTS, MOTIONS, DENSITIES, TEXT_SIZES } from '../preferences.ts'
 import { StreamMarkdown } from './stream.tsx'
 import { StepLabel } from './StepLabel.tsx'
-import { ThinkingDisclosure, useThinkingOpen } from './Thinking.tsx'
+import { ActivityDisclosure, useSeatDisclosure, type ActivityRecord } from './Edits.tsx'
+
+/** Clearly sample activity for the concise preview; never presented as a real session record. */
+const SAMPLE_ACTIVITY: readonly ActivityRecord[] = [
+  { callId: 'sample-activity-1', kind: 'edit', tool: 'edit', path: 'notes.md', status: 'done' },
+  { callId: 'sample-activity-2', kind: 'read', tool: 'read', path: 'config.ts', status: 'done' },
+  { callId: 'sample-activity-3', kind: 'search', tool: 'grep', query: '220', status: 'done' },
+]
 
 export interface SettingsInjected extends OutputInjected { setPreference: PreferencesController['set'] }
 type Props = PropsRuntime<'settings.section'> & PropsLocale<'missher.output-renderer'> & InjectFace<SettingsInjected>
@@ -15,12 +22,14 @@ type Props = PropsRuntime<'settings.section'> & PropsLocale<'missher.output-rend
 export function Settings({ useOutputPreferences, setPreference, t }: Props) {
   const state = useOutputPreferences(value => value)
   const processPreview = state.value.layout === 'process' || state.value.layout === 'checklist'
-  // Only the concise layout folds; the others keep the fully expanded process they preview today.
+  // Concise chat renders no thinking body; the other layouts keep the fully expanded process.
   const concise = state.value.layout === 'cards'
-  // The preview choice is keyed by the sample, not by layout or replay, so switching layouts or
-  // replaying the sample does not silently reopen or re-close what the user chose.
-  const [previewThinkingOpen, togglePreviewThinking] = useThinkingOpen('settings-preview', false)
+  // Each replay starts a new preview round, so the fold collapses again; tokens within one round
+  // never reset the user's choice.
+  const [previewRound, setPreviewRound] = useState(0)
+  const [previewActivityOpen, togglePreviewActivity] = useSeatDisclosure(`settings-activity:${previewRound}`, false)
   const sampleText = t(processPreview ? 'processSample' : 'sample')
+  const previewText = t('processSample')
   const [sample, setSample] = useState(sampleText)
   const [playing, setPlaying] = useState(false)
   const frame = useRef(0)
@@ -32,6 +41,7 @@ export function Settings({ useOutputPreferences, setPreference, t }: Props) {
     return () => cancelAnimationFrame(frame.current)
   }, [sampleText])
   const replay = () => {
+    setPreviewRound(round => round + 1)
     cancelAnimationFrame(frame.current)
     setSample('')
     setPlaying(true)
@@ -40,8 +50,11 @@ export function Settings({ useOutputPreferences, setPreference, t }: Props) {
     const tick = (time: number) => {
       started ??= time
       const count = Math.floor((time - started) / 80) * 3
-      if (count !== lastChunk) { lastChunk = count; setSample(sampleText.slice(0, count)) }
-      if (count >= sampleText.length) { setSample(sampleText); setPlaying(false) }
+      if (count !== lastChunk) { lastChunk = count; setSample((concise ? previewText : sampleText).slice(0, count)) }
+      if (count >= (concise ? previewText : sampleText).length) {
+        setSample(sampleText)
+        setPlaying(false)
+      }
       else frame.current = requestAnimationFrame(tick)
     }
     frame.current = requestAnimationFrame(tick)
@@ -71,7 +84,7 @@ export function Settings({ useOutputPreferences, setPreference, t }: Props) {
       </div>
     </fieldset>
     <div className="dsh-output-fields">
-      <div className="dsh-output-field"><div><span>{t('thinking')}</span><p className="dsh-output-description">{t(concise ? 'thinkingHintConcise' : 'thinkingHint')}</p></div><Tag tone="neutral">{t(concise ? 'collapsedDefault' : 'alwaysOpen')}</Tag></div>
+      <div className="dsh-output-field"><div><span>{t('thinking')}</span><p className="dsh-output-description">{t(concise ? 'thinkingHintConcise' : 'thinkingHint')}</p></div><Tag tone="neutral">{t(concise ? 'thinkingHidden' : 'alwaysOpen')}</Tag></div>
       <fieldset className="dsh-output-field" disabled={disabled}>
         <legend>{t('density')}</legend>
         <div className="dsh-output-controls">
@@ -110,17 +123,14 @@ export function Settings({ useOutputPreferences, setPreference, t }: Props) {
       </div>}
       <div className="dsh-output-assistant" data-output-layout={state.value.layout} data-output-both={!processPreview || undefined}
         data-output-density={state.value.density} data-output-text-size={state.value.textSize}>
-        {!processPreview && (concise
-          // Same shared component as the live seat, so the preview really folds and unfolds. The
-          // sample line describes folding; the fully expanded layouts below keep the old note.
-          ? <ThinkingDisclosure id="dsh-output-thinking-preview" status="settled" text={t}
-              open={previewThinkingOpen} onToggle={togglePreviewThinking}>
-              <section className="dsh-output-reasoning" aria-label={t('thinking')}><p>{t('noteConcise')}</p></section>
-            </ThinkingDisclosure>
-          : <section className="dsh-output-reasoning"><div className="dsh-output-label">{t('thinking')}</div><p>{t('note')}</p></section>)}
-        <section className="dsh-output-answer"><div className="dsh-output-label dsh-output-answer-label">{t('answer')}</div>
+        {/* Concise chat shows no thinking body at all; only the other layouts preview it. */}
+        {!processPreview && !concise
+          && <section className="dsh-output-reasoning"><div className="dsh-output-label">{t('thinking')}</div><p>{t('note')}</p></section>}
+        <section className={`dsh-output-answer${concise && playing ? ' dsh-output-preview-text' : ''}`}><div className="dsh-output-label dsh-output-answer-label">{t('answer')}</div>
           <StreamMarkdown text={sample} running={playing} motion={state.value.motion} labels={labels} />
         </section>
+        {concise && playing && <ActivityDisclosure id="dsh-output-activity-preview" records={SAMPLE_ACTIVITY} text={t}
+          open={previewActivityOpen} onToggle={togglePreviewActivity} />}
       </div>
     </section>
     <p className="dsh-output-description">{t('rate')}</p>

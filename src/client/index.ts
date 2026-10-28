@@ -4,15 +4,22 @@ import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type { ConfigForm } from '@deepseek-ai/dsh-client-ui-settings/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-chat/client'
+import { fileAddressFor } from '@deepseek-ai/dsh-util-workspace-path'
 import { ENTRY_ID, PACKAGE_ID, type Preferences } from '../preferences.ts'
 import { createPreferences, type PreferencesController } from './settings.ts'
 import { Assistant, type OutputInjected } from './Assistant.tsx'
+import { ActivityTail } from './ActivityTail.tsx'
+import { ActivityDock } from './ActivityDock.tsx'
 import { Settings, type SettingsInjected } from './Settings.tsx'
 import { NS, en, zh } from './locales.ts'
 import styles from './styles.css'
 
 /** Assistant seat this Bundle shadows; declared by the shipped Chat package. */
 const ASSISTANT_SLOT = 'conversation.chat.node'
+/** Completed-Turn extension list; the shipped package renders it once the Turn tail is published. */
+const TURN_TAIL_SLOT = 'conversation.chat.turnTail'
+/** Input-zone dock list, rendered above the composer independently of any Assistant or Turn tail. */
+const INPUT_DOCK_SLOT = 'conversation.input.dock'
 /** Settings seat this Bundle adds; independent of every chat declaration. */
 const SETTINGS_SLOT = 'settings.section'
 /** Root marker every native-output takeover rule in styles.css is scoped by. */
@@ -123,6 +130,38 @@ export function apply(ctx: Context): void {
     }, Assistant),
     installTakeover(controller),
   ])
+  // The Turn's activity summary and its single native-row controller live in the public Turn tail,
+  // which the host publishes only on `turn/end`. A Turn that is still running or only producing tools
+  // has no tail yet and is covered by the input dock below. A host without the declaration registers
+  // nothing and hides nothing; the entry keeps its own `id`, so shipped tail contributions stay intact.
+  ctx.slots.inject(TURN_TAIL_SLOT, () => ctx.slots.register({
+    name: TURN_TAIL_SLOT, id: 'output-activity', order: 0, locale: NS, inject: injectOutput,
+  }, ActivityTail))
+  // The shipped Turn tail exists only after `turn/end`, so a running or tool-only Turn is covered by
+  // the public input dock until that tail is published. The dock needs the public sidebar file
+  // service and the session list, so it is registered inside their lifecycle: it appears when both
+  // are usable, and its registration — summary, controller and rules — disappears when either is
+  // withdrawn. Nothing is polled and no private registry is touched.
+  ctx.inject(['sidebarRight', 'sessions'], (scoped) => {
+    const sidebar = (scoped as unknown as { get: (name: string) => unknown }).get('sidebarRight') as
+      { openResource?: (address: string) => void } | undefined
+    const sessions = (scoped as unknown as { get: (name: string) => unknown }).get('sessions') as
+      { list?: { getSnapshot?: () => { byId?: Record<string, { cwd?: string }> } } } | undefined
+    if (sidebar === undefined || typeof sidebar.openResource !== 'function') return
+    if (sessions === undefined || typeof sessions.list?.getSnapshot !== 'function') return
+    // Capture the verified method once and keep the service receiver bound: a mutable optional
+    // property would not stay narrowed inside the callback (TS2722) and `this` must survive.
+    const openResource = sidebar.openResource.bind(sidebar)
+    const openFileFor = (sessionId: string, path: string): void => {
+      // cwd is read when a file is actually opened.
+      const cwd = sessions.list?.getSnapshot?.()?.byId?.[sessionId]?.cwd
+      openResource(fileAddressFor(sessionId, cwd, path))
+    }
+    scoped.slots.inject(INPUT_DOCK_SLOT, () => scoped.slots.register({
+      name: INPUT_DOCK_SLOT, id: 'output-activity', order: 0, locale: NS,
+      inject: () => ({ ...injectOutput(), openFile: openFileFor, canOpenFile: true }),
+    }, ActivityDock))
+  })
   // The settings page never touches native output, so it keeps its own independent declaration.
   ctx.slots.inject(SETTINGS_SLOT, () => ctx.slots.register({
     name: SETTINGS_SLOT, id: ENTRY_ID, order: 14, label: () => outputText('section'), locale: NS,

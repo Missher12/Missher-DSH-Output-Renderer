@@ -3,14 +3,15 @@ import { Fragment, memo, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import type { InjectFace } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ObservableSnapshot } from '@deepseek-ai/dsh-client-store'
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type { ChatNodeViewProps, TurnTailOwnerProps } from '@deepseek-ai/dsh-client-ui-chat/client'
 import { JsonBlock } from '@deepseek-ai/dsh-client-ui-primitives'
 import { fileMediaUrl } from '@deepseek-ai/dsh-util-workspace-path'
 import type { PreferencesController } from './settings.ts'
 import type { Translate } from './locales.ts'
+import { latestTurn, parseTurnView, pendingApplies, previewText, turnView, type TurnSnapshotView } from './turn-view.ts'
 import { StreamMarkdown } from './stream.tsx'
 import { StepLabel } from './StepLabel.tsx'
-import { ThinkingDisclosure, useThinkingOpen, type ThinkingStatus } from './Thinking.tsx'
 
 export interface OutputInjected {
   hooks: { outputPreferences: ObservableSnapshot<ReturnType<PreferencesController['store']['getSnapshot']>> }
@@ -36,24 +37,17 @@ type SharedGalleryCall = (
 ) => ReactNode
 type Props = ChatProps & { renderFactorySlot?: unknown }
 
-export const Assistant = memo(function Assistant({ node, groupPart, sessionId, useTurnData, openFile, renderMessageImages,
-  renderFactorySlot, loadImage, fileMentions, useOutputPreferences, outputText, t }: Props) {
+export const Assistant = memo(function Assistant({ node, groupPart, useTurnData, openFile, renderMessageImages,
+  renderFactorySlot, loadImage, fileMentions, useOutputPreferences, outputText, t, sessionId, useChat, useSessionStatus }: Props) {
   const { motion, layout, density, textSize } = useOutputPreferences(state => state.value)
   const data = node.data
   const running = data.status === 'running'
   // Only the final block can still grow. Earlier blocks are closed by the block after them,
   // so frame buffering must settle them instead of holding their last grapheme until the step ends.
   const streamingIndex = running ? data.blocks.length - 1 : -1
-  // "简洁对话" reads as one column and folds the reasoning by default; the other layouts stay fully open.
+  // "简洁对话" renders no thinking body at all: the answer plus its real edit records. The other
+  // layouts keep the fully expanded process they render today.
   const concise = layout === 'cards'
-  // The step status is not the thinking status: a running step that already appended text or a tool
-  // call has finished its reasoning. Only the last block of a running step can still be growing.
-  const reasoningLast = data.blocks[data.blocks.length - 1]?.kind === 'reasoning'
-  const reasoningActive = running && reasoningLast
-  // Keyed by seat identity, never by content: a delta, a new block or a status change keeps the
-  // user's choice, while another session or step starts collapsed.
-  const [thinkingOpen, toggleThinking] = useThinkingOpen(`${sessionId}:${data.turn}:${data.step}`, false)
-  const thinkingBodyId = `dsh-output-thinking-${sessionId}-${data.turn}-${data.step}`.replace(/[^A-Za-z0-9_-]/gu, '-')
   const turn = node.location.kind === 'turn' || node.location.kind === 'step' ? node.location.turn : undefined
   const tail = useTurnData('turn-tail')
   const owner = useMemo<TurnTailOwnerProps | undefined>(() => {
@@ -125,41 +119,37 @@ export const Assistant = memo(function Assistant({ node, groupPart, sessionId, u
   const hasReasoning = data.blocks.some(block => block.kind === 'reasoning' && block.text.trim())
   const hasResponse = data.blocks.some(block => block.kind === 'text' ? block.text.trim()
     : block.kind !== 'reasoning' && block.kind !== 'tool-call')
-  // Exactly one interruption notice. The fold row owns it only when the reasoning itself was the
-  // last real block of an interrupted step — the same phase test as `reasoningActive`, not "no answer
-  // text yet": a step that stopped after a tool call or an empty text block has already closed its
-  // reasoning. Everything else is assigned per seat responsibility, so no two seats claim it.
-  const rowOwnsStop = concise && hasReasoning && data.status === 'interrupted' && reasoningLast
+  // Exactly one interruption notice. Concise chat renders no thinking row, so the notice belongs to
+  // a seat: the reasoning seat only when it is the sole content seat, the response seat otherwise,
+  // and an unsplit seat always. Other layouts keep their existing split-seat rule.
   const reasoningSeatOwnsStop = hasReasoning && !hasResponse
-  const seatOwnsStop = !rowOwnsStop && (groupPart === undefined ? true
-    : groupPart === 'reasoning' ? reasoningSeatOwnsStop : !reasoningSeatOwnsStop)
-  const interrupted = data.status === 'interrupted'
-    && (concise ? seatOwnsStop : groupPart !== 'reasoning' || !hasResponse)
-  if (!reasoning.length && !response.length && !interrupted) return null
+  const interrupted = data.status === 'interrupted' && (concise
+    ? (groupPart === undefined ? true : groupPart === 'reasoning' ? reasoningSeatOwnsStop : !reasoningSeatOwnsStop)
+    : groupPart !== 'reasoning' || !hasResponse)
+  const showReasoning = !concise && reasoning.length > 0
+  // Cards need the public Turn readers; without them the host keeps its readable rendering and no
+  // hook is called conditionally — the capability check itself is hook-free.
+  if (concise) {
+    const canReadTurn = typeof useChat === 'function' && typeof useSessionStatus === 'function'
+    return canReadTurn
+      ? <CardsSeat useChat={useChat} useSessionStatus={useSessionStatus} sessionId={sessionId}
+          data={data} response={response} interrupted={interrupted} groupPart={groupPart}
+          outputText={outputText} density={density} textSize={textSize} />
+      : <CardsFallback data={data} response={response} interrupted={interrupted} groupPart={groupPart}
+          outputText={outputText} density={density} textSize={textSize} />
+  }
+  if (!showReasoning && !response.length && !interrupted) return null
   const checklistStep = layout === 'checklist' && (reasoning.length > 0
     || !hasReasoning && (response.length > 0 || interrupted))
   const showStopped = interrupted && (layout !== 'checklist' || !hasReasoning && !checklistStep)
-  // Never claim the thinking is in progress once the block has closed; a settled row describes the
-  // reasoning output, not task or tool success.
-  const thinkingStatus: ThinkingStatus = rowOwnsStop ? 'interrupted'
-    : reasoningActive ? 'running' : 'settled'
   return <div className={`dsh-output-assistant${checklistStep ? ' dsh-output-checklist-step' : ''}`} data-output-layout={layout} data-output-part={groupPart}
     data-output-density={density} data-output-text-size={textSize}
     data-output-both={reasoning.length > 0 && response.length > 0 || undefined} data-output-running={running || undefined}>
     {checklistStep && <StepLabel step={data.step} status={data.status} text={outputText} />}
-    {reasoning.length > 0 && (concise
-      // The row carries the interruption only when the reasoning itself stopped there; otherwise it
-      // names a finished process and the single stopped chip stays with the response seat.
-      ? <ThinkingDisclosure id={thinkingBodyId} status={thinkingStatus} text={outputText}
-          open={thinkingOpen} onToggle={toggleThinking}>
-          <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
-            <div data-reasoning-full>{reasoning}</div>
-          </section>
-        </ThinkingDisclosure>
-      : <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
-          <div className="dsh-output-label">{outputText('thinking')}</div>
-          <div data-reasoning-full>{reasoning}</div>
-        </section>)}
+    {showReasoning && <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
+      <div className="dsh-output-label">{outputText('thinking')}</div>
+      <div data-reasoning-full>{reasoning}</div>
+    </section>}
     {response.length > 0 && <section className="dsh-output-answer" aria-label={outputText('answer')}>
       <div className="dsh-output-label dsh-output-answer-label">{outputText('answer')}</div>
       {response}
@@ -167,3 +157,88 @@ export const Assistant = memo(function Assistant({ node, groupPart, sessionId, u
     {showStopped && <span className="dsh-output-stopped">{outputText('stopped')}</span>}
   </div>
 })
+
+/** Shared shell attributes for one concise seat. */
+function seatAttributes(data: ChatProps['node']['data'], groupPart: ChatProps['groupPart'], density: string, textSize: string) {
+  return {
+    className: 'dsh-output-assistant', 'data-output-layout': 'cards', 'data-output-part': groupPart,
+    'data-output-density': density, 'data-output-text-size': textSize,
+    'data-output-running': data.status === 'running' || undefined,
+  } as const
+}
+
+/** Public hooks the concise seat needs; the shell only mounts it when both exist. */
+type ChatSelector = ChatProps['useChat']
+type StatusSelector = (selector: (snapshot: ReadonlyMap<string, { pendingInteraction?: unknown }>) => boolean) => boolean
+interface CardsSeatProps {
+  useChat: ChatSelector
+  useSessionStatus: StatusSelector
+  sessionId: string
+  data: ChatProps['node']['data']
+  response: ReactNode[]
+  interrupted: boolean
+  groupPart: ChatProps['groupPart']
+  outputText: Translate
+  density: string
+  textSize: string
+}
+
+/**
+ * Concise Turn view: the trusted final reply alone, or the latest step's ordinary text as a short
+ * preview while the Turn is active. Intermediate steps never render, and a pending interaction hands
+ * the Turn back to the readable fallback so native entries stay usable.
+ * @param props - the seat's data and the public Turn readers.
+ * @returns the seat, or null when this seat has nothing to show in the current phase.
+ */
+function CardsSeat({ useChat, useSessionStatus, sessionId, data, response, interrupted, groupPart, outputText, density, textSize }: CardsSeatProps) {
+  const view = useChat(snapshot => turnView(snapshot as TurnSnapshotView, data.turn))
+  const latest = useChat(snapshot => latestTurn(snapshot as TurnSnapshotView))
+  const rawPending = useSessionStatus(snapshot => snapshot.get(sessionId)?.pendingInteraction !== undefined)
+  const pending = pendingApplies(rawPending, latest, data.turn)
+  const preview = previewText(data.blocks)
+  const parsed = parseTurnView(view)
+  const fallback = <CardsFallback data={data} response={response} interrupted={interrupted}
+    groupPart={groupPart} outputText={outputText} density={density} textSize={textSize} />
+  if (parsed === undefined || parsed.phase === 'unavailable' || pending) return fallback
+  if (parsed.phase === 'completed' && parsed.final >= 0) {
+    // Only the trusted final seat survives; every earlier seat (including an interrupted one) hides.
+    const finalNode = data.finalNode as { seq?: unknown } | undefined
+    const finalSeq = typeof finalNode?.seq === 'number' ? finalNode.seq : undefined
+    if (finalSeq === undefined || parsed.finalSeq !== finalSeq
+      || data.step !== parsed.final || groupPart === 'reasoning') return null
+    return <div {...seatAttributes(data, groupPart, density, textSize)}>
+      <section className="dsh-output-answer" aria-label={outputText('answer')}>{response}</section>
+    </div>
+  }
+  // Intermediate seats never carry text; only the latest step of an open Turn previews its own text.
+  if (parsed.phase === 'active') {
+    if (data.step !== parsed.latest || groupPart === 'reasoning' || preview === '') return null
+    return <div {...seatAttributes(data, groupPart, density, textSize)}>
+      <section className="dsh-output-answer dsh-output-preview-text" aria-label={outputText('answer')}
+        data-output-preview="">{preview}</section>
+    </div>
+  }
+  // Closed without a trusted final reply: keep real failed/cancelled content readable on the last
+  // step instead of promoting an older text to final.
+  if (data.step !== parsed.latest) return null
+  if (groupPart === 'reasoning') {
+    if (!interrupted) return null
+    return <div {...seatAttributes(data, groupPart, density, textSize)}>
+      <span className="dsh-output-stopped">{outputText('stopped')}</span>
+    </div>
+  }
+  if (response.length === 0 && !interrupted) return null
+  return <div {...seatAttributes(data, groupPart, density, textSize)}>
+    {response.length > 0 && <section className="dsh-output-answer" aria-label={outputText('answer')}>{response}</section>}
+    {interrupted && <span className="dsh-output-stopped">{outputText('stopped')}</span>}
+  </div>
+}
+
+/** Readable cards rendering for hosts that do not expose the Turn readers. */
+function CardsFallback({ data, response, interrupted, groupPart, outputText, density, textSize }: Omit<CardsSeatProps, 'useChat' | 'useSessionStatus' | 'sessionId'>) {
+  if (response.length === 0 && !interrupted) return null
+  return <div {...seatAttributes(data, groupPart, density, textSize)}>
+    {response.length > 0 && <section className="dsh-output-answer" aria-label={outputText('answer')}>{response}</section>}
+    {interrupted && <span className="dsh-output-stopped">{outputText('stopped')}</span>}
+  </div>
+}

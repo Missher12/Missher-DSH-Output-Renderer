@@ -35,7 +35,7 @@ function props(layout: Layout, blocks: Data['blocks'], status: Data['status'] = 
     outputText: key => zh[key], t: key => key,
     openFile: vi.fn(), openSkill: unused, inspectCall: undefined, forkAt: unused,
     fileMentions: vi.fn(() => undefined), renderMessageImages: unused, loadImage: unused,
-    useDisclosure: unused, useChat: unused, useConversation: unused, useInput: unused,
+    useDisclosure: unused, useChat: selector => selector({}), useConversation: unused, useInput: unused,
     useWorkspaces: unused, useSessions: unused, useSessionStatus: unused, useSessionRetainInfo: unused,
     useSession: unused, useProjection: unused, sessionId: 'synthetic-output-test' as Props['sessionId'],
     inputActions: { captureInsertion: unused, insertText: unused, setDraft: unused, addAttachments: unused,
@@ -45,20 +45,19 @@ function props(layout: Layout, blocks: Data['blocks'], status: Data['status'] = 
 
 test.each(LAYOUTS)('%s identifies a reasoning-only interruption exactly once', layout => {
   const html = renderToStaticMarkup(<Assistant {...props(layout, [{ kind: 'reasoning', text: '保留已经收到的思考。' }])} groupPart="reasoning" />)
-  expect(html).toContain('保留已经收到的思考。')
-  // One notice owns the interruption: the concise fold row when the reasoning stopped there,
-  // otherwise the detached stopped label. Never two wordings for one interruption.
-  const stopped = html.match(/已停止/gu) ?? []
-  const interruptedRow = html.match(/思考中断/gu) ?? []
-  expect(stopped.length + interruptedRow.length).toBe(1)
-  expect(stopped).toHaveLength(layout === 'cards' ? 0 : 1)
+  // Concise chat never renders the thinking text; the other layouts keep it fully expanded.
+  if (layout === 'cards') expect(html).not.toContain('保留已经收到的思考。')
+  else expect(html).toContain('保留已经收到的思考。')
+  // One notice owns the interruption; it is never duplicated by a second wording.
+  expect(html.match(/已停止/gu) ?? []).toHaveLength(1)
   expect(html).not.toContain('class="dsh-output-answer"')
 })
 
 test.each(LAYOUTS)('%s reports one interruption across the reasoning and response seats', layout => {
   const shared = props(layout, [{ kind: 'reasoning', text: '检查过程。' }, { kind: 'text', text: '保留部分答复。' }])
   const html = renderToStaticMarkup(<><Assistant {...shared} groupPart="reasoning" /><Assistant {...shared} groupPart="response" /></>)
-  expect(html).toContain('检查过程。')
+  if (layout === 'cards') expect(html).not.toContain('检查过程。')
+  else expect(html).toContain('检查过程。')
   expect(html).toContain('保留部分答复。')
   expect(html.match(/已停止/gu)).toHaveLength(1)
 })

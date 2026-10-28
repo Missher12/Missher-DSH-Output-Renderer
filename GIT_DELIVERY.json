@@ -1,95 +1,20 @@
 {
-  "version": "0.1.5",
-  "date": "2026-10-22",
+  "version": "0.1.3-rc.5",
   "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
-  "sourceBaseCommit": "186aadd5644c6671c87b581b29138bff9bbcb19d",
-  "status": "formal Release published; Ubuntu daily installation and active plugin verified; other native platforms unverified",
+  "sourceBaseCommit": "23a7cdf0a872e8d47368a5ecdcd3a6e1a911b200",
+  "status": "source-for-prerelease",
+  "acceptedPackageSha256": "902bbef203352494345c2ceefa262c1a8e6244734d05c712e3a1c4b57643f095",
   "runtimeFiles": [
     {
       "path": "lib/index.js",
-      "sha256": "5a68c88922e5215c4ada28286ea60628d195226d2e024bd60b8166eaa04db603"
+      "sha256": "f9228fd3020670cca0d33eede8c7d283ebec519c53ab59d363dfb52336b6309a"
     },
     {
       "path": "lib/client.js",
-      "sha256": "e83726c8eed246266dd7fcce9f1d0bdd1d7930b703d707cedb4dd5532afde3f6"
+      "sha256": "21b1abfaa2d769b56dd1686b9c2a90c10f77c5ce36f9f54568b797d583b5de4b"
     }
   ],
-  "validation": "35 focused tests, Host/client types, build and actual installed-community RC.2 Web UI on 0.1.4 candidate; identical runtime reused. Not proven unmodified official RC.2 or native/all-platform acceptance.",
-  "previousDelivery": {
-    "version": "0.1.3",
-    "date": "2026-10-17",
-    "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
-    "sourceBaseCommit": "161ddeb5b4756a3504650ee9c91c959cfe3a8eea",
-    "status": "accepted source and runtime; regular Release and device installation are separate steps",
-    "acceptedPackageSha256": "a4de6d8be26842f38aa643c379eb336ca13f6068e678fba656d1e144f9c7b1ec",
-    "packageBytes": 39125,
-    "runtimeFiles": [
-      {
-        "path": "lib/index.js",
-        "sha256": "5a68c88922e5215c4ada28286ea60628d195226d2e024bd60b8166eaa04db603"
-      },
-      {
-        "path": "lib/client.js",
-        "sha256": "fbe18ee6afc02245bf0af1b8d1285a6955d74b43b754101f4783c38b83406c44"
-      }
-    ],
-    "sourceTag": "v0.1.3",
-    "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.3",
-    "publicationChanges": "Neutral documentation and immutable screenshot links only after acceptance. All ten final archive files match this export; runtime bytes and package manifest unchanged.",
-    "validation": "53 focused tests, types/build, six real Host cases and controlled real SlotRegistry checks, actual Web UI on official npm alpha.5 and community rc.2. Current community alpha.2/native desktop/Windows/macOS/real-provider limits are explicit in VALIDATION.md.",
-    "previousDelivery": {
-      "version": "0.1.3-rc.5",
-      "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
-      "sourceBaseCommit": "23a7cdf0a872e8d47368a5ecdcd3a6e1a911b200",
-      "status": "source-for-prerelease",
-      "acceptedPackageSha256": "902bbef203352494345c2ceefa262c1a8e6244734d05c712e3a1c4b57643f095",
-      "runtimeFiles": [
-        {
-          "path": "lib/index.js",
-          "sha256": "f9228fd3020670cca0d33eede8c7d283ebec519c53ab59d363dfb52336b6309a"
-        },
-        {
-          "path": "lib/client.js",
-          "sha256": "21b1abfaa2d769b56dd1686b9c2a90c10f77c5ce36f9f54568b797d583b5de4b"
-        }
-      ],
-      "sourceTag": "v0.1.3-rc.5",
-      "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.3-rc.5",
-      "publicationChanges": "Documentation only after frozen package acceptance; original runtime archive preserved."
-    }
-  },
-  "sourceTag": "v0.1.5",
-  "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.5",
-  "supersededSourceTag": {
-    "tag": "v0.1.4",
-    "commit": "186aadd5644c6671c87b581b29138bff9bbcb19d",
-    "releasePublished": false,
-    "reason": "Correct unsupported official-host provenance wording without rewriting public tag"
-  },
-  "archive": "missher-dsh-output-renderer-0.1.5.tgz",
-  "sha256": "78e44b45e723c41e59f45c35b4312d182fdf217a937ff7e06236ff918dcc1e0d",
-  "bytes": 42103,
-  "members": 10,
-  "published": true,
-  "release": {
-    "url": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.5",
-    "id": 420309764,
-    "tag": "v0.1.5",
-    "commit": "04edc228daf885eddf291f9aadf8e9cf2e1ae464",
-    "draft": false,
-    "prerelease": false,
-    "anonymousDownloadsMatched": true
-  },
-  "installation": {
-    "platform": "Ubuntu",
-    "version": "0.1.5",
-    "exactArchiveMembersMatched": 10,
-    "enabled": true,
-    "fiberPhase": "active",
-    "preferencesPreserved": true,
-    "coldRollbackBackupVerified": true,
-    "hostChanged": false,
-    "otherPluginVersionsChanged": false,
-    "scope": "Local installed community RC.2; not a claim for unmodified official Host or every platform"
-  }
+  "sourceTag": "v0.1.3-rc.5",
+  "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.3-rc.5",
+  "publicationChanges": "Documentation only after frozen package acceptance; original runtime archive preserved."
 }

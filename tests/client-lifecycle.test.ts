@@ -96,8 +96,76 @@ function host(overrides: Overrides = {}) {
     },
   }
 
+  /** Public services provided to the fiber, mirroring a late/withdrawn Cordis service. */
+  const provided = new Map<string, unknown>()
+  const pendingInjects: { deps: string[]; callback: (scope: unknown) => unknown }[] = []
+  const injectFibers: { deps: string[]; callback: (scope: unknown) => unknown; dispose: () => void }[] = []
+
+  const scopedFaces = (): Record<string, unknown> => ({
+    ...faces,
+    get: (name: string) => provided.get(name),
+  })
+
+  const runInjects = (): void => {
+    for (const entry of [...pendingInjects]) {
+      if (!entry.deps.every(dep => provided.has(dep))) continue
+      pendingInjects.splice(pendingInjects.indexOf(entry), 1)
+      const own: (() => void)[] = []
+      const scope = {
+        ...scopedFaces(),
+        slots: {
+          inject: (key: string, callback: () => SlotInjectionEffect) => {
+            const dispose = slots.inject(key, callback)
+            own.push(dispose)
+            return dispose
+          },
+          register: slots.register,
+        },
+      }
+      const cleanup = entry.callback(scope)
+      const extra = typeof cleanup === 'function' ? cleanup as () => void : (): void => {}
+      const fiber = {
+        deps: entry.deps,
+        // Keep the original public injection so a withdrawn dependency can restore the wait.
+        callback: entry.callback,
+        dispose: () => { extra(); for (const dispose of [...own].reverse()) dispose() },
+      }
+      injectFibers.push(fiber)
+      effects.push(fiber.dispose)
+    }
+  }
+
+  const provide = (name: string, value: unknown): void => {
+    provided.set(name, value)
+    faces[name] = value
+    runInjects()
+  }
+  const revoke = (name: string): void => {
+    provided.delete(name)
+    delete faces[name]
+    for (const fiber of [...injectFibers]) {
+      if (!fiber.deps.includes(name)) continue
+      injectFibers.splice(injectFibers.indexOf(fiber), 1)
+      const at = effects.indexOf(fiber.dispose)
+      if (at >= 0) effects.splice(at, 1)
+      fiber.dispose()
+      // Cordis re-arms the same dependency wait: the scoped callback runs again when every service
+      // is provided once more. Skipped only while the plugin fiber itself is unloading.
+      if (!unloaded) pendingInjects.push({ deps: fiber.deps, callback: fiber.callback })
+    }
+  }
+
   const faces: Record<string, unknown> = {
     effect: installEffect,
+    // Optional public services the dock resolves; absence must keep it inert.
+    get: (name: string) => provided.get(name),
+    // Public dependency lifecycle: the scoped callback runs only when every service exists and is
+    // torn down when one is withdrawn, exactly like Cordis' `ctx.inject(deps, cb)`.
+    inject: (deps: string[], callback: (scope: unknown) => unknown): void => {
+      if (unloaded) throw new Error(`ctx.inject(${deps.join(',')}) after fiber unload`)
+      pendingInjects.push({ deps, callback })
+      runInjects()
+    },
     slots,
     locale: { register: () => () => {}, bind: () => (key: string) => key },
     configForms: { get: () => 'form' in overrides ? overrides.form : form },
@@ -107,7 +175,7 @@ function host(overrides: Overrides = {}) {
     faces[key] = value
   }
   return {
-    ctx: faces, waits, registered, subscribers, effects,
+    ctx: faces, waits, registered, subscribers, effects, provide, revoke,
     sync: (value: Partial<typeof snapshot>) => { snapshot = { ...snapshot, ...value }; subscribers.forEach(listener => listener()) },
     /** Declare a slot the way the owning package would, installing its contribution once. */
     declare: (key: string): void => {
@@ -157,7 +225,9 @@ afterEach(() => {
 
 test('native takeover starts only once the assistant seat is really registered and ends with it', () => {
   const created = boot()
-  expect([...created.waits.keys()].sort()).toEqual(['conversation.chat.node', 'settings.section'])
+  expect([...created.waits.keys()].sort()).toEqual([
+    'conversation.chat.node', 'conversation.chat.turnTail', 'settings.section',
+  ])
   expect(created.registered).toEqual([])
   expect(document.documentElement.hasAttribute(MARKER)).toBe(false)
   expect(document.head.querySelectorAll(CSS)).toHaveLength(1)
@@ -169,6 +239,42 @@ test('native takeover starts only once the assistant seat is really registered a
   created.collapse('conversation.chat.node')
   expect(document.documentElement.hasAttribute(MARKER)).toBe(false)
   expect(created.registered).toEqual([])
+})
+
+test('the activity tail entry is additive, declaration-scoped and released with it', () => {
+  const created = boot()
+  expect(created.registered).toEqual([])
+  created.declare('conversation.chat.turnTail')
+  expect(created.registered).toEqual(['conversation.chat.turnTail'])
+  // The shipped tail entries are untouched: this Bundle adds its own id and never replaces one.
+  created.collapse('conversation.chat.turnTail')
+  expect(created.registered).toEqual([])
+})
+
+test('the input dock follows its optional services: late arrival, withdrawal and restore', () => {
+  const created = boot()
+  // Neither service exists yet, so the dock is not even declarable.
+  expect(created.waits.has('conversation.input.dock')).toBe(false)
+  // A partial service face is not enough.
+  created.provide('sidebarRight', {})
+  created.provide('sessions', { list: { getSnapshot: () => ({ byId: {} }) } })
+  expect(created.waits.has('conversation.input.dock')).toBe(false)
+  created.revoke('sidebarRight')
+  // Both usable services arrive: the entry becomes declarable.
+  created.provide('sidebarRight', { openResource: () => {} })
+  created.provide('sessions', { list: { getSnapshot: () => ({ byId: {} }) } })
+  expect(created.waits.has('conversation.input.dock')).toBe(true)
+  created.declare('conversation.input.dock')
+  expect(created.registered).toEqual(['conversation.input.dock'])
+  // Withdrawing one service releases the entry with its declaration.
+  created.revoke('sessions')
+  expect(created.registered).toEqual([])
+  expect(created.waits.has('conversation.input.dock')).toBe(false)
+  // Restoring it makes the entry declarable again.
+  created.provide('sessions', { list: { getSnapshot: () => ({ byId: {} }) } })
+  expect(created.waits.has('conversation.input.dock')).toBe(true)
+  created.declare('conversation.input.dock')
+  expect(created.registered).toEqual(['conversation.input.dock'])
 })
 
 test('the marker follows the accepted layout for as long as the seat is live', () => {
@@ -265,7 +371,9 @@ test('a form still waiting for its first accepted section is installed, not trea
     subscribe: () => () => {},
     set: async () => false,
   } })
-  expect([...created.waits.keys()].sort()).toEqual(['conversation.chat.node', 'settings.section'])
+  expect([...created.waits.keys()].sort()).toEqual([
+    'conversation.chat.node', 'conversation.chat.turnTail', 'settings.section',
+  ])
   expect(document.head.querySelectorAll(CSS)).toHaveLength(1)
   created.declare('conversation.chat.node')
   expect(created.registered).toEqual(['conversation.chat.node'])

@@ -20,6 +20,19 @@ interface Seat {
 
 function unused(): never { throw new Error('Assistant requested an unrelated host capability') }
 
+/** Cards seat with a completed Turn whose last step is the given reply. */
+function cardsSeat(seat: Seat, blocks: Blocks): Props {
+  const base = props(seat, blocks)
+  const last = { step: 2, data: { get: (key: string) => key === 'assistant-step' ? base.node.data : undefined } }
+  const turn = { turn: 1, status: 'closed', end: { data: { reason: { kind: 'completed' } } }, steps: [last] }
+  return { ...base,
+    useChat: ((selector: (value: unknown) => unknown) => selector({ timeline: { turns: new Map([[1, turn]]) } })) as Props['useChat'],
+    useSessionStatus: ((selector: (value: unknown) => unknown) => selector(new Map())) as Props['useSessionStatus'],
+    useOutputPreferences: (selector: (value: unknown) => unknown) => selector({ value: { ...DEFAULTS, layout: 'cards' },
+      status: 'ready', ready: true, writable: true, saving: false, error: false }),
+  } as unknown as Props
+}
+
 const group: Blocks = [
   { kind: 'image', attachment: { id: 'local-image-1', name: 'demo-1.png' } },
   { kind: 'image', attachment: { id: 'local-image-2', name: 'demo-2.png' } },
@@ -109,6 +122,24 @@ test('a Factory published without an authorized loader is reported instead of ca
   const html = renderToStaticMarkup(<Assistant {...props({ renderFactorySlot }, group)} groupPart="response" />)
   expect(renderFactorySlot).not.toHaveBeenCalled()
   expect(html).toContain(zh.imagesUnavailable)
+})
+
+test('cards keeps a pure-image trusted final through the host gallery', () => {
+  const renderMessageImages = vi.fn((owner: { images: readonly { attachment: { id: string } }[] }) =>
+    <ul data-gallery={owner.images.length} />)
+  const html = renderToStaticMarkup(<Assistant {...cardsSeat({ renderMessageImages }, group)} groupPart="response" />)
+  expect(renderMessageImages).toHaveBeenCalledOnce()
+  expect(html).toContain('data-gallery="2"')
+  expect(html).not.toContain(zh.imagesUnavailable)
+})
+
+test('cards keeps a mixed text-and-image trusted final', () => {
+  const mixed = [{ kind: 'text', text: '图片前后的说明。' } as Blocks[number], ...group]
+  const renderMessageImages = vi.fn((owner: { images: readonly unknown[] }) => <ul data-gallery={owner.images.length} />)
+  const html = renderToStaticMarkup(<Assistant {...cardsSeat({ renderMessageImages }, mixed)} groupPart="response" />)
+  expect(renderMessageImages).toHaveBeenCalledOnce()
+  expect(html).toContain('图片前后的说明。')
+  expect(html).toContain('data-gallery="2"')
 })
 
 test('an image block on a host with no gallery is reported visibly, never dropped silently', () => {
