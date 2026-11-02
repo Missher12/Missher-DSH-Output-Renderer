@@ -235,42 +235,30 @@ function process(step: number, overrides: Record<string, unknown> = {}) {
   }
 }
 
-test('a settled final answer folds its reasoning into one process disclosure', async () => {
+test('a settled final answer renders only the answer, with no process control or thinking row', async () => {
   await render(<Assistant {...props({ turnProcess: process(2), blocks: [
     { kind: 'reasoning', text: '折叠的完整思考。' }, { kind: 'tool-call' }, { kind: 'text', text: '最终结论。' }] })} />)
   const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
-  const toggle = mount.querySelector<HTMLButtonElement>('[data-output-process-toggle]')!
-  const body = document.getElementById(toggle.getAttribute('aria-controls') ?? '')
   expect(root.getAttribute('data-output-conclusion')).toBe('true')
   expect(root.hasAttribute('data-output-process-open')).toBe(false)
-  expect(toggle.textContent).toBe(zh.processShow)
-  expect(toggle.getAttribute('aria-expanded')).toBe('false')
-  expect(body).not.toBeNull()
-  expect(body!.hasAttribute('hidden')).toBe(true)
-  expect(mount.querySelector('.dsh-output-answer')?.textContent).toContain('最终结论。')
-
-  await act(async () => { toggle.click() })
-  expect(root.getAttribute('data-output-process-open')).toBe('true')
-  expect(toggle.getAttribute('aria-expanded')).toBe('true')
-  expect(toggle.textContent).toBe(zh.processHide)
-  expect(body!.hasAttribute('hidden')).toBe(false)
-  expect(body!.textContent).toContain('折叠的完整思考。')
-
-  await act(async () => { toggle.click() })
-  expect(root.hasAttribute('data-output-process-open')).toBe(false)
-  expect(body!.hasAttribute('hidden')).toBe(true)
+  expect(mount.querySelector('[data-output-process-toggle]')).toBeNull()
+  expect(root.querySelector('.dsh-output-thinking')).toBeNull()
+  expect(root.textContent).not.toContain(zh.thinkingSettled)
+  expect(root.textContent).not.toContain('折叠的完整思考。')
+  expect(root.querySelector('.dsh-output-answer')?.textContent).toContain('最终结论。')
 })
 
-test('a running final step keeps the live thinking row and does not enter conclusion mode', async () => {
+test('a running final step keeps its live thinking row and no conclusion marker', async () => {
   await render(<Assistant {...props({ status: 'running', turnProcess: process(2), blocks: [
     { kind: 'reasoning', text: '仍在思考。' }, { kind: 'text', text: '正在生成。' }] })} />)
   const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
   expect(root.hasAttribute('data-output-conclusion')).toBe(false)
   expect(mount.querySelector('[data-output-process-toggle]')).toBeNull()
+  expect(control()).not.toBeNull()
   expect(control()?.textContent).toBe(zh.thinkingSettled)
 })
 
-test('an interrupted final step exposes its process instead of pretending it finished', async () => {
+test('an interrupted final step keeps its thinking row and does not claim a conclusion', async () => {
   await render(<Assistant {...props({ status: 'interrupted', turnProcess: process(2), blocks: [
     { kind: 'reasoning', text: '被中断的思考。' }, { kind: 'text', text: '部分答复。' }] })} />)
   const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
@@ -285,25 +273,25 @@ test('only the Turn answer step enters conclusion mode', async () => {
   const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
   expect(root.hasAttribute('data-output-conclusion')).toBe(false)
   expect(mount.querySelector('[data-output-process-toggle]')).toBeNull()
+  expect(control()).not.toBeNull()
 })
 
-test('a final answer with prior Turn tools but no local reasoning still offers the process control', async () => {
+test('a final answer with prior Turn tools but no local reasoning still keeps only the answer', async () => {
   await render(<Assistant {...props({ turnProcess: process(2), blocks: [{ kind: 'text', text: '只含结论。' }] })} />)
   const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
-  const toggle = mount.querySelector<HTMLButtonElement>('[data-output-process-toggle]')!
   expect(root.getAttribute('data-output-conclusion')).toBe('true')
-  expect(toggle).not.toBeNull()
-  expect(toggle.hasAttribute('aria-controls')).toBe(false)
-  await act(async () => { toggle.click() })
-  expect(root.getAttribute('data-output-process-open')).toBe('true')
+  expect(mount.querySelector('[data-output-process-toggle]')).toBeNull()
+  expect(root.querySelector('.dsh-output-thinking')).toBeNull()
+  expect(root.querySelector('.dsh-output-answer')?.textContent).toContain('只含结论。')
 })
 
-test('a pure final answer with no process does not invent a process control', async () => {
+test('a pure final answer also has no process control', async () => {
   await render(<Assistant {...props({ turnProcess: process(2, { toolCallCount: 0, messageCount: 0, inlineReasoning: false }),
     blocks: [{ kind: 'text', text: '纯结论。' }] })} />)
   const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
-  expect(root.hasAttribute('data-output-conclusion')).toBe(false)
+  expect(root.getAttribute('data-output-conclusion')).toBe('true')
   expect(mount.querySelector('[data-output-process-toggle]')).toBeNull()
+  expect(root.textContent).toContain('纯结论。')
 })
 
 test('non-concise layouts never enter conclusion mode even with a final answer projection', () => {

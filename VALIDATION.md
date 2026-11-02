@@ -1,3 +1,14 @@
+## 2026-11-03 · 0.2.1 只留结论与单思考行
+
+- 0.2.0 的“查看过程”按钮移除：最终答案步骤 settle 且命中 `answerStep` 后，只渲染最终答复；结论不再要求存在可回看过程。
+- 同类过程去重：cards 布局下同一 `[data-chat-group-key]` 内，只保留最新 assistant-step 的 `.dsh-output-thinking`；前面步骤的思考行隐藏，其答复/工具不因去重被删。`data-chat-group-part="response"` 用于避免把同一步的 reasoning/response 拆分误判为重复。
+- 中断和运行中不进入结论模式；其他布局不受去重或结论隐藏影响。
+- 双端 TypeScript 检查通过；11 个测试文件、130 项通过。结论模式 7 项已按“无按钮/无思考行”重写。
+- 隔离副本构建通过：`lib/client.js` 93,987 bytes，SHA-256 `db33f1af31feb477714b573a4b63b8be62208850f6a4888ff9938083f5083a0e`；`lib/index.js` 哈希不变。
+- 浏览器 mock 分组 DOM：cards 运行态两个步骤只显示 1 个思考行；同一 step 拆分仍显示 1 个；结论态工具/其他步骤/组头隐藏、最终答复可见、可见思考行 0、过程按钮 0；切到 process/reader 后去重和结论隐藏失效并恢复 2 个思考行。
+- 本地安装：`dsh plugin --profile desktop add` 已把 `@missher/dsh-output-renderer` 从 0.2.0 升到 0.2.1；profile 指向 `or-0.2.1.tgz`，安装后 `lib/client.js` 哈希与受检构建一致，其他 14 个插件仍在。旧 0.2.0 的 profile 包、锁文件、插件目录和 tgz 备份在 `~/.dsh/backups/output-renderer-0.2.0-20261103-005051`。宿主进程未重启，实际 Web UI 需刷新/重启后加载。
+- 限制：真实 DSH rc.4 的分组 DOM、拆分步骤属性和重启后的 Web UI 交互仍需复核；Project Ops task_run 适配器仍返回 `Tool batch execution failed`，本轮使用原生命令回执。0.2.1 尚未发布 GitHub Release。
+
 ## 2026-11-02 · 0.2.0 来源卡片与结论模式
 
 - 源码新增 `web_search` 根调用来源卡片：`tool.call.toolview`、`web_search`、priority -10；来源仅取持久化 `meta.sources`，只把 http(s) 暴露为外链，PTC 子调用/未知 meta 回退文本；宿主没有该槽时保留原生行。

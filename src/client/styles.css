@@ -17,7 +17,7 @@
 .dsh-output-thinking-toggle[aria-expanded="true"] .dsh-output-thinking-arrow { transform: rotate(90deg); }
 .dsh-output-thinking-state { min-width: 0; overflow-wrap: break-word; }
 /* This body is plugin-owned, never a host row: keep it hidden against any host or global display rule. */
-.dsh-output-assistant .dsh-output-thinking-body[hidden], .dsh-output-assistant .dsh-output-conclusion-process > div[hidden] { display: none !important; }
+.dsh-output-assistant .dsh-output-thinking-body[hidden] { display: none !important; }
 .dsh-output-thinking-body > .dsh-output-reasoning { padding-left: 0; border-left: 0; }
 .dsh-output-answer { display: flex; flex-direction: column; gap: var(--output-space); }
 .dsh-output-answer-label { display: none; margin-bottom: 0; }
@@ -54,14 +54,14 @@ html[data-dsh-output-renderer] [data-chat-group-key][hidden] { display: block !i
 html[data-dsh-output-renderer] [data-chat-flow-kind="turn-process"] { display: none !important; }
 html[data-dsh-output-renderer] [data-chat-group-key]:has(.dsh-output-reasoning) > div:first-child { display: none; }
 html[data-dsh-output-renderer] [data-chat-group-key]:has(.dsh-output-reasoning) > [data-step-process-body] { display: block !important; content-visibility: visible !important; max-height: none; overflow: visible; mask-image: none; scrollbar-gutter: auto; }
-/* Conclusion mode: the settled final answer owns one disclosure for the whole group. While it is
-   closed, the native tool rows and non-final assistant steps in that group are not rendered; the
-   group body stays open so the answer itself remains visible. Expanding flips one root attribute;
-   no host row is mutated or queried. */
+/* Conclusion mode: after the final answer settles, only that answer remains. The native tool rows,
+   non-final assistant steps and the group header in this group are hidden; the group body stays open
+   so the answer itself remains visible. No toggle, host row mutation or query is involved. */
+html[data-dsh-output-renderer="cards"] [data-chat-group-key] [data-chat-flow-kind="assistant-step"]:has(~ [data-chat-flow-kind="assistant-step"]:not([data-chat-group-part="response"])) .dsh-output-thinking { display: none !important; }
 html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion]) > div:first-child { display: none !important; }
 html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion]) > [data-step-process-body] { display: block !important; content-visibility: visible !important; max-height: none; overflow: visible; mask-image: none; scrollbar-gutter: auto; }
-html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion]:not([data-output-process-open])) [data-chat-flow-kind="tool-call"] { display: none !important; }
-html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion]:not([data-output-process-open])) [data-chat-flow-kind="assistant-step"]:not(:has(.dsh-output-assistant[data-output-conclusion])) { display: none !important; }
+html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion]) [data-chat-flow-kind="tool-call"] { display: none !important; }
+html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion]) [data-chat-flow-kind="assistant-step"]:not(:has(.dsh-output-assistant[data-output-conclusion])) { display: none !important; }
 html[data-dsh-output-renderer="process"] [data-chat-group-key]:has(.dsh-output-reasoning),
 .dsh-output-preview-process[data-output-layout="process"] { padding-left: 16px; border-left: 2px solid var(--dsw-alias-border-l2); }
 html[data-dsh-output-renderer="process"] [data-chat-group-key] .dsh-output-reasoning,
