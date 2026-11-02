@@ -11,7 +11,7 @@ Four assistant output layouts with full reasoning, independent tool details, and
 
 0.2.1 is a source and local-installation candidate; the initial 0.2.0 local installation and earlier history remain in [VALIDATION.md](./VALIDATION.md). No GitHub Release has been published; published assets remain authoritative at [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases).
 
-Host/client type checks, 130 tests, an isolated build and browser checks of conclusion hiding and the single thinking row passed. 0.2.1 is installed in the local `desktop` profile; a refresh/restart of the host is required to load it, and actual Web UI interaction remains to be checked in that environment. See [VALIDATION.md](./VALIDATION.md).
+Host/client type checks, 130 tests, an isolated build and browser checks of conclusion hiding and the single thinking row passed. 0.2.1 is installed in the local `desktop` profile; on 2026-11-03 the user confirmed the behavior in the actual page (the host process was not restarted; the page was reloaded). See [VALIDATION.md](./VALIDATION.md).
 
 The two screenshots below are retained from 0.1.3 and show the settings entry and process layout. The Soft cards option shown there has since been replaced.
 
@@ -66,7 +66,7 @@ It reads existing assistant content for display, creates no separate session dat
 
 | Scope | Evidence and limits |
 | --- | --- |
-| Local DSH `0.2.1-rc.4` | 0.2.1: host/client type checks, 130 tests, isolated build and mock group-DOM conclusion/single-thinking checks passed; `tool.call.toolview` and the `turn-process` projection are implemented against this version's contract. Installed in the local `desktop` profile (0.2.1); actual Web UI interaction after a host refresh/restart remains to be recorded. |
+| Local DSH `0.2.1-rc.4` | 0.2.1: host/client type checks, 130 tests, isolated build and mock group-DOM conclusion/single-thinking checks passed; `tool.call.toolview` and the `turn-process` projection are implemented against this version's contract. Installed in the local `desktop` profile (0.2.1); the user confirmed the actual page behavior on 2026-11-03. |
 | Installed community `0.2.1-rc.2` | 0.1.4: disclosure, in-flight choice retention, real state/interruption, native tools/images, settings preview/save/refresh/failure rollback, dark narrow layout and disable restoration on isolated synthetic data. |
 | Official npm alpha.5 (`0.2.1-alpha.5`, Cordis `4.0.5` / Schemastery `3.18.5`) | 0.1.3 historical evidence: the real Loader checks passed, including and settings, service scenarios covering normal saving, a missing settings service and a missing `configure`, controlled front-end SlotRegistry lifecycles, and real-page review of all four layouts, images, native zoom/tool expansion, save-failure rollback, stop-with-partial retention, 36-turn history loading, streaming fade and scroll-away stability; the 390 px settings panel and the 1280 px word wrapping were re-checked |
 | Missher community-extended rc.2 (`0.2.0-rc.2`, Cordis `4.0.4` / Schemastery `3.18.4`) | 0.1.3 historical evidence: the same real Loader/settings scenarios, controlled slot lifecycles and real-page review (identical four-layout content, refresh persistence, native image zoom, narrow width and unload) |
@@ -77,7 +77,7 @@ It reads existing assistant content for display, creates no separate session dat
 
 The renderer uses `conversation.chat.node` / `assistant-step`, `settings.section`, native Markdown and file callbacks, and version-related chat DOM markers. Images prefer the Chat-provided `renderMessageImages` closure and otherwise use the host-published `conversation.images.content` Factory; when neither exists the answer shows an explicit note instead of dropping the picture. Before calling any host face it checks `slots.inject/register`, `locale.register/bind` and `configForms.get`, reports what is missing and leaves native output visible. The host supplies React, Schemastery and DSH client modules; development SDK links are excluded from the runtime package. Recheck these interfaces after host upgrades. If the settings entry is absent, check whether the plugin is enabled and inspect host loading errors.
 
-See [VALIDATION.md](./VALIDATION.md) for dated evidence. The 0.2.1 130 tests, type checks, isolated build and mock group-DOM checks are source/component evidence, not an actual DSH Web UI acceptance. Real-profile installation and Web interaction must be recorded separately. Native desktop clicking, Windows/current macOS and sustained hardware frame rates are not claimed on this basis.
+See [VALIDATION.md](./VALIDATION.md) for dated evidence. The 0.2.1 130 tests, type checks, isolated build and mock group-DOM checks are source/component evidence, not an actual DSH Web UI acceptance. Real-profile installation and Web interaction are confirmed by the user in the actual page; DOM group details were not separately probed. Native desktop clicking, Windows/current macOS and sustained hardware frame rates are not claimed on this basis.
 
 ## Development and attribution
 

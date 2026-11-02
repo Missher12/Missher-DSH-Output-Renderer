@@ -11,7 +11,7 @@
 
 0.2.1 是源码与本地安装候选；0.2.0 的首次本地安装和更早历史保留在 [VALIDATION.md](./VALIDATION.md)。GitHub Release 尚未发布，正式安装资产仍以 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 为准。
 
-本次实现通过两端类型检查、130 项测试、隔离副本构建，以及浏览器分组 DOM 的结论隐藏和单思考行检查；0.2.1 已安装到本机 `desktop` profile，需刷新/重启宿主后加载，实际 Web UI 交互再按该环境复核。完整证据及旧版兼容记录见 [VALIDATION.md](./VALIDATION.md)。
+本次实现通过两端类型检查、130 项测试、隔离副本构建，以及浏览器分组 DOM 的结论隐藏和单思考行检查；0.2.1 已安装到本机 `desktop` profile；2026-11-03 用户在实际页面确认行为正确（宿主进程未重启，页面刷新后加载）。完整证据及旧版兼容记录见 [VALIDATION.md](./VALIDATION.md)。
 
 下面两张图片保留自0.1.3，展示设置入口和“深想简答”布局；其中“柔和卡片”现已替换。
 
@@ -66,7 +66,7 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 | 检查范围 | 证据与限制 |
 | --- | --- |
-| 本机 DSH `0.2.1-rc.4` | 0.2.1：双端类型检查、130 项测试、隔离构建和 mock 分组 DOM 的结论隐藏/单思考行检查通过；`tool.call.toolview` 与 `turn-process` 投影已按该版本契约实现。已安装到本机 `desktop` profile（0.2.1）；刷新/重启宿主后的实际 Web UI 交互待复核。 |
+| 本机 DSH `0.2.1-rc.4` | 0.2.1：双端类型检查、130 项测试、隔离构建和 mock 分组 DOM 的结论隐藏/单思考行检查通过；`tool.call.toolview` 与 `turn-process` 投影已按该版本契约实现。已安装到本机 `desktop` profile（0.2.1）；2026-11-03 用户在实际页面确认行为正确。 |
 | 本机社区发行版 `0.2.1-rc.2` | 0.1.4已验：折叠与键盘操作、流中展开保持、实际状态和中断、正文/图片/原生工具、设置预览/保存/刷新/失败回退、暗色窄栏、停用恢复。浏览器使用隔离的本地合成数据。 |
 | 官方 npm alpha.5（`0.2.1-alpha.5`，Cordis `4.0.5` / Schemastery `3.18.5`） | 0.1.3历史证据：已通过真实 Loader 与设置；服务场景含正常保存、缺少 settings、缺少 configure；真实前端 SlotRegistry 受控生命周期；真实 Web 页面复核四布局、图片、原生放大/工具展开、保存失败回退、停止保留、36 轮历史加载、流式淡入与滚离底部；390 px 设置面板与 1280 px 词语分行均复验 |
 | Missher 社区扩展 rc.2（`0.2.0-rc.2`，Cordis `4.0.4` / Schemastery `3.18.4`） | 0.1.3历史证据：已通过同一组真实 Loader/设置场景、受控插槽生命周期与真实 Web 页面复核（四布局内容一致、刷新持久化、原生图片放大、窄屏与卸载） |
@@ -77,7 +77,7 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 插件依赖 `conversation.chat.node` 的 `assistant-step`、`settings.section`、原生 Markdown 与文件回调，以及聊天 DOM 标记；图片优先使用 Chat 提供的 `renderMessageImages` 闭包，其次使用宿主发布的 `conversation.images.content` Factory，两者都不存在时在正文位置显示明确提示而不是丢图。调用宿主能力前会检查 `slots.inject/register`、`locale.register/bind` 与 `configForms.get` 是否存在，缺失时给出诊断并保持原生输出可见。React、Schemastery 及 DSH 客户端模块由宿主提供；开发 SDK 链接不会进入运行包。升级宿主后需重新核验这些接口，若设置页不出现，检查插件启用状态和宿主加载错误。
 
-完整证据见 [VALIDATION.md](./VALIDATION.md)。0.2.1 的 130 项测试、类型检查、隔离构建与 mock 分组 DOM 检查属于源码/组件级证据，不等同于实际 DSH Web UI 验收；真实 profile 安装和 Web 交互需按本机环境单独记录。原生桌面点击、Windows/当前 macOS 与持续硬件满帧率均未据此宣称通过。
+完整证据见 [VALIDATION.md](./VALIDATION.md)。0.2.1 的 130 项测试、类型检查、隔离构建与 mock 分组 DOM 检查属于源码/组件级证据，不等同于实际 DSH Web UI 验收；真实 profile 安装和 Web 交互已由用户在实际页面确认；DOM 分组细节未单独探测。原生桌面点击、Windows/当前 macOS 与持续硬件满帧率均未据此宣称通过。
 
 ## 开发与署名
 

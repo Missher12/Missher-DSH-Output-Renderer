@@ -112,7 +112,7 @@
     "sha256": "5b2aea887df0467a53b584e0884b8e1ea093ceacb485cc6f6710da173a454a89",
     "bytes": 49327,
     "members": 10,
-    "validation": "130 tests in 11 files, host/client type checks, isolated build and browser mock group-DOM checks (one thinking row while running, answer-only conclusion). Desktop profile installed 0.2.1; host restart/reload and real Web UI interaction not yet verified.",
+    "validation": "130 tests in 11 files, host/client type checks, isolated build and browser mock group-DOM checks (one thinking row while running, answer-only conclusion). Desktop profile installed 0.2.1; user confirmed the actual page behavior on 2026-11-03 after a page reload.",
     "installation": {
       "profile": "desktop",
       "version": "0.2.1",
@@ -120,8 +120,11 @@
       "otherPluginsUnchanged": true,
       "backup": "~/.dsh/backups/output-renderer-0.2.0-20261103-005051",
       "hostChanged": false,
-      "restartRequired": true,
-      "webUiVerified": false
+      "restartRequired": false,
+      "webUiVerified": true,
+      "hostRestarted": false,
+      "pageReloaded": true,
+      "verification": "User confirmed 0.2.1 behavior on the actual page at 2026-11-03T01:23:09+08:00: no process control and one thinking row while running."
     }
   },
   "previousSourceCandidate": {
