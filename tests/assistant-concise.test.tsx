@@ -24,14 +24,16 @@ function props(options: {
   step?: number
   sessionId?: string
   renderMessageImages?: Props['renderMessageImages']
+  /** Optional Turn-process projection; without it the old concise behavior stays. */
+  turnProcess?: unknown
 }): Props {
   const { blocks, layout = 'cards', status = 'settled', step = 2, sessionId = 'synthetic-concise',
-    renderMessageImages } = options
+    renderMessageImages, turnProcess } = options
   const finalNode = { kind: 'assistant' as const, seq: 10, time: 100, turn: 1, step, blocks,
     ...(status === 'interrupted' ? { interrupted: true as const } : {}) }
   const data = { status, turn: 1, step, blocks, time: 100, ...(status === 'running' ? {} : { finalNode }) }
-  // This fixture publishes only turn-tail; other merged keys have no value.
-  const useTurnData = (() => undefined) as Props['useTurnData']
+  // This fixture publishes only the keys a test opts into; other merged keys have no value.
+  const useTurnData = ((key: string) => key === 'turn-process' ? turnProcess : undefined) as Props['useTurnData']
   return {
     node: {
       key: 'assistant-step:1:2', id: '1:2', kind: 'assistant-step', target: 'chat', anchorSeq: 2,
@@ -222,4 +224,91 @@ test('a trailing interrupted reasoning block owns the notice even when text came
   const html = renderToStaticMarkup(<><Assistant {...shared} groupPart="reasoning" /><Assistant {...shared} groupPart="response" /></>)
   expect(html.match(/思考中断/gu) ?? []).toHaveLength(1)
   expect(html.match(/已停止/gu) ?? []).toHaveLength(0)
+})
+
+
+/** Minimal Turn-process projection: the current step owns the final answer. */
+function process(step: number, overrides: Record<string, unknown> = {}) {
+  return {
+    turn: 1, controlAnchorSeq: 1, processStartSeq: 1, answerAnchorSeq: 10, answerStep: step,
+    inlineReasoning: true, messageCount: 1, toolCallCount: 1, subagentCount: 0, ...overrides,
+  }
+}
+
+test('a settled final answer folds its reasoning into one process disclosure', async () => {
+  await render(<Assistant {...props({ turnProcess: process(2), blocks: [
+    { kind: 'reasoning', text: '折叠的完整思考。' }, { kind: 'tool-call' }, { kind: 'text', text: '最终结论。' }] })} />)
+  const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
+  const toggle = mount.querySelector<HTMLButtonElement>('[data-output-process-toggle]')!
+  const body = document.getElementById(toggle.getAttribute('aria-controls') ?? '')
+  expect(root.getAttribute('data-output-conclusion')).toBe('true')
+  expect(root.hasAttribute('data-output-process-open')).toBe(false)
+  expect(toggle.textContent).toBe(zh.processShow)
+  expect(toggle.getAttribute('aria-expanded')).toBe('false')
+  expect(body).not.toBeNull()
+  expect(body!.hasAttribute('hidden')).toBe(true)
+  expect(mount.querySelector('.dsh-output-answer')?.textContent).toContain('最终结论。')
+
+  await act(async () => { toggle.click() })
+  expect(root.getAttribute('data-output-process-open')).toBe('true')
+  expect(toggle.getAttribute('aria-expanded')).toBe('true')
+  expect(toggle.textContent).toBe(zh.processHide)
+  expect(body!.hasAttribute('hidden')).toBe(false)
+  expect(body!.textContent).toContain('折叠的完整思考。')
+
+  await act(async () => { toggle.click() })
+  expect(root.hasAttribute('data-output-process-open')).toBe(false)
+  expect(body!.hasAttribute('hidden')).toBe(true)
+})
+
+test('a running final step keeps the live thinking row and does not enter conclusion mode', async () => {
+  await render(<Assistant {...props({ status: 'running', turnProcess: process(2), blocks: [
+    { kind: 'reasoning', text: '仍在思考。' }, { kind: 'text', text: '正在生成。' }] })} />)
+  const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
+  expect(root.hasAttribute('data-output-conclusion')).toBe(false)
+  expect(mount.querySelector('[data-output-process-toggle]')).toBeNull()
+  expect(control()?.textContent).toBe(zh.thinkingSettled)
+})
+
+test('an interrupted final step exposes its process instead of pretending it finished', async () => {
+  await render(<Assistant {...props({ status: 'interrupted', turnProcess: process(2), blocks: [
+    { kind: 'reasoning', text: '被中断的思考。' }, { kind: 'text', text: '部分答复。' }] })} />)
+  const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
+  expect(root.hasAttribute('data-output-conclusion')).toBe(false)
+  expect(mount.querySelector('[data-output-process-toggle]')).toBeNull()
+  expect(control()).not.toBeNull()
+})
+
+test('only the Turn answer step enters conclusion mode', async () => {
+  await render(<Assistant {...props({ step: 2, turnProcess: process(3), blocks: [
+    { kind: 'reasoning', text: '中间步骤。' }, { kind: 'text', text: '中间答复。' }] })} />)
+  const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
+  expect(root.hasAttribute('data-output-conclusion')).toBe(false)
+  expect(mount.querySelector('[data-output-process-toggle]')).toBeNull()
+})
+
+test('a final answer with prior Turn tools but no local reasoning still offers the process control', async () => {
+  await render(<Assistant {...props({ turnProcess: process(2), blocks: [{ kind: 'text', text: '只含结论。' }] })} />)
+  const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
+  const toggle = mount.querySelector<HTMLButtonElement>('[data-output-process-toggle]')!
+  expect(root.getAttribute('data-output-conclusion')).toBe('true')
+  expect(toggle).not.toBeNull()
+  expect(toggle.hasAttribute('aria-controls')).toBe(false)
+  await act(async () => { toggle.click() })
+  expect(root.getAttribute('data-output-process-open')).toBe('true')
+})
+
+test('a pure final answer with no process does not invent a process control', async () => {
+  await render(<Assistant {...props({ turnProcess: process(2, { toolCallCount: 0, messageCount: 0, inlineReasoning: false }),
+    blocks: [{ kind: 'text', text: '纯结论。' }] })} />)
+  const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
+  expect(root.hasAttribute('data-output-conclusion')).toBe(false)
+  expect(mount.querySelector('[data-output-process-toggle]')).toBeNull()
+})
+
+test('non-concise layouts never enter conclusion mode even with a final answer projection', () => {
+  const html = renderToStaticMarkup(<Assistant {...props({ layout: 'process', turnProcess: process(2), blocks: [
+    { kind: 'reasoning', text: '完整思考。' }, { kind: 'text', text: '完整答复。' }] })} groupPart="reasoning" />)
+  expect(html).not.toContain('data-output-conclusion')
+  expect(html).toContain('完整思考。')
 })

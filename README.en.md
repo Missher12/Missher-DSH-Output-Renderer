@@ -2,13 +2,16 @@
 
 [简体中文](./README.md) · [Prebuilt downloads](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [Desktop app](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [Issues](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **0.1.5**. This removable UI plugin requires an existing DSH host.
+Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **0.2.0**. This removable UI plugin requires an existing DSH host.
 
-`0.1.5` replaces **Soft cards** with **Concise conversation**: a single-column answer with thinking collapsed by default. Expand it on demand; your choice survives streaming and completion. Answers, images and native tool details remain accessible. Saved `layout: cards` preferences adopt this appearance automatically. Other layouts retain their behavior. Status follows the actual output phase; no duration or summary is invented.
+`0.2.0` adds two output-surface features:
 
-0.1.5 corrects host provenance documentation and release metadata; both runtime files are byte-identical to the tested 0.1.4 candidate. The v0.1.4 source tag remains as history without a formal Release. Its claim of an unmodified official RC.2 host was not supported.
+- **Web search source cards**: a root `web_search` call shows a source pill and default-open cards (three plus "more sources"), expandable to all. It reads only persisted `meta.sources`, adds no search backend and fetches no favicons. Hosts without `tool.call.toolview` keep the native row; `web_fetch` and PTC child calls keep the generic presentation.
+- **Concise conclusion mode**: after the final answer step settles, Concise conversation keeps only the final answer and a "Show process" disclosure. Thinking, ordinary tool rows, web-search sources and other steps in the same group fold away until reopened. Running, interrupted and the other three layouts keep their previous behavior.
 
-Host/client type checks, 35 focused component tests, the build and actual Web interactions on the installed community `0.2.1-rc.2` distribution passed. At 390px the conversation has no horizontal overflow; the host settings sidebar leaves a narrow content area with substantial wrapping. See [VALIDATION.md](./VALIDATION.md) for evidence and earlier compatibility results. [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) determines package availability; installation on each device is a separate step.
+0.2.0 is a source and local-installation candidate; no GitHub Release has been published. Published assets remain authoritative at [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases). The 0.1.5 history remains in [VALIDATION.md](./VALIDATION.md).
+
+Host/client type checks, 130 tests, an isolated build and browser checks of mock group DOM passed. 0.2.0 is installed in the local `desktop` profile; a refresh/restart of the host is required to load it, and actual Web UI interaction remains to be checked in that environment. See [VALIDATION.md](./VALIDATION.md).
 
 The two screenshots below are retained from 0.1.3 and show the settings entry and process layout. The Soft cards option shown there has since been replaced.
 
@@ -23,22 +26,23 @@ The two screenshots are real Web pages of official npm DSH `0.2.1-alpha.5`. Thei
 | Layout | Presentation |
 | --- | --- |
 | Clear reading | Continuous, single-column text with quiet tool details |
-| Concise conversation | Single-column answers, thinking collapsed by default and expanded on demand |
+| Concise conversation | Single-column answers; thinking folds while running, and the whole process folds after the final answer, leaving the conclusion plus a Show process control |
 | Deep process, simple reply | The full process followed by a distinct final answer |
 | Task checklist | Actual assistant step numbers with running, output-complete or stopped states |
 
 Use **Settings → Output appearance** to choose the layout, 14/16 px text, comfortable/compact spacing and streaming effect. Changes save automatically. Equal-height cards become a single column in a narrow panel; **Replay output** previews the effect.
 
-- Concise conversation collapses thinking by default and reveals the full content on demand. Other layouts retain their presentation; individual tools and tool-only groups still fold independently.
+- Concise conversation folds thinking while running and folds the same step's process after the final answer. Other layouts retain their presentation; individual tools and tool-only groups still fold independently.
+- Web search source cards appear only when the host declares `tool.call.toolview`; source titles and links stay plain text or safe http(s) links.
 - Code, tables, images and file actions use native host components. The process layout does not summarize or truncate answers. A checklist's output-complete state does not mean that a tool or task succeeded.
 - Frame-synchronized output uses `requestAnimationFrame` without a fixed 30/60 fps cap. Fade-in affects only arriving text. Reduced-motion settings are respected, and stopping, finishing or hiding the page clears buffers and animations.
 - The plugin does not change prompts, model parameters or generation speed. Actual frame rate depends on hardware, browser load and Markdown complexity; sustained full-refresh performance is not guaranteed.
 
 ## Install, enable, disable and uninstall
 
-Use a prebuilt `.tgz` from [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases); available release assets determine what is published. The `0.1.5` filename is `missher-dsh-output-renderer-0.1.5.tgz`, with a matching `.tgz.sha256` file. Check the installed version on each device against the downloaded asset. The installation steps below use the downloaded tgz directly and do not depend on npm package-name resolution.
+Use a prebuilt `.tgz` from [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases); available release assets determine what is published. The `0.2.0` local candidate is `missher-dsh-output-renderer-0.2.0.tgz`, with a matching `.tgz.sha256` file; no formal Release has been published yet. Check the installed version on each device against the downloaded asset. The installation steps below use the downloaded tgz directly and do not depend on npm package-name resolution.
 
-1. Download the chosen tgz and checksum file. Verify with `shasum -a 256 -c missher-dsh-output-renderer-0.1.5.tgz.sha256`.
+1. Download the chosen tgz and checksum file. Verify with `shasum -a 256 -c missher-dsh-output-renderer-0.2.0.tgz.sha256`.
 2. In the desktop app, open **Plugins → Add plugin**, enter the downloaded file's full path, then install and enable the plugin. Follow any reload prompt and open **Settings → Output appearance**.
 3. Turn the plugin's enable switch off in plugin management to disable it, or on to enable it again. Disabling restores native output rendering.
 4. Choose **Uninstall** on this plugin to remove it. To upgrade, use Update plugin in the current Missher desktop app and choose the new tgz. Back up the profile configuration and retain the old tgz first. If an older host lacks this action, use its supported replacement or reinstall flow and retain the configuration backup. A missing update button does not restrict the plugin to newer hosts; the host controls preference retention on uninstall.
@@ -46,7 +50,7 @@ Use a prebuilt `.tgz` from [Releases](https://github.com/Missher12/Missher-DSH-O
 For a Web or custom profile, use the target host's official CLI and replace the profile name and file path:
 
 ```sh
-dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.1.5.tgz
+dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.2.0.tgz
 dsh plugin --profile my-web remove @missher/dsh-output-renderer
 ```
 
@@ -62,6 +66,7 @@ It reads existing assistant content for display, creates no separate session dat
 
 | Scope | Evidence and limits |
 | --- | --- |
+| Local DSH `0.2.1-rc.4` | 0.2.0: host/client type checks, 130 tests, isolated build and mock group-DOM fold/reveal checks passed; `tool.call.toolview` and the `turn-process` projection are implemented against this version's contract. Installed in the local `desktop` profile (0.2.0); actual Web UI interaction after a host refresh/restart remains to be recorded. |
 | Installed community `0.2.1-rc.2` | 0.1.4: disclosure, in-flight choice retention, real state/interruption, native tools/images, settings preview/save/refresh/failure rollback, dark narrow layout and disable restoration on isolated synthetic data. |
 | Official npm alpha.5 (`0.2.1-alpha.5`, Cordis `4.0.5` / Schemastery `3.18.5`) | 0.1.3 historical evidence: the real Loader checks passed, including and settings, service scenarios covering normal saving, a missing settings service and a missing `configure`, controlled front-end SlotRegistry lifecycles, and real-page review of all four layouts, images, native zoom/tool expansion, save-failure rollback, stop-with-partial retention, 36-turn history loading, streaming fade and scroll-away stability; the 390 px settings panel and the 1280 px word wrapping were re-checked |
 | Missher community-extended rc.2 (`0.2.0-rc.2`, Cordis `4.0.4` / Schemastery `3.18.4`) | 0.1.3 historical evidence: the same real Loader/settings scenarios, controlled slot lifecycles and real-page review (identical four-layout content, refresh persistence, native image zoom, narrow width and unload) |
@@ -72,7 +77,7 @@ It reads existing assistant content for display, creates no separate session dat
 
 The renderer uses `conversation.chat.node` / `assistant-step`, `settings.section`, native Markdown and file callbacks, and version-related chat DOM markers. Images prefer the Chat-provided `renderMessageImages` closure and otherwise use the host-published `conversation.images.content` Factory; when neither exists the answer shows an explicit note instead of dropping the picture. Before calling any host face it checks `slots.inject/register`, `locale.register/bind` and `configForms.get`, reports what is missing and leaves native output visible. The host supplies React, Schemastery and DSH client modules; development SDK links are excluded from the runtime package. Recheck these interfaces after host upgrades. If the settings entry is absent, check whether the plugin is enabled and inspect host loading errors.
 
-See [VALIDATION.md](./VALIDATION.md) for dated evidence. The historical 47 logic tests and the earlier controlled DOM/Web checks are separate evidence layers and are not added to this candidate's counts. Acceptance used an independent Linux Host and a real Web browser and did **not** operate the native Electron daily UI. Page content came from a **local deterministic adapter**, so the accurate wording is "no external model calls" rather than "zero model calls"; native desktop clicking, Windows/current macOS and sustained hardware frame rates are not claimed on this basis.
+See [VALIDATION.md](./VALIDATION.md) for dated evidence. The 0.2.0 130 tests, type checks, isolated build and mock group-DOM checks are source/component evidence, not an actual DSH Web UI acceptance. Real-profile installation and Web interaction must be recorded separately. Native desktop clicking, Windows/current macOS and sustained hardware frame rates are not claimed on this basis.
 
 ## Development and attribution
 

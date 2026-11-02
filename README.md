@@ -2,13 +2,16 @@
 
 [English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **0.1.5**。这是可卸载的界面插件，需要已有 DSH 宿主。
+为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **0.2.0**。这是可卸载的界面插件，需要已有 DSH 宿主。
 
-`0.1.5` 将“柔和卡片”替换为“简洁对话”：单列回答，思考默认收起，点击即可查看；流式输出及完成时保留你的展开选择，回答、图片与原生工具仍可直接访问。旧的 `layout: cards` 设置自动采用这一外观，其他布局与偏好保持原行为。状态来自实际输出阶段，不编造思考时长或摘要。
+`0.2.0` 增加两项输出界面能力：
 
-0.1.5仅修正文档中的宿主来源与发布版本元数据，两份运行文件与已验0.1.4候选逐字节一致。已推送的v0.1.4仅保留源码历史，没有正式Release；此前“官方原样RC.2”表述不准确。
+- **Web 搜索来源卡片**：宿主 `web_search` 的根调用显示来源胶囊与卡片，默认 3 张 + “还有 N 个来源”，可展开全部；只使用宿主已记录的 `meta.sources`，不抓取 favicon、不新增搜索后端。宿主没有 `tool.call.toolview` 时保留原生行，`web_fetch` 与 PTC 子调用不走富卡片。
+- **简洁对话结论模式**：最终答案步骤完成后，默认只保留最终答复和一条“查看过程”；思考、普通工具行、web_search 来源卡片及同组中间步骤收起，展开后可完整回看。运行中、中断和其他三种布局保持原行为。
 
-本次实现通过两端类型检查、35项相关组件测试、构建及本机社区发行版 `0.2.1-rc.2` 上的实际 Web 交互检查。390px宽度下聊天没有横向溢出；设置页受宿主侧栏挤压，内容区较窄、换行较多。完整证据及旧版兼容记录见 [VALIDATION.md](./VALIDATION.md)。包的发布情况以 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 为准，设备安装状态需另行核对。
+0.2.0 是源码与本地安装候选；GitHub Release 尚未发布，正式安装资产仍以 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 为准。0.1.5 的历史说明保留在 [VALIDATION.md](./VALIDATION.md)。
+
+本次实现通过两端类型检查、130 项测试、隔离副本构建，以及浏览器分组 DOM 的收起/展开检查；0.2.0 已安装到本机 `desktop` profile，需刷新/重启宿主后加载，实际 Web UI 交互再按该环境复核。完整证据及旧版兼容记录见 [VALIDATION.md](./VALIDATION.md)。
 
 下面两张图片保留自0.1.3，展示设置入口和“深想简答”布局；其中“柔和卡片”现已替换。
 
@@ -23,22 +26,23 @@
 | 布局 | 呈现方式 |
 | --- | --- |
 | 清晰阅读 | 连续单列正文，弱化工具区域的视觉干扰 |
-| 简洁对话 | 单列回答，思考默认收起，按需展开，弱化卡片边框和背景 |
+| 简洁对话 | 单列回答；运行中折叠思考，最终答案完成后折叠整个过程，默认只留结论 + “查看过程” |
 | 深想简答 | 完整展示过程，末尾答复独立收尾 |
 | 任务清单 | 按实际助手步骤编号，显示输出中、输出完成或已停止 |
 
 在 **设置 → 输出外观** 选择布局、14/16 px 字号、舒适/紧凑间距和动效，修改自动保存。四张选项卡片等高排列，窄窗口自动转为单列；可用“重播输出”查看动效。
 
-- 简洁对话默认收起思考，按需展开完整内容；其他布局沿用原来的展示方式。工具条目和纯工具组可独立展开/收起。
+- 简洁对话在运行中折叠思考，最终答案完成后把同组过程收进“查看过程”；其他布局沿用原来的展示方式。工具条目和纯工具组可独立展开/收起。
+- Web 搜索来源卡片只在宿主声明 `tool.call.toolview` 时接管根 `web_search`；来源标题/链接按纯文本或 http(s) 外链处理。
 - 代码、表格、图片和文件操作复用宿主组件。深想简答不自动摘要或截断正文；任务清单的“输出完成”不表示工具或任务执行成功。
 - 刷新率同步使用 `requestAnimationFrame`，没有固定 30/60 fps 上限；新增文字淡入只作用于新到达的文字。遵循系统“减少动态效果”，停止、结束和后台切换会清理缓冲及动画。
 - 布局不改变提示词、模型参数或生成速度。实际帧率受硬件、浏览器和 Markdown 复杂度影响，不承诺持续满帧。
 
 ## 安装、启停与卸载
 
-推荐使用 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 中的预构建 `.tgz`，版本以实际发布资产为准。`0.1.5` 文件名为 `missher-dsh-output-renderer-0.1.5.tgz`，校验文件为同名 `.tgz.sha256`。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
+推荐使用 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 中的预构建 `.tgz`，版本以实际发布资产为准。`0.2.0` 本地候选文件名为 `missher-dsh-output-renderer-0.2.0.tgz`，校验文件为同名 `.tgz.sha256`；正式 Release 尚未发布。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
 
-1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.1.5.tgz.sha256` 核对下载字节。
+1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.2.0.tgz.sha256` 核对下载字节。
 2. 桌面版进入 **插件 → 添加插件**，填入下载文件的完整路径，安装并启用本插件。按宿主提示重新加载后，进入 **设置 → 输出外观**。
 3. 在插件管理中关闭本插件的启用开关即可停用；重新打开可启用。停用后恢复宿主原生输出。
 4. 在插件管理中选择本插件并点击 **卸载** 可移除。升级请优先使用当前 Missher 桌面端的“更新插件”入口，选择新版 tgz；先备份 profile 配置并保留原版本 tgz。较早宿主若没有更新入口，可按该宿主支持的替换或重新安装流程操作，并保留配置备份；缺少更新按钮不表示插件只支持新宿主。卸载后的偏好保留行为由宿主管理。
@@ -46,7 +50,7 @@
 Web/自建 profile 使用目标宿主的正式 CLI，替换下面的 profile 和文件路径：
 
 ```sh
-dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.1.5.tgz
+dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.2.0.tgz
 dsh plugin --profile my-web remove @missher/dsh-output-renderer
 ```
 
@@ -62,6 +66,7 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 | 检查范围 | 证据与限制 |
 | --- | --- |
+| 本机 DSH `0.2.1-rc.4` | 0.2.0：双端类型检查、130 项测试、隔离构建和 mock 分组 DOM 的收起/展开检查通过；`tool.call.toolview` 与 `turn-process` 投影已按该版本契约实现。已安装到本机 `desktop` profile（0.2.0）；刷新/重启宿主后的实际 Web UI 交互待复核。 |
 | 本机社区发行版 `0.2.1-rc.2` | 0.1.4已验：折叠与键盘操作、流中展开保持、实际状态和中断、正文/图片/原生工具、设置预览/保存/刷新/失败回退、暗色窄栏、停用恢复。浏览器使用隔离的本地合成数据。 |
 | 官方 npm alpha.5（`0.2.1-alpha.5`，Cordis `4.0.5` / Schemastery `3.18.5`） | 0.1.3历史证据：已通过真实 Loader 与设置；服务场景含正常保存、缺少 settings、缺少 configure；真实前端 SlotRegistry 受控生命周期；真实 Web 页面复核四布局、图片、原生放大/工具展开、保存失败回退、停止保留、36 轮历史加载、流式淡入与滚离底部；390 px 设置面板与 1280 px 词语分行均复验 |
 | Missher 社区扩展 rc.2（`0.2.0-rc.2`，Cordis `4.0.4` / Schemastery `3.18.4`） | 0.1.3历史证据：已通过同一组真实 Loader/设置场景、受控插槽生命周期与真实 Web 页面复核（四布局内容一致、刷新持久化、原生图片放大、窄屏与卸载） |
@@ -72,7 +77,7 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 插件依赖 `conversation.chat.node` 的 `assistant-step`、`settings.section`、原生 Markdown 与文件回调，以及聊天 DOM 标记；图片优先使用 Chat 提供的 `renderMessageImages` 闭包，其次使用宿主发布的 `conversation.images.content` Factory，两者都不存在时在正文位置显示明确提示而不是丢图。调用宿主能力前会检查 `slots.inject/register`、`locale.register/bind` 与 `configForms.get` 是否存在，缺失时给出诊断并保持原生输出可见。React、Schemastery 及 DSH 客户端模块由宿主提供；开发 SDK 链接不会进入运行包。升级宿主后需重新核验这些接口，若设置页不出现，检查插件启用状态和宿主加载错误。
 
-完整证据见 [VALIDATION.md](./VALIDATION.md)。历史 47 项逻辑测试、较早的受控 DOM/Web 检查与本次候选的验收属于不同层级，不合并计数。本次验收使用 Linux 独立 Host 与真实 Web 浏览器，**未**操作原生 Electron 日常界面；界面内容由**本地确定性适配器**产生（非外部模型或服务端生成图片），因此准确表述是"无外部模型调用"，不是"零模型调用"；原生桌面点击、Windows/当前 macOS 与持续硬件满帧率均未据此宣称通过。
+完整证据见 [VALIDATION.md](./VALIDATION.md)。0.2.0 的 130 项测试、类型检查、隔离构建与 mock 分组 DOM 检查属于源码/组件级证据，不等同于实际 DSH Web UI 验收；真实 profile 安装和 Web 交互需按本机环境单独记录。原生桌面点击、Windows/当前 macOS 与持续硬件满帧率均未据此宣称通过。
 
 ## 开发与署名
 

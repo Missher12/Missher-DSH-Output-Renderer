@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark" data-variant="a">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DSH · Web 搜索来源界面方案</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0b0d10;
+    --bg-glow: radial-gradient(900px 420px at 72% -8%, rgba(86, 132, 255, .10), transparent 60%);
+    --panel: #12161d;
+    --panel-2: #171c24;
+    --panel-3: #1c222b;
+    --line: rgba(255, 255, 255, .09);
+    --line-strong: rgba(255, 255, 255, .17);
+    --text: #e8ecf2;
+    --muted: #99a3b2;
+    --muted-2: #6f7988;
+    --accent: #78a9ff;
+    --accent-2: #a7c6ff;
+    --accent-soft: rgba(120, 169, 255, .14);
+    --user-bg: #1d2835;
+    --danger: #ff8b8b;
+    --success: #82d7a4;
+    --shadow: 0 22px 60px rgba(0, 0, 0, .38);
+    --radius-lg: 18px;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  }
+  html[data-theme="light"] {
+    color-scheme: light;
+    --bg: #f4f6f9;
+    --bg-glow: radial-gradient(900px 420px at 72% -8%, rgba(86, 132, 255, .10), transparent 60%);
+    --panel: #ffffff;
+    --panel-2: #f6f8fb;
+    --panel-3: #eef2f7;
+    --line: rgba(15, 23, 42, .10);
+    --line-strong: rgba(15, 23, 42, .20);
+    --text: #172033;
+    --muted: #5d6a7c;
+    --muted-2: #8490a1;
+    --accent: #2f6fed;
+    --accent-2: #1f54c8;
+    --accent-soft: rgba(47, 111, 237, .10);
+    --user-bg: #e8eef9;
+    --danger: #c53b3b;
+    --success: #1d7f4a;
+    --shadow: 0 18px 46px rgba(30, 48, 80, .14);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg-glow), var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  button { font: inherit; color: inherit; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  /* ---------- Studio chrome ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 30;
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    padding: 14px 26px;
+    background: color-mix(in srgb, var(--bg) 84%, transparent);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .brand-mark {
+    width: 34px; height: 34px; flex: none; display: grid; place-items: center;
+    border: 1px solid var(--line-strong); border-radius: 10px;
+    background: linear-gradient(145deg, var(--panel-3), var(--panel));
+    color: var(--accent);
+  }
+  .brand-mark svg { width: 17px; height: 17px; }
+  .kicker {
+    font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted-2); font-weight: 700; line-height: 1;
+    margin-bottom: 5px;
+  }
+  .brand h1 { margin: 0; font-size: 15px; line-height: 1.25; font-weight: 600; letter-spacing: -.01em; }
+  .brand h1 span { color: var(--muted); font-weight: 400; }
+
+  .topbar-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+  .seg {
+    display: flex; align-items: center; gap: 2px; padding: 3px;
+    border: 1px solid var(--line); border-radius: 11px; background: var(--panel);
+  }
+  .seg button {
+    border: 0; background: transparent; color: var(--muted);
+    padding: 6px 10px; border-radius: 8px; cursor: pointer;
+    font-size: 12px; line-height: 1; white-space: nowrap;
+  }
+  .seg button:hover { color: var(--text); background: var(--panel-3); }
+  .seg button[aria-pressed="true"] {
+    color: var(--text); background: var(--panel-3);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+  .icon-btn, .primary-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    height: 34px; padding: 0 11px; border-radius: 10px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+    font-size: 12px; white-space: nowrap;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--line-strong); }
+  .icon-btn svg, .primary-btn svg { width: 15px; height: 15px; }
+  .primary-btn {
+    color: #fff; background: var(--accent); border-color: transparent;
+    font-weight: 600; padding-inline: 13px;
+  }
+  html[data-theme="light"] .primary-btn { color: #fff; }
+  .primary-btn:hover { filter: brightness(1.06); }
+  .icon-only { width: 34px; padding: 0; }
+
+  /* ---------- Layout ---------- */
+  .workspace {
+    max-width: 1240px; margin: 0 auto; padding: 26px;
+    display: grid; grid-template-columns: 306px minmax(0, 1fr); gap: 26px;
+    align-items: start;
+  }
+  .rail {
+    position: sticky; top: 86px;
+    display: flex; flex-direction: column; gap: 14px;
+    min-width: 0;
+  }
+  .rail-card {
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--panel); padding: 16px;
+  }
+  .rail-card h2 {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin: 0 0 12px; font-size: 11px; font-weight: 700;
+    letter-spacing: .09em; text-transform: uppercase; color: var(--muted-2);
+  }
+  .rail-card h2 span { letter-spacing: 0; text-transform: none; font-weight: 400; color: var(--muted-2); }
+
+  .variant-name { margin: 0 0 7px; font-size: 17px; line-height: 1.35; font-weight: 600; letter-spacing: -.015em; }
+  .variant-desc { margin: 0; font-size: 12.5px; line-height: 1.75; color: var(--muted); }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 13px; }
+  .tag {
+    padding: 3px 7px; border-radius: 6px; font-size: 10.5px; line-height: 1.4;
+    color: var(--muted); background: var(--panel-3); border: 1px solid var(--line);
+  }
+  .tag.recommend { color: var(--accent-2); border-color: color-mix(in srgb, var(--accent) 35%, transparent); background: var(--accent-soft); }
+
+  .state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .state-btn, .toggle-row {
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2);
+    color: var(--muted); padding: 8px 9px; font-size: 11.5px; line-height: 1.2;
+    cursor: pointer; text-align: left;
+  }
+  .state-btn:hover, .toggle-row:hover { color: var(--text); border-color: var(--line-strong); }
+  .state-btn[aria-pressed="true"] {
+    color: var(--text); background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  .state-dot { width: 6px; height: 6px; flex: none; border-radius: 50%; background: currentColor; opacity: .7; }
+  .state-btn[data-state="searching"] .state-dot { background: var(--accent); animation: pulse 1.2s infinite; }
+  .state-btn[data-state="done"] .state-dot { background: var(--success); }
+  .state-btn[data-state="empty"] .state-dot { background: var(--muted-2); }
+  .state-btn[data-state="error"] .state-dot { background: var(--danger); }
+  .toggle-row { justify-content: space-between; width: 100%; margin-top: 6px; }
+  .switch {
+    width: 28px; height: 16px; flex: none; border-radius: 999px;
+    background: var(--panel-3); border: 1px solid var(--line-strong); position: relative;
+  }
+  .switch::after {
+    content: ""; position: absolute; top: 2px; left: 2px;
+    width: 10px; height: 10px; border-radius: 50%; background: var(--muted);
+    transition: transform .16s ease, background .16s ease;
+  }
+  .toggle-row[aria-pressed="true"] .switch { background: var(--accent-soft); border-color: var(--accent); }
+  .toggle-row[aria-pressed="true"] .switch::after { transform: translateX(12px); background: var(--accent); }
+
+  .hint-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .hint-list li { display: flex; gap: 7px; font-size: 11.5px; line-height: 1.55; color: var(--muted); }
+  .hint-list li::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--muted-2); margin-top: 7px; flex: none; }
+  .code {
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: .92em; padding: 1px 4px; border-radius: 4px;
+    background: var(--panel-3); border: 1px solid var(--line); color: var(--text);
+    overflow-wrap: anywhere;
+  }
+  .fine { margin: 0; font-size: 10.5px; line-height: 1.65; color: var(--muted-2); }
+
+  /* ---------- Device / chat ---------- */
+  .stage { min-width: 0; display: flex; justify-content: center; }
+  .device {
+    width: 100%; max-width: 800px;
+    border: 1px solid var(--line); border-radius: 20px;
+    background: color-mix(in srgb, var(--panel) 72%, var(--bg));
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .device.narrow { max-width: 390px; }
+  .chat-top {
+    display: flex; align-items: center; gap: 9px;
+    padding: 11px 16px; border-bottom: 1px solid var(--line);
+    font-size: 11px; color: var(--muted);
+  }
+  .chat-top .model-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); }
+  .chat-top .spacer { flex: 1; }
+  .chat-top .ghost { color: var(--muted-2); }
+  .chat-scroll {
+    padding: 26px 24px 10px; max-height: calc(100vh - 250px);
+    overflow: auto; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent;
+  }
+  .device.narrow .chat-scroll { padding: 18px 14px 8px; max-height: none; }
+  .turn + .turn { margin-top: 30px; }
+  .user-row { display: flex; justify-content: flex-end; }
+  .user-msg {
+    max-width: 80%; padding: 10px 14px; border-radius: 16px 16px 4px 16px;
+    background: var(--user-bg); border: 1px solid var(--line);
+    font-size: 13.5px; line-height: 1.65;
+  }
+  .device.narrow .user-msg { max-width: 92%; }
+  .assistant-msg { margin-top: 17px; display: flex; flex-direction: column; gap: 13px; min-width: 0; }
+  .thinking-row {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; line-height: 1.5; color: var(--muted);
+  }
+  .thinking-row svg { width: 13px; height: 13px; opacity: .8; }
+  .answer {
+    font-size: 13.5px; line-height: 1.8; color: var(--text);
+    transition: opacity .2s ease;
+  }
+  .answer.is-dim { opacity: .42; }
+  .answer p { margin: 0 0 11px; }
+  .answer p:last-child { margin-bottom: 0; }
+  .answer code {
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: .9em; padding: 1px 4px; border-radius: 4px;
+    background: var(--panel-3); border: 1px solid var(--line);
+  }
+  .answer a {
+    color: var(--accent); text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+  }
+  .answer a:hover { border-bottom-color: var(--accent); }
+
+  /* ---------- Search component ---------- */
+  .search-card {
+    min-width: 0; border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--panel); overflow: clip;
+  }
+  .search-pill {
+    width: 100%; display: flex; align-items: center; gap: 9px;
+    padding: 9px 11px; border: 0; background: transparent;
+    cursor: pointer; text-align: left; min-width: 0;
+  }
+  .search-pill:hover { background: color-mix(in srgb, var(--text) 3%, transparent); }
+  .search-pill:focus-visible { outline-offset: -3px; border-radius: 12px; }
+  .globe {
+    width: 27px; height: 27px; flex: none; display: grid; place-items: center;
+    border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  .globe svg { width: 14px; height: 14px; }
+  .search-card[data-status="searching"] .globe svg { animation: rotate 1.8s linear infinite; }
+  .search-copy { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .search-label { font-size: 12.5px; line-height: 1.4; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .search-card[data-status="searching"] .search-label {
+    background: linear-gradient(100deg, var(--muted) 18%, var(--text) 46%, var(--muted) 74%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shimmer 1.5s linear infinite;
+  }
+  .search-query { font-size: 10.5px; line-height: 1.4; color: var(--muted-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fav-stack { display: flex; align-items: center; flex: none; margin-left: auto; padding-left: 4px; }
+  .fav-stack .fav { margin-left: -6px; border: 2px solid var(--panel); }
+  .fav-stack .fav:first-child { margin-left: 0; }
+  .fav-stack .fav-more {
+    margin-left: 4px; font-size: 10px; color: var(--muted-2);
+    background: var(--panel-3); border: 1px solid var(--line);
+    min-width: 20px; height: 20px; padding: 0 4px; border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .fav {
+    width: 20px; height: 20px; flex: none; border-radius: 50%;
+    display: inline-grid; place-items: center;
+    font-size: 8.5px; font-weight: 800; line-height: 1; color: #fff;
+    background: hsl(var(--hue, 210) 44% 36%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
+  }
+  html[data-theme="light"] .fav { background: hsl(var(--hue, 210) 48% 43%); }
+  .chevron { flex: none; width: 14px; height: 14px; color: var(--muted-2); transition: transform .18s ease; }
+  .search-pill[aria-expanded="false"] .chevron { transform: rotate(-90deg); }
+  .search-body { border-top: 1px solid var(--line); padding: 11px; }
+  .search-body[hidden] { display: none !important; }
+
+  .source-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+  .device.narrow .source-grid { grid-template-columns: minmax(0, 1fr); }
+  .device.narrow .source-card, .device.narrow .source-more { min-height: 0; }
+  .device.narrow .source-card { gap: 8px; }
+  .device.narrow .source-more { gap: 5px; padding-block: 10px; }
+  .source-card {
+    min-width: 0; min-height: 104px;
+    display: flex; flex-direction: column; gap: 9px;
+    padding: 9px 9px 8px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+    background: var(--panel-2); text-decoration: none;
+    transition: border-color .14s ease, background .14s ease, transform .14s ease;
+  }
+  .source-card:hover, .source-card:focus-visible {
+    border-color: var(--line-strong); background: var(--panel-3);
+    transform: translateY(-1px);
+  }
+  .source-card.is-cite-active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-soft);
+  }
+  .source-title {
+    min-width: 0; font-size: 11.5px; line-height: 1.5; font-weight: 600;
+    color: var(--text); overflow-wrap: anywhere;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
+  .source-card .source-foot { margin-top: auto; }
+  .source-foot { display: flex; align-items: center; gap: 5px; min-width: 0; color: var(--muted); font-size: 9.5px; line-height: 1.4; }
+  .source-site { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .source-num {
+    flex: none; margin-left: auto; min-width: 15px; height: 15px; padding: 0 3px;
+    display: inline-grid; place-items: center; border: 1px solid var(--line);
+    border-radius: 4px; font-size: 8.5px; color: var(--muted-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .source-more {
+    min-height: 104px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px;
+    padding: 9px; border: 1px dashed var(--line-strong); border-radius: var(--radius-sm);
+    background: transparent; color: var(--text); cursor: pointer; text-align: left;
+  }
+  .source-more:hover, .source-more:focus-visible { background: var(--panel-2); border-color: var(--accent); }
+  .more-favs { display: flex; padding-left: 1px; }
+  .more-favs .fav { margin-left: -5px; border: 2px solid var(--panel-2); }
+  .more-favs .fav:first-child { margin-left: 0; }
+  .source-more strong { font-size: 11.5px; line-height: 1.4; font-weight: 600; }
+  .source-more span { font-size: 10px; color: var(--muted-2); line-height: 1.4; }
+  .search-foot {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-top: 9px; padding: 1px 1px 0;
+    font-size: 10px; color: var(--muted-2);
+  }
+  .search-foot .grow { flex: 1; }
+  .trunc-badge {
+    padding: 2px 6px; border-radius: 5px; border: 1px solid var(--line);
+    background: var(--panel-2); color: var(--muted-2); font-size: 9.5px;
+  }
+  .link-btn {
+    border: 0; background: none; padding: 2px 0; cursor: pointer;
+    color: var(--muted); font-size: 10.5px; line-height: 1.4;
+  }
+  .link-btn:hover { color: var(--text); text-decoration: underline; }
+
+  /* B variant list */
+  .source-list { display: flex; flex-direction: column; }
+  .source-row {
+    display: flex; align-items: flex-start; gap: 9px; padding: 9px 7px;
+    text-decoration: none; border-radius: 8px; min-width: 0;
+  }
+  .source-row + .source-row { border-top: 1px solid var(--line); }
+  .source-row:hover, .source-row:focus-visible { background: var(--panel-2); }
+  .source-row.is-cite-active { background: var(--accent-soft); }
+  .source-row .fav { margin-top: 1px; }
+  .source-row-main { min-width: 0; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .source-row-title { font-size: 12px; line-height: 1.5; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .source-row-snippet {
+    font-size: 10.5px; line-height: 1.55; color: var(--muted);
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+    overflow-wrap: anywhere;
+  }
+  .source-row-meta { display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: var(--muted-2); min-width: 0; }
+  .source-row-meta .source-site { color: var(--muted-2); }
+  .source-row .source-num { margin-left: 2px; }
+  .source-row-more {
+    display: flex; align-items: center; gap: 7px; padding: 8px 7px 2px;
+    font-size: 10.5px; color: var(--muted);
+  }
+  .source-row-more button { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; font-size: 10.5px; }
+  .source-row-more button:hover { text-decoration: underline; }
+
+  /* skeleton */
+  .skeleton-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+  .device.narrow .skeleton-grid { grid-template-columns: minmax(0, 1fr); }
+  .skeleton-card {
+    min-height: 104px; padding: 9px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+    background: var(--panel-2); display: flex; flex-direction: column; gap: 8px; overflow: hidden; position: relative;
+  }
+  .sk-line { height: 7px; border-radius: 4px; background: var(--line); }
+  .sk-line.w1 { width: 92%; } .sk-line.w2 { width: 74%; } .sk-line.w3 { width: 48%; }
+  .sk-foot { margin-top: auto; display: flex; align-items: center; gap: 5px; }
+  .sk-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--line); }
+  .shimmer-block::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(100deg, transparent 20%, color-mix(in srgb, var(--text) 5%, transparent) 50%, transparent 80%);
+    transform: translateX(-100%); animation: sweep 1.4s ease-in-out infinite;
+  }
+  .search-empty, .search-error {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 10px 4px 4px; font-size: 11.5px; line-height: 1.5; color: var(--muted);
+  }
+  .search-error { color: var(--danger); }
+  .empty-mark {
+    width: 20px; height: 20px; flex: none; border-radius: 50%;
+    display: grid; place-items: center; border: 1px solid var(--line); color: var(--muted-2);
+    font-size: 11px;
+  }
+
+  /* citation chips */
+  .cite {
+    display: inline-flex; align-items: center; gap: 3px;
+    height: 17px; padding: 0 4px 0 2px; margin: 0 2px;
+    vertical-align: 1px; border: 1px solid var(--line); border-radius: 5px;
+    background: var(--panel-2); color: var(--muted); cursor: pointer;
+    font-size: 9px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums;
+  }
+  .cite .fav { width: 11px; height: 11px; font-size: 6.5px; box-shadow: none; }
+  .cite:hover, .cite:focus-visible {
+    color: var(--text); border-color: var(--accent); background: var(--accent-soft);
+    outline: none;
+  }
+  .cite.is-active { color: var(--text); border-color: var(--accent); background: var(--accent-soft); }
+
+  /* ---------- Composer / footer ---------- */
+  .composer-wrap { padding: 8px 16px 16px; }
+  .device.narrow .composer-wrap { padding: 8px 10px 12px; }
+  .composer {
+    display: flex; align-items: center; gap: 9px; min-width: 0;
+    border: 1px solid var(--line-strong); border-radius: 14px;
+    background: var(--panel); padding: 10px 12px;
+    color: var(--muted-2); font-size: 12px;
+  }
+  .composer .plus {
+    width: 22px; height: 22px; flex: none; display: grid; place-items: center;
+    border-radius: 50%; border: 1px solid var(--line); color: var(--muted);
+  }
+  .composer .placeholder { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .composer .send {
+    width: 25px; height: 25px; flex: none; display: grid; place-items: center;
+    border-radius: 50%; border: 0; background: var(--panel-3); color: var(--muted-2);
+  }
+  .composer .send svg { width: 13px; height: 13px; }
+  .chat-foot { text-align: center; font-size: 9.5px; color: var(--muted-2); padding-top: 7px; }
+
+  /* animations */
+  @keyframes shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+  @keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+  @keyframes rotate { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+  @keyframes cardIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  .source-card { animation: cardIn .32s both; animation-delay: calc(var(--i, 0) * 38ms); }
+
+  @media (max-width: 980px) {
+    .workspace { grid-template-columns: minmax(0, 1fr); padding: 18px; }
+    .rail { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .rail-card:first-child { grid-column: 1 / -1; }
+    .chat-scroll { max-height: none; }
+  }
+  @media (max-width: 760px) {
+    .source-grid, .skeleton-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 680px) {
+    .topbar { align-items: flex-start; flex-direction: column; padding: 12px 16px; }
+    .topbar-actions { width: 100%; justify-content: flex-start; }
+    .rail { grid-template-columns: 1fr; }
+    .workspace { padding: 14px; }
+    .seg button { padding-inline: 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3c2.5 2.6 3.7 5.6 3.7 9S14.5 18.4 12 21c-2.5-2.6-3.7-5.6-3.7-9S9.5 5.6 12 3Z"></path></svg>
+    </div>
+    <div>
+      <div class="kicker">DSH · Output Renderer</div>
+      <h1>Web 搜索来源 <span>· 交互方案预览</span></h1>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <div class="seg" role="group" aria-label="方案切换">
+      <button type="button" data-variant="a" aria-pressed="true">A · 卡片</button>
+      <button type="button" data-variant="b" aria-pressed="false">B · 胶囊</button>
+      <button type="button" data-variant="c" aria-pressed="false">C · 引用</button>
+    </div>
+    <button type="button" class="icon-btn icon-only" id="themeBtn" aria-label="切换亮色/暗色" title="切换亮色/暗色">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8Z"></path></svg>
+    </button>
+    <button type="button" class="icon-btn" id="narrowBtn" aria-pressed="false" title="切换窄屏">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="7" y="3" width="10" height="18" rx="2"></rect><path d="M11 18h2"></path></svg>
+      <span>窄屏</span>
+    </button>
+    <button type="button" class="primary-btn" id="replayBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7"></path><path d="M4 4v5h5"></path></svg>
+      <span>重播搜索</span>
+    </button>
+  </div>
+</header>
+
+<main class="workspace">
+  <aside class="rail" aria-label="方案说明与演示控制">
+    <section class="rail-card">
+      <h2>正在预览 <span>交互 Demo</span></h2>
+      <h3 class="variant-name" id="variantName">A · 卡片置顶</h3>
+      <p class="variant-desc" id="variantDesc">搜索完成即展开 3 张来源卡片，最接近 Rare UI 的形态。</p>
+      <div class="tag-row" id="variantTags"></div>
+    </section>
+
+    <section class="rail-card">
+      <h2>状态</h2>
+      <div class="state-grid" role="group" aria-label="搜索状态">
+        <button type="button" class="state-btn" data-state="searching" aria-pressed="false"><span class="state-dot"></span>搜索中</button>
+        <button type="button" class="state-btn" data-state="done" aria-pressed="true"><span class="state-dot"></span>已完成</button>
+        <button type="button" class="state-btn" data-state="empty" aria-pressed="false"><span class="state-dot"></span>无结果</button>
+        <button type="button" class="state-btn" data-state="error" aria-pressed="false"><span class="state-dot"></span>失败</button>
+      </div>
+      <button type="button" class="toggle-row" id="truncBtn" aria-pressed="false">
+        <span>结果已截断</span>
+        <span class="switch" aria-hidden="true"></span>
+      </button>
+    </section>
+
+    <section class="rail-card">
+      <h2>观察点</h2>
+      <ul class="hint-list" id="hintList"></ul>
+    </section>
+
+    <section class="rail-card">
+      <h2>真实数据</h2>
+      <p class="fine">
+        Demo 使用合成来源。插件实现时读取宿主 <span class="code">web_search</span> block 的
+        <span class="code">meta.sources</span>、<span class="code">meta.answer</span> 与
+        <span class="code">meta.truncated</span>；不抓取 favicon，用域名首字母色块。
+      </p>
+    </section>
+  </aside>
+
+  <section class="stage" aria-label="对话预览">
+    <div class="device" id="device">
+      <div class="chat-top">
+        <span class="model-dot" aria-hidden="true"></span>
+        <span>DeepSeek · 普通对话</span>
+        <span class="spacer"></span>
+        <span class="ghost">本地预览</span>
+      </div>
+
+      <div class="chat-scroll" id="chatScroll">
+        <div class="turn">
+          <div class="user-row"><div class="user-msg">帮我查一下 React 19 的服务器组件和 <code class="code">use()</code> 有哪些变化？</div></div>
+
+          <div class="assistant-msg">
+            <div class="thinking-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
+              已思考 · 12 秒
+            </div>
+
+            <div id="searchSlot" aria-live="polite"></div>
+
+            <div class="answer" id="answer"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="composer-wrap">
+        <div class="composer" role="textbox" aria-label="输入消息（演示）" aria-disabled="true">
+          <span class="plus" aria-hidden="true">+</span>
+          <span class="placeholder">继续追问，或让助手核对其中的来源…</span>
+          <span class="send" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path></svg>
+          </span>
+        </div>
+        <div class="chat-foot">演示数据 · 不代表真实搜索结果</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const QUERY = "React 19 server components use() changes";
+  const SOURCES = [
+    {
+      title: "React 19 正式发布：use()、Actions 与服务器组件的稳定形态",
+      url: "https://react.dev/blog/2024/12/05/react-19",
+      site: "react.dev",
+      snippet: "React 19 稳定了 use()、Actions 和 useActionState，并改进了服务器组件与客户端组件的边界。",
+      letter: "R",
+      hue: 194
+    },
+    {
+      title: "Server Components – React",
+      url: "https://react.dev/reference/rsc/server-components",
+      site: "react.dev",
+      snippet: "服务器组件在服务端渲染，只把渲染结果发送给客户端，组件代码本身不会被下载到浏览器。",
+      letter: "R",
+      hue: 194
+    },
+    {
+      title: "Server Components · Next.js",
+      url: "https://nextjs.org/docs/app/building-your-application/rendering/server-components",
+      site: "nextjs.org",
+      snippet: "App Router 默认使用服务器组件；需要交互的组件通过 use client 指令声明为客户端组件。",
+      letter: "N",
+      hue: 0
+    },
+    {
+      title: "use – React",
+      url: "https://react.dev/reference/react/use",
+      site: "react.dev",
+      snippet: "use() 可以读取 Promise 或 Context；必须在组件或 Hook 中调用，并遵守 Hook 的调用规则。",
+      letter: "R",
+      hue: 194
+    },
+    {
+      title: "React 19 upgrade guide",
+      url: "https://react.dev/blog/2024/04/25/react-19-upgrade-guide",
+      site: "react.dev",
+      snippet: "升级指南列出移除的 API、codemod 与行为变化，包括 ref 作为 prop 和表单 Actions 的新用法。",
+      letter: "R",
+      hue: 194
+    },
+    {
+      title: "RFC: Server Components",
+      url: "https://github.com/reactjs/rfcs/pull/188",
+      site: "github.com",
+      snippet: "服务器组件的提案与设计讨论，涉及数据获取、序列化边界与服务端/客户端组件的关系。",
+      letter: "G",
+      hue: 220
+    }
+  ];
+
+  const VARIANTS = {
+    a: {
+      name: "A · 卡片置顶",
+      desc: "搜索完成即展开 3 张来源卡片，最接近 Rare UI 的形态。",
+      tags: ["默认展开", "信息密度中高", "推荐首版"],
+      hints: ["卡片与胶囊共同构成一次搜索的完整交代", "“还有 N 个来源”展开全部，不跳页", "长标题 3 行截断，完整标题留在来源列表"]
+    },
+    b: {
+      name: "B · 折叠胶囊",
+      desc: "只占一行；点开才是来源列表，适合频繁搜索和长对话。",
+      tags: ["默认收起", "信息密度低", "长对话"],
+      hints: ["收起时仍显示来源数与图标堆叠", "展开后以竖向列表呈现标题与摘要", "与原生工具行的差异最小，迁移风险低"]
+    },
+    c: {
+      name: "C · 引用联动",
+      desc: "来源卡片 + 回答内引用；悬停或聚焦引用时高亮对应来源。",
+      tags: ["默认展开", "交互最丰富", "第二阶段"],
+      hints: ["引用 chip 与来源序号一一对应", "点击引用展开来源并滚动定位", "需要把回答链接映射到本次搜索的来源"]
+    }
+  };
+
+  const state = {
+    variant: "a",
+    status: "done",
+    open: true,
+    expanded: false,
+    truncated: false,
+    theme: "dark",
+    narrow: false,
+    replaying: false,
+    activeCite: null
+  };
+  let replayTimer = 0;
+
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+  const searchSlot = $("#searchSlot");
+  const answer = $("#answer");
+  const device = $("#device");
+  const themeBtn = $("#themeBtn");
+  const narrowBtn = $("#narrowBtn");
+  const replayBtn = $("#replayBtn");
+  const truncBtn = $("#truncBtn");
+  const themeIcon = $("#themeIcon");
+
+  const esc = value => String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+
+  const favicon = (source, extraClass = "") =>
+    `<span class="fav ${extraClass}" style="--hue:${source.hue}" aria-hidden="true">${esc(source.letter)}</span>`;
+
+  const visibleSources = () => {
+    if (state.variant === "b") return state.expanded ? SOURCES : SOURCES.slice(0, 3);
+    return state.expanded ? SOURCES : SOURCES.slice(0, 3);
+  };
+
+  function statusLabel() {
+    if (state.status === "searching") return "正在搜索网页";
+    if (state.status === "error") return "搜索失败";
+    if (state.status === "empty") return "搜索完成，没有找到来源";
+    return `已搜索 ${SOURCES.length} 个站点`;
+  }
+
+  function sourceCard(source, index) {
+    return `<a class="source-card" href="${esc(source.url)}" target="_blank" rel="noreferrer noopener"
+      data-source-idx="${index}" style="--i:${index}" title="${esc(source.title)}">
+      <span class="source-title">${esc(source.title)}</span>
+      <span class="source-foot">${favicon(source)}<span class="source-site">${esc(source.site)}</span><span class="source-num">${index + 1}</span></span>
+    </a>`;
+  }
+
+  function sourceRow(source, index) {
+    return `<a class="source-row" href="${esc(source.url)}" target="_blank" rel="noreferrer noopener" data-source-idx="${index}">
+      ${favicon(source)}
+      <span class="source-row-main">
+        <span class="source-row-title">${esc(source.title)}</span>
+        <span class="source-row-snippet">${esc(source.snippet)}</span>
+        <span class="source-row-meta"><span class="source-site">${esc(source.site)}</span><span class="source-num">${index + 1}</span></span>
+      </span>
+    </a>`;
+  }
+
+  function moreCard(remaining) {
+    const icons = SOURCES.slice(3, 6).map(source => favicon(source)).join("");
+    return `<button type="button" class="source-more" data-action="expand">
+      <span class="more-favs" aria-hidden="true">${icons}</span>
+      <strong>还有 ${remaining} 个来源</strong>
+      <span>查看全部</span>
+    </button>`;
+  }
+
+  function skeletonCards() {
+    const card = `<div class="skeleton-card shimmer-block" aria-hidden="true">
+      <span class="sk-line w1"></span><span class="sk-line w2"></span><span class="sk-line w3"></span>
+      <span class="sk-foot"><span class="sk-dot"></span><span class="sk-line w3" style="width:34px"></span></span>
+    </div>`;
+    return `<div class="skeleton-grid">${card}${card}${card}</div>`;
+  }
+
+  function skeletonRows() {
+    const row = `<div class="skeleton-card shimmer-block" aria-hidden="true" style="min-height:58px">
+      <span class="sk-line w1"></span><span class="sk-line w2"></span>
+    </div>`;
+    return `<div class="source-list">${row}${row}${row}</div>`;
+  }
+
+  function buildBody() {
+    if (state.status === "searching") {
+      return state.variant === "b" ? skeletonRows() : skeletonCards();
+    }
+    if (state.status === "empty") {
+      return `<div class="search-empty"><span class="empty-mark" aria-hidden="true">–</span><span>没有可展示的来源</span></div>`;
+    }
+    if (state.status === "error") {
+      return `<div class="search-error"><span class="empty-mark" aria-hidden="true">!</span><span>搜索服务暂时不可用，请稍后再试</span></div>`;
+    }
+
+    if (state.variant === "b") {
+      const rows = visibleSources().map((source, index) => sourceRow(source, index)).join("");
+      const more = !state.expanded && SOURCES.length > 3
+        ? `<div class="source-row-more"><span>已显示 3 个</span><button type="button" data-action="expand">还有 ${SOURCES.length - 3} 个来源</button></div>`
+        : `<div class="source-row-more"><button type="button" data-action="collapse">收起来源</button></div>`;
+      return `<div class="source-list">${rows}${more}</div>${foot()}`;
+    }
+
+    const cards = visibleSources().map((source, index) => sourceCard(source, index)).join("");
+    const more = !state.expanded && SOURCES.length > 3 ? moreCard(SOURCES.length - 3) : "";
+    return `<div class="source-grid">${cards}${more}</div>${foot()}`;
+  }
+
+  function foot() {
+    if (state.status !== "done") return "";
+    const bits = [];
+    if (state.truncated) bits.push(`<span class="trunc-badge">结果已截断</span>`);
+    if (state.expanded) bits.push(`<button type="button" class="link-btn" data-action="collapse">收起来源</button>`);
+    if (bits.length === 0) return "";
+    return `<div class="search-foot"><span class="grow"></span>${bits.join("")}</div>`;
+  }
+
+  function buildSearch() {
+    const open = state.open;
+    const stack = state.status === "done"
+      ? `<span class="fav-stack" aria-hidden="true">${SOURCES.slice(0, 4).map(source => favicon(source)).join("")}${SOURCES.length > 4 ? `<span class="fav-more">+${SOURCES.length - 4}</span>` : ""}</span>`
+      : "";
+    const label = statusLabel();
+    const queryLine = `“${esc(QUERY)}”`;
+    return `<section class="search-card" data-status="${state.status}" data-open="${open}" aria-label="Web 搜索来源">
+      <button type="button" class="search-pill" aria-expanded="${open}" aria-controls="search-body">
+        <span class="globe" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3c2.5 2.6 3.7 5.6 3.7 9S14.5 18.4 12 21c-2.5-2.6-3.7-5.6-3.7-9S9.5 5.6 12 3Z"></path></svg>
+        </span>
+        <span class="search-copy">
+          <span class="search-label">${esc(label)}</span>
+          <span class="search-query">${queryLine}</span>
+        </span>
+        ${stack}
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+      </button>
+      <div class="search-body" id="search-body" ${open ? "" : "hidden"}>${buildBody()}</div>
+    </section>`;
+  }
+
+  function buildAnswer() {
+    const canCite = state.variant === "c" && state.status === "done";
+    const cite = n => `<button type="button" class="cite" data-cite="${n}" aria-label="来源 ${n + 1}：${esc(SOURCES[n].site)}" title="来源 ${n + 1}：${esc(SOURCES[n].title)}">${favicon(SOURCES[n])}<span>${n + 1}</span></button>`;
+    const use = canCite
+      ? `<code>use()</code>${cite(3)}`
+      : `<a href="${esc(SOURCES[3].url)}" target="_blank" rel="noreferrer noopener"><code>use()</code></a>`;
+    const actions = canCite ? `Actions${cite(0)}` : `<a href="${esc(SOURCES[0].url)}" target="_blank" rel="noreferrer noopener">Actions</a>`;
+    const next = canCite ? `App Router${cite(2)}` : `<a href="${esc(SOURCES[2].url)}" target="_blank" rel="noreferrer noopener">App Router</a>`;
+    return `<p>React 19 把异步数据读取集中到 ${use}：服务器组件本身不再依赖新的客户端 API，但它的返回值可以在客户端组件里被读取。</p>
+      <p>表单提交可以用 ${actions} 和 <code>useActionState</code> 处理 pending 状态；${next} 默认启用服务器组件，需要交互的部分再用 <code>use client</code> 声明。</p>
+      <p>迁移时优先核对 ref 作为 prop、Context 读取和表单 Action 的变化；搜索结果里的版本差异以官方升级指南为准。</p>`;
+  }
+
+  function renderRail() {
+    const variant = VARIANTS[state.variant];
+    $("#variantName").textContent = variant.name;
+    $("#variantDesc").textContent = variant.desc;
+    $("#variantTags").innerHTML = variant.tags.map((tag, index) =>
+      `<span class="tag ${index === variant.tags.length - 1 && state.variant === "a" ? "recommend" : ""}">${esc(tag)}</span>`
+    ).join("");
+    $("#hintList").innerHTML = variant.hints.map(hint => `<li>${esc(hint)}</li>`).join("");
+    $$(".state-btn").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.state === state.status)));
+    truncBtn.setAttribute("aria-pressed", String(state.truncated));
+    $$("button[data-variant]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.variant === state.variant)));
+    narrowBtn.setAttribute("aria-pressed", String(state.narrow));
+  }
+
+  function render() {
+    document.documentElement.dataset.theme = state.theme;
+    document.documentElement.dataset.variant = state.variant;
+    device.classList.toggle("narrow", state.narrow);
+    themeIcon.innerHTML = state.theme === "dark"
+      ? `<path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8Z"></path>`
+      : `<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>`;
+    searchSlot.innerHTML = buildSearch();
+    answer.innerHTML = buildAnswer();
+    answer.classList.toggle("is-dim", state.status === "searching");
+    renderRail();
+  }
+
+  function setVariant(variant) {
+    state.variant = variant;
+    state.open = variant !== "b";
+    state.expanded = false;
+    state.activeCite = null;
+    render();
+  }
+
+  function setStatus(status) {
+    clearTimeout(replayTimer);
+    state.status = status;
+    state.expanded = false;
+    state.activeCite = null;
+    if (status === "searching") state.open = true;
+    if (status === "done") state.open = state.variant !== "b";
+    if (status === "empty" || status === "error") state.open = true;
+    render();
+  }
+
+  function replay() {
+    clearTimeout(replayTimer);
+    state.status = "searching";
+    state.open = true;
+    state.expanded = false;
+    state.activeCite = null;
+    render();
+    replayTimer = window.setTimeout(() => {
+      state.status = "done";
+      state.open = state.variant !== "b";
+      render();
+    }, 1500);
+  }
+
+  const focusSoon = selector => requestAnimationFrame(() => {
+    searchSlot.querySelector(selector)?.focus({ preventScroll: true });
+  });
+
+  function toggleOpen() {
+    state.open = !state.open;
+    render();
+    focusSoon(".search-pill");
+    if (state.open) {
+      requestAnimationFrame(() => searchSlot.querySelector(".search-body")?.scrollIntoView({ block: "nearest" }));
+    }
+  }
+
+  function expandAll() {
+    state.expanded = true;
+    state.open = true;
+    render();
+    focusSoon('.search-body [data-action="collapse"]');
+  }
+
+  function collapseAll() {
+    state.expanded = false;
+    render();
+    focusSoon('.search-body [data-action="expand"]');
+  }
+
+  function highlightCite(index) {
+    state.activeCite = index;
+    $$(".cite").forEach(chip => chip.classList.toggle("is-active", Number(chip.dataset.cite) === index));
+    $$("[data-source-idx]").forEach(card => card.classList.toggle("is-cite-active", Number(card.dataset.sourceIdx) === index));
+  }
+
+  function clearCite() {
+    state.activeCite = null;
+    $$(".cite").forEach(chip => chip.classList.remove("is-active"));
+    $$("[data-source-idx]").forEach(card => card.classList.remove("is-cite-active"));
+  }
+
+  function focusSource(index) {
+    state.open = true;
+    if (index >= 3) state.expanded = true;
+    render();
+    requestAnimationFrame(() => {
+      const card = searchSlot.querySelector(`[data-source-idx="${index}"]`);
+      if (!card) return;
+      card.classList.add("is-cite-active");
+      card.focus({ preventScroll: true });
+      card.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    });
+  }
+
+  searchSlot.addEventListener("click", event => {
+    const actionEl = event.target.closest("[data-action]");
+    const pill = event.target.closest(".search-pill");
+    if (pill) { toggleOpen(); return; }
+    if (actionEl) {
+      if (actionEl.dataset.action === "expand") expandAll();
+      if (actionEl.dataset.action === "collapse") collapseAll();
+    }
+  });
+
+  answer.addEventListener("click", event => {
+    const chip = event.target.closest(".cite");
+    if (!chip) return;
+    focusSource(Number(chip.dataset.cite));
+  });
+  answer.addEventListener("pointerover", event => {
+    const chip = event.target.closest(".cite");
+    if (chip) highlightCite(Number(chip.dataset.cite));
+  });
+  answer.addEventListener("pointerout", event => {
+    if (event.target.closest(".cite") && !event.relatedTarget?.closest?.(".cite")) clearCite();
+  });
+  answer.addEventListener("focusin", event => {
+    const chip = event.target.closest(".cite");
+    if (chip) highlightCite(Number(chip.dataset.cite));
+  });
+  answer.addEventListener("focusout", () => clearCite());
+
+  $$("button[data-variant]").forEach(button => button.addEventListener("click", () => setVariant(button.dataset.variant)));
+  $$(".state-btn").forEach(button => button.addEventListener("click", () => setStatus(button.dataset.state)));
+  themeBtn.addEventListener("click", () => { state.theme = state.theme === "dark" ? "light" : "dark"; render(); });
+  narrowBtn.addEventListener("click", () => { state.narrow = !state.narrow; render(); });
+  replayBtn.addEventListener("click", replay);
+  truncBtn.addEventListener("click", () => { state.truncated = !state.truncated; render(); });
+
+  // Start with a short replay so the first screen demonstrates the transition.
+  render();
+  window.setTimeout(() => {
+    if (state.status === "done") replay();
+  }, 450);
+})();
+</script>
+</body>
+</html>

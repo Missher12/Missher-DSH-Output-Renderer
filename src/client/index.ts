@@ -7,12 +7,15 @@ import type {} from '@deepseek-ai/dsh-client-ui-chat/client'
 import { ENTRY_ID, PACKAGE_ID, type Preferences } from '../preferences.ts'
 import { createPreferences, type PreferencesController } from './settings.ts'
 import { Assistant, type OutputInjected } from './Assistant.tsx'
+import { WebSearchRow } from './WebSearch.tsx'
 import { Settings, type SettingsInjected } from './Settings.tsx'
 import { NS, en, zh } from './locales.ts'
 import styles from './styles.css'
 
 /** Assistant seat this Bundle shadows; declared by the shipped Chat package. */
 const ASSISTANT_SLOT = 'conversation.chat.node'
+/** Keyed Tool view this Bundle shadows once the host's ui-tool package declares it. */
+const TOOL_SLOT = 'tool.call.toolview'
 /** Settings seat this Bundle adds; independent of every chat declaration. */
 const SETTINGS_SLOT = 'settings.section'
 /** Root marker every native-output takeover rule in styles.css is scoped by. */
@@ -123,6 +126,12 @@ export function apply(ctx: Context): void {
     }, Assistant),
     installTakeover(controller),
   ])
+  // A host without this keyed Tool slot keeps its native web row: the callback below simply
+  // never runs. On 0.2.1-rc.4 the built-in web_search row sits at priority 0, so -10 is the
+  // shadowing slot rather than a same-priority duplicate that would throw at load.
+  ctx.slots.inject(TOOL_SLOT, () => ctx.slots.register({
+    name: TOOL_SLOT, key: 'web_search', priority: -10, locale: NS,
+  }, WebSearchRow))
   // The settings page never touches native output, so it keeps its own independent declaration.
   ctx.slots.inject(SETTINGS_SLOT, () => ctx.slots.register({
     name: SETTINGS_SLOT, id: ENTRY_ID, order: 14, label: () => outputText('section'), locale: NS,

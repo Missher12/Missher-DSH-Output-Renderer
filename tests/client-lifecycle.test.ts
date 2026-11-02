@@ -40,6 +40,7 @@ function host(overrides: Overrides = {}) {
   const waits = new Map<string, () => SlotInjectionEffect>()
   const contributions = new Map<string, (() => void)[]>()
   const registered: string[] = []
+  const registrations: { name: string; key?: string; priority?: number; locale?: string }[] = []
   let unloaded = false
 
   const form = {
@@ -84,14 +85,17 @@ function host(overrides: Overrides = {}) {
       effects.push(dispose)
       return dispose
     },
-    register: (options: { name: string }) => {
+    register: (options: { name: string; key?: string; priority?: number; locale?: string }) => {
       registered.push(options.name)
+      registrations.push(options)
       let live = true
       return () => {
         if (!live) return
         live = false
         const at = registered.indexOf(options.name)
         if (at >= 0) registered.splice(at, 1)
+        const registration = registrations.indexOf(options)
+        if (registration >= 0) registrations.splice(registration, 1)
       }
     },
   }
@@ -107,7 +111,7 @@ function host(overrides: Overrides = {}) {
     faces[key] = value
   }
   return {
-    ctx: faces, waits, registered, subscribers, effects,
+    ctx: faces, waits, registered, registrations, subscribers, effects,
     sync: (value: Partial<typeof snapshot>) => { snapshot = { ...snapshot, ...value }; subscribers.forEach(listener => listener()) },
     /** Declare a slot the way the owning package would, installing its contribution once. */
     declare: (key: string): void => {
@@ -157,7 +161,7 @@ afterEach(() => {
 
 test('native takeover starts only once the assistant seat is really registered and ends with it', () => {
   const created = boot()
-  expect([...created.waits.keys()].sort()).toEqual(['conversation.chat.node', 'settings.section'])
+  expect([...created.waits.keys()].sort()).toEqual(['conversation.chat.node', 'settings.section', 'tool.call.toolview'])
   expect(created.registered).toEqual([])
   expect(document.documentElement.hasAttribute(MARKER)).toBe(false)
   expect(document.head.querySelectorAll(CSS)).toHaveLength(1)
@@ -258,6 +262,17 @@ test('a config service that resolves no form at all is reported once, not per me
   expect(message).not.toContain('subscribe')
 })
 
+test('the web search view shadows its keyed Tool slot at a lower priority and leaves on collapse', () => {
+  const created = boot()
+  created.declare('tool.call.toolview')
+  expect(created.registered).toEqual(['tool.call.toolview'])
+  expect(created.registrations).toEqual([{ name: 'tool.call.toolview', key: 'web_search', priority: -10, locale: 'missher.output-renderer' }])
+  // The Tool view does not participate in the assistant takeover marker.
+  expect(document.documentElement.hasAttribute(MARKER)).toBe(false)
+  created.collapse('tool.call.toolview')
+  expect(created.registered).toEqual([])
+})
+
 test('a form still waiting for its first accepted section is installed, not treated as missing', () => {
   const created = boot({ form: {
     getSnapshot: () => ({ value: undefined, base: undefined, user: undefined, revision: undefined,
@@ -265,7 +280,7 @@ test('a form still waiting for its first accepted section is installed, not trea
     subscribe: () => () => {},
     set: async () => false,
   } })
-  expect([...created.waits.keys()].sort()).toEqual(['conversation.chat.node', 'settings.section'])
+  expect([...created.waits.keys()].sort()).toEqual(['conversation.chat.node', 'settings.section', 'tool.call.toolview'])
   expect(document.head.querySelectorAll(CSS)).toHaveLength(1)
   created.declare('conversation.chat.node')
   expect(created.registered).toEqual(['conversation.chat.node'])

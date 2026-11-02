@@ -1,3 +1,13 @@
+## 2026-11-02 · 0.2.0 来源卡片与结论模式
+
+- 源码新增 `web_search` 根调用来源卡片：`tool.call.toolview`、`web_search`、priority -10；来源仅取持久化 `meta.sources`，只把 http(s) 暴露为外链，PTC 子调用/未知 meta 回退文本；宿主没有该槽时保留原生行。
+- 简洁对话新增结论模式：读取 `turn-process` 的 `answerStep`/`toolCallCount`/`messageCount`/`inlineReasoning`，最终答案 settle 后收起同组工具行、非最终 assistant-step 和组头，只留答复 + “查看过程”；展开恢复。运行中、中断和其他布局不变。
+- 双端 TypeScript 检查通过。11 个测试文件共 130 项通过（原 98 + 新增 32：来源卡片 25 项、结论模式 7 项，均为组件/模型/生命周期测试）。
+- 隔离副本构建通过：`lib/client.js` 95,898 bytes，SHA-256 `a9bdfa7e3cb66998b0eceeb6f783b77e6589af44a67b372c42862589664f08c4`；`lib/index.js` 哈希不变。
+- 浏览器 mock 分组 DOM（非真实宿主）验证：cards 收起态工具行/中间步骤/组头隐藏，展开恢复，切到 process 布局规则失效；真实 DSH rc.4 分组 DOM 和安装后 Web 交互仍单独复核。
+- 本地安装：`dsh plugin --profile desktop add` 已把 `@missher/dsh-output-renderer` 从 0.1.5 升到 0.2.0；profile 指向 `or-0.2.0.tgz`，安装后 `lib/client.js` 哈希与受检构建一致，其他 14 个插件仍在。旧 0.1.5 的 profile 包、锁文件、插件目录和 tgz 备份在 `~/.dsh/backups/output-renderer-0.1.5-20261102-235550`。宿主进程未重启，实际 Web UI 需刷新/重启后加载。
+- 限制：Project Ops task_run 适配器在本机返回 `Tool batch execution failed`，本轮使用原生命令回执；0.2.0 尚未发布 GitHub Release。
+
 # 验证记录
 
 本文保留冻结验收时的事实与历史阶段；当前发布状态以 [GitHub Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 为准，设备安装单独核对。

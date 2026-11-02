@@ -91,5 +91,37 @@
     "hostChanged": false,
     "otherPluginVersionsChanged": false,
     "scope": "Local installed community RC.2; not a claim for unmodified official Host or every platform"
+  },
+  "sourceCandidate": {
+    "version": "0.2.0",
+    "date": "2026-11-02",
+    "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
+    "sourceBaseCommit": "e1cd9a6ad878b863da29e4de5de5fc07b86fc243",
+    "status": "source and local desktop-profile installation; formal GitHub Release not published",
+    "runtimeFiles": [
+      {
+        "path": "lib/index.js",
+        "sha256": "5a68c88922e5215c4ada28286ea60628d195226d2e024bd60b8166eaa04db603"
+      },
+      {
+        "path": "lib/client.js",
+        "sha256": "a9bdfa7e3cb66998b0eceeb6f783b77e6589af44a67b372c42862589664f08c4"
+      }
+    ],
+    "archive": "missher-dsh-output-renderer-0.2.0.tgz",
+    "sha256": "b2297f3ac85e159dfb05b06bd2d69652a98345ce3de195ce8e367a68d8a947fe",
+    "bytes": 48830,
+    "members": 10,
+    "validation": "130 tests in 11 files, host/client type checks, isolated build and browser mock group-DOM checks. Desktop profile installed 0.2.0; host restart/reload and real Web UI interaction not yet verified.",
+    "installation": {
+      "profile": "desktop",
+      "version": "0.2.0",
+      "installedClientSha256": "a9bdfa7e3cb66998b0eceeb6f783b77e6589af44a67b372c42862589664f08c4",
+      "otherPluginsUnchanged": true,
+      "backup": "~/.dsh/backups/output-renderer-0.1.5-20261102-235550",
+      "hostChanged": false,
+      "restartRequired": true,
+      "webUiVerified": false
+    }
   }
 }

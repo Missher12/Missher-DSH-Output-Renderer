@@ -44,7 +44,8 @@ export const Assistant = memo(function Assistant({ node, groupPart, sessionId, u
   // Only the final block can still grow. Earlier blocks are closed by the block after them,
   // so frame buffering must settle them instead of holding their last grapheme until the step ends.
   const streamingIndex = running ? data.blocks.length - 1 : -1
-  // "简洁对话" reads as one column and folds the reasoning by default; the other layouts stay fully open.
+  // "简洁对话" reads as one column; while running it focuses on the live reasoning, and a settled
+  // final answer folds the whole process group behind one disclosure. Other layouts stay fully open.
   const concise = layout === 'cards'
   // The step status is not the thinking status: a running step that already appended text or a tool
   // call has finished its reasoning. Only the last block of a running step can still be growing.
@@ -53,9 +54,12 @@ export const Assistant = memo(function Assistant({ node, groupPart, sessionId, u
   // Keyed by seat identity, never by content: a delta, a new block or a status change keeps the
   // user's choice, while another session or step starts collapsed.
   const [thinkingOpen, toggleThinking] = useThinkingOpen(`${sessionId}:${data.turn}:${data.step}`, false)
+  const [processOpen, toggleProcess] = useThinkingOpen(`${sessionId}:${data.turn}:${data.step}:process`, false)
   const thinkingBodyId = `dsh-output-thinking-${sessionId}-${data.turn}-${data.step}`.replace(/[^A-Za-z0-9_-]/gu, '-')
+  const processBodyId = `${thinkingBodyId}-process`
   const turn = node.location.kind === 'turn' || node.location.kind === 'step' ? node.location.turn : undefined
   const tail = useTurnData('turn-tail')
+  const turnProcess = useTurnData('turn-process')
   const owner = useMemo<TurnTailOwnerProps | undefined>(() => {
     if (turn?.status !== 'closed' || !data.finalNode || tail?.closing?.finalNode.seq !== data.finalNode.seq) return undefined
     return { turn, seq: data.finalNode.seq, openFile }
@@ -125,6 +129,13 @@ export const Assistant = memo(function Assistant({ node, groupPart, sessionId, u
   const hasReasoning = data.blocks.some(block => block.kind === 'reasoning' && block.text.trim())
   const hasResponse = data.blocks.some(block => block.kind === 'text' ? block.text.trim()
     : block.kind !== 'reasoning' && block.kind !== 'tool-call')
+  // A settled final answer may fold its whole process group. `turn-process` is the host's own
+  // final-answer boundary; without it, keep the previous concise behavior instead of guessing.
+  const hasToolCall = data.blocks.some(block => block.kind === 'tool-call')
+  const hasProcess = hasReasoning || hasToolCall || (turnProcess?.toolCallCount ?? 0) > 0
+    || (turnProcess?.messageCount ?? 0) > 0 || turnProcess?.inlineReasoning === true
+  const finalAnswer = turnProcess?.answerStep === data.step
+  const conclusion = concise && data.status === 'settled' && hasResponse && hasProcess && finalAnswer
   // Exactly one interruption notice. The fold row owns it only when the reasoning itself was the
   // last real block of an interrupted step — the same phase test as `reasoningActive`, not "no answer
   // text yet": a step that stopped after a tool call or an empty text block has already closed its
@@ -145,21 +156,38 @@ export const Assistant = memo(function Assistant({ node, groupPart, sessionId, u
     : reasoningActive ? 'running' : 'settled'
   return <div className={`dsh-output-assistant${checklistStep ? ' dsh-output-checklist-step' : ''}`} data-output-layout={layout} data-output-part={groupPart}
     data-output-density={density} data-output-text-size={textSize}
-    data-output-both={reasoning.length > 0 && response.length > 0 || undefined} data-output-running={running || undefined}>
+    data-output-both={reasoning.length > 0 && response.length > 0 || undefined} data-output-running={running || undefined}
+    data-output-conclusion={conclusion || undefined} data-output-process-open={conclusion && processOpen || undefined}>
     {checklistStep && <StepLabel step={data.step} status={data.status} text={outputText} />}
-    {reasoning.length > 0 && (concise
-      // The row carries the interruption only when the reasoning itself stopped there; otherwise it
-      // names a finished process and the single stopped chip stays with the response seat.
-      ? <ThinkingDisclosure id={thinkingBodyId} status={thinkingStatus} text={outputText}
-          open={thinkingOpen} onToggle={toggleThinking}>
-          <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
+    {conclusion
+      // The final answer keeps only its disclosure control; the host rows in this group are
+      // revealed by CSS from `data-output-process-open`, never by mutating host DOM here.
+      ? <section className="dsh-output-thinking dsh-output-conclusion-process">
+          <button type="button" className="dsh-output-thinking-toggle" data-output-process-toggle
+            aria-expanded={processOpen} aria-controls={reasoning.length > 0 ? processBodyId : undefined}
+            onClick={toggleProcess}>
+            <span className="dsh-output-thinking-arrow" aria-hidden="true" />
+            <span className="dsh-output-thinking-state">{processOpen ? outputText('processHide') : outputText('processShow')}</span>
+          </button>
+          {reasoning.length > 0 && <div id={processBodyId} hidden={!processOpen}>
+            <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
+              <div data-reasoning-full>{reasoning}</div>
+            </section>
+          </div>}
+        </section>
+      : reasoning.length > 0 && (concise
+        // The row carries the interruption only when the reasoning itself stopped there; otherwise it
+        // names a finished process and the single stopped chip stays with the response seat.
+        ? <ThinkingDisclosure id={thinkingBodyId} status={thinkingStatus} text={outputText}
+            open={thinkingOpen} onToggle={toggleThinking}>
+            <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
+              <div data-reasoning-full>{reasoning}</div>
+            </section>
+          </ThinkingDisclosure>
+        : <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
+            <div className="dsh-output-label">{outputText('thinking')}</div>
             <div data-reasoning-full>{reasoning}</div>
-          </section>
-        </ThinkingDisclosure>
-      : <section className="dsh-output-reasoning" aria-label={outputText('thinking')}>
-          <div className="dsh-output-label">{outputText('thinking')}</div>
-          <div data-reasoning-full>{reasoning}</div>
-        </section>)}
+          </section>)}
     {response.length > 0 && <section className="dsh-output-answer" aria-label={outputText('answer')}>
       <div className="dsh-output-label dsh-output-answer-label">{outputText('answer')}</div>
       {response}
