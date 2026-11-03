@@ -1,6 +1,6 @@
 # 当前维护：0.2.2 正式发布
 
-2026-11-03：0.2.2 基于 9f9f882 发布，包含 Assistant 类型安全修正；运行行为与 0.2.1 相同（只留结论、运行中单已思考、web_search 来源卡片）。双端 typecheck、130 项测试、隔离构建通过；`lib/client.js` 93,987 bytes，SHA-256 `db33f1af…`。GitHub Release `v0.2.2` 提供 tgz（49,708 bytes，SHA-256 `fd24c6cd2d9b…`）与 sha256；desktop profile 已安装 0.2.2（客户端哈希 `db33f1af…`），旧 0.2.1 备份于 `~/.dsh/backups/output-renderer-0.2.1-20261103-133405`；0.2.1 的实际页面行为已由用户确认，0.2.2 未单独重做页面验收。设置保存失败曾在 rc.4 出现一次通用回滚提示，未定位到插件根因，发布说明保留该边界。
+2026-11-03：0.2.2 基于 9f9f882 发布，包含 Assistant 类型安全修正；运行行为与 0.2.1 相同（只留结论、运行中单已思考、web_search 来源卡片）。双端 typecheck、130 项测试、隔离构建通过；`lib/client.js` 93,987 bytes，SHA-256 `db33f1af…`。GitHub Release `v0.2.2` 提供 tgz（49,708 bytes，SHA-256 `fd24c6cd2d9b…`）与 sha256；desktop profile 已安装 0.2.2（客户端哈希 `db33f1af…`），旧 0.2.1 备份于 `~/.dsh/backups/output-renderer-0.2.1-20261103-133405`；0.2.1 的实际页面行为已由用户确认，0.2.2 未单独重做页面验收。GitHub Release 已公开，Release 公共 URL 下载的 tgz 哈希与发布资产一致。设置保存失败曾在 rc.4 出现一次通用回滚提示，未定位到插件根因，发布说明保留该边界。
 
 ## 历史：0.2.1 只留结论与单思考行
 

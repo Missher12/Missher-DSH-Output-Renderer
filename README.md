@@ -40,7 +40,7 @@
 
 ## 安装、启停与卸载
 
-推荐使用 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) 中的预构建 `.tgz`，版本以实际发布资产为准。`0.2.2` 发布文件名为 `missher-dsh-output-renderer-0.2.2.tgz`，校验文件为同名 `.tgz.sha256`。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
+推荐使用 [v0.2.2 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.2) 的预构建包：[直接下载 tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz.sha256)。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
 
 1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.2.2.tgz.sha256` 核对下载字节。
 2. 桌面版进入 **插件 → 添加插件**，填入下载文件的完整路径，安装并启用本插件。按宿主提示重新加载后，进入 **设置 → 输出外观**。

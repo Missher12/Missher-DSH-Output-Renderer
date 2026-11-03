@@ -40,7 +40,7 @@ Use **Settings → Output appearance** to choose the layout, 14/16 px text, comf
 
 ## Install, enable, disable and uninstall
 
-Use a prebuilt `.tgz` from [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases); available release assets determine what is published. The `0.2.2` release asset is `missher-dsh-output-renderer-0.2.2.tgz`, with a matching `.tgz.sha256` file. Check the installed version on each device against the downloaded asset. The installation steps below use the downloaded tgz directly and do not depend on npm package-name resolution.
+Use the prebuilt package from the [v0.2.2 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.2): [download tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz.sha256). Check the installed version on each device against the downloaded asset. The installation steps below use the downloaded tgz directly and do not depend on npm package-name resolution.
 
 1. Download the chosen tgz and checksum file. Verify with `shasum -a 256 -c missher-dsh-output-renderer-0.2.2.tgz.sha256`.
 2. In the desktop app, open **Plugins → Add plugin**, enter the downloaded file's full path, then install and enable the plugin. Follow any reload prompt and open **Settings → Output appearance**.

@@ -123,7 +123,26 @@
       "pageReloaded": true,
       "hostRestarted": false,
       "webUiVerified": false
-    }
+    },
+    "releaseCommit": "46359b2",
+    "releaseAssets": [
+      {
+        "name": "missher-dsh-output-renderer-0.2.2.tgz",
+        "id": 704447195,
+        "size": 49708,
+        "digest": "sha256:fd24c6cd2d9bc07c53e164a9bbc3ba8e465b1fe5ae51a9853bb64d854bbf8bc4",
+        "state": "uploaded"
+      },
+      {
+        "name": "missher-dsh-output-renderer-0.2.2.tgz.sha256",
+        "id": 704447303,
+        "size": 104,
+        "digest": "sha256:f5b09ae02c0fc82722942a1d6705171e9f34d3c0fadff1386b485ff21a5d7ed1",
+        "state": "uploaded"
+      }
+    ],
+    "releaseVerification": "Public release draft=false, prerelease=false; both assets uploaded; re-downloaded tgz sha256 matches fd24c6cd...; size 49708.",
+    "downloadUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz"
   },
   "previousSourceCandidate": {
     "version": "0.2.1",
@@ -278,5 +297,25 @@
         "webUiVerified": false
       }
     }
-  }
+  },
+  "releaseCommit": "46359b2",
+  "downloadUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz",
+  "checksumUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz.sha256",
+  "releaseAssets": [
+    {
+      "name": "missher-dsh-output-renderer-0.2.2.tgz",
+      "id": 704447195,
+      "size": 49708,
+      "digest": "sha256:fd24c6cd2d9bc07c53e164a9bbc3ba8e465b1fe5ae51a9853bb64d854bbf8bc4",
+      "state": "uploaded"
+    },
+    {
+      "name": "missher-dsh-output-renderer-0.2.2.tgz.sha256",
+      "id": 704447303,
+      "size": 104,
+      "digest": "sha256:f5b09ae02c0fc82722942a1d6705171e9f34d3c0fadff1386b485ff21a5d7ed1",
+      "state": "uploaded"
+    }
+  ],
+  "releaseVerification": "Public release draft=false, prerelease=false; both assets uploaded; re-downloaded tgz sha256 matches fd24c6cd...; size 49708."
 }
