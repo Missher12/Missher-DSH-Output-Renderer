@@ -1,3 +1,12 @@
+## 2026-11-03 · 0.2.3 搜索默认折叠与结论保留来源
+
+- `WebSearchRow` 初始 `open=false`：搜索中、完成、失败、空结果等状态均先显示胶囊和查询摘要，body 隐藏；点击胶囊才展开骨架/来源/错误详情。来源数据与展开全部逻辑未改。
+- 简洁对话结论 CSS 在隐藏所有 `tool-call` 后追加例外：仅 `[data-chat-flow-kind="tool-call"]:has(.dsh-output-websearch)` 恢复 `display:block`；普通工具行、非最终 assistant-step、组头继续隐藏，最终答复可见。
+- 双端 TypeScript 检查通过；11 个测试文件、131 项通过（WebSearch 组件测试改为默认折叠，并新增结论 CSS 例外静态检查）。隔离构建 `lib/client.js` 94,295 bytes，SHA-256 `e7fdfeb11b978b526e73e37378369ce372d1db8ea59d98b26b19c0e41f5f7985`。
+- 浏览器 mock 分组 DOM（静态胶囊 + 插件样式）验证：cards 结论态组头 none、组体 block、web_search 行 block、普通工具 none、非最终步骤 none、最终答复 block；胶囊初始 aria-expanded=false 且 body hidden。点击行为由 jsdom 组件测试覆盖。
+- 0.2.1 的实际页面结论行为已由用户确认；0.2.3 新增的搜索默认折叠和结论保留来源未单独在真实 DSH 页面复测。
+- 打包 `missher-dsh-output-renderer-0.2.3.tgz`（50,580 bytes，SHA-256 `df2dff9cef1daf3a1e3762ef1cf7bc354f34f8946728151d857e1a4d4ce4df37`）与 `.tgz.sha256`；desktop profile 已从 0.2.2 升到 0.2.3，安装后客户端哈希 `e7fdfeb1…`；旧 0.2.2 的 profile 包、锁文件、插件目录和 tgz 备份在 `~/.dsh/backups/output-renderer-0.2.2-20261103-190212`。其他插件数量随当前 profile 状态变化，本次未逐包作字节比对。
+
 ## 2026-11-03 · 0.2.2 正式发布
 
 - 0.2.2 是 0.2.1 的发布打包加上 `9f9f882` 的 Assistant 类型安全修正；结论态、运行态单已思考和 web_search 来源卡片运行行为不变。

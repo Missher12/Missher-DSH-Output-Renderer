@@ -1,9 +1,9 @@
 {
-  "version": "0.2.2",
+  "version": "0.2.3",
   "date": "2026-11-03",
   "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
-  "sourceBaseCommit": "9f9f882b2e2164b747b9417f48e1999d79427faa",
-  "status": "formal Release published; desktop profile installation verified; actual 0.2.2 page re-test and other hosts not claimed",
+  "sourceBaseCommit": "ade205e",
+  "status": "formal Release v0.2.3; desktop profile installed; new search-collapse/conclusion-retention not separately real-page retested",
   "runtimeFiles": [
     {
       "path": "lib/index.js",
@@ -11,10 +11,10 @@
     },
     {
       "path": "lib/client.js",
-      "sha256": "db33f1af31feb477714b573a4b63b8be62208850f6a4888ff9938083f5083a0e"
+      "sha256": "e7fdfeb11b978b526e73e37378369ce372d1db8ea59d98b26b19c0e41f5f7985"
     }
   ],
-  "validation": "130 tests in 11 files, host/client type checks, isolated build and mock group-DOM checks passed. 0.2.1 actual page confirmed on DSH 0.2.1-rc.4; 0.2.2 adds the 9f9f882 type-safety fix and was not separately re-tested in the real page. Settings-save failure observed once on rc.4 remains unroot-caused.",
+  "validation": "131 tests in 11 files, host/client type checks, isolated build, browser mock group-DOM conclusion check (search row kept; ordinary tool and earlier step hidden) passed. 0.2.1 actual-page conclusion behavior confirmed; 0.2.3 collapsed search and retained source capsule not separately retested in the real page.",
   "previousDelivery": {
     "version": "0.1.3",
     "date": "2026-10-17",
@@ -58,17 +58,17 @@
       "publicationChanges": "Documentation only after frozen package acceptance; original runtime archive preserved."
     }
   },
-  "sourceTag": "v0.2.2",
-  "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.2",
+  "sourceTag": "v0.2.3",
+  "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3",
   "supersededSourceTag": {
     "tag": "v0.1.4",
     "commit": "186aadd5644c6671c87b581b29138bff9bbcb19d",
     "releasePublished": false,
     "reason": "Correct unsupported official-host provenance wording without rewriting public tag"
   },
-  "archive": "missher-dsh-output-renderer-0.2.2.tgz",
-  "sha256": "fd24c6cd2d9bc07c53e164a9bbc3ba8e465b1fe5ae51a9853bb64d854bbf8bc4",
-  "bytes": 49708,
+  "archive": "missher-dsh-output-renderer-0.2.3.tgz",
+  "sha256": "df2dff9cef1daf3a1e3762ef1cf7bc354f34f8946728151d857e1a4d4ce4df37",
+  "bytes": 50580,
   "members": 10,
   "published": true,
   "release": {
@@ -93,6 +93,39 @@
     "scope": "Local installed community RC.2; not a claim for unmodified official Host or every platform"
   },
   "sourceCandidate": {
+    "version": "0.2.3",
+    "date": "2026-11-03",
+    "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
+    "sourceBaseCommit": "ade205e",
+    "status": "formal Release v0.2.3 asset; desktop profile 0.2.3 installed",
+    "runtimeFiles": [
+      {
+        "path": "lib/index.js",
+        "sha256": "5a68c88922e5215c4ada28286ea60628d195226d2e024bd60b8166eaa04db603"
+      },
+      {
+        "path": "lib/client.js",
+        "sha256": "e7fdfeb11b978b526e73e37378369ce372d1db8ea59d98b26b19c0e41f5f7985"
+      }
+    ],
+    "archive": "missher-dsh-output-renderer-0.2.3.tgz",
+    "sha256": "df2dff9cef1daf3a1e3762ef1cf7bc354f34f8946728151d857e1a4d4ce4df37",
+    "bytes": 50580,
+    "members": 10,
+    "sourceTag": "v0.2.3",
+    "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3",
+    "validation": "131 tests in 11 files; default-collapsed search capsule; conclusion keeps the web_search row and hides other tools. 0.2.1 actual page confirmed; 0.2.3 real page re-test pending.",
+    "installation": {
+      "profile": "desktop",
+      "version": "0.2.3",
+      "installedClientSha256": "e7fdfeb11b978b526e73e37378369ce372d1db8ea59d98b26b19c0e41f5f7985",
+      "backup": "~/.dsh/backups/output-renderer-0.2.2-20261103-190212",
+      "pageReloaded": false,
+      "hostRestarted": false,
+      "webUiVerified": false
+    }
+  },
+  "previousSourceCandidate": {
     "version": "0.2.2",
     "date": "2026-11-03",
     "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
@@ -144,12 +177,12 @@
     "releaseVerification": "Public release draft=false, prerelease=false; both assets uploaded; re-downloaded tgz sha256 matches fd24c6cd...; size 49708.",
     "downloadUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz"
   },
-  "previousSourceCandidate": {
-    "version": "0.2.1",
+  "previousRelease": {
+    "version": "0.2.2",
     "date": "2026-11-03",
     "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
-    "sourceBaseCommit": "b587896ee6bf7c489ce5940c555e38814ad1eb67",
-    "status": "source and local desktop-profile installation; formal GitHub Release not published",
+    "sourceBaseCommit": "9f9f882b2e2164b747b9417f48e1999d79427faa",
+    "status": "formal Release published; desktop profile installation verified; actual 0.2.2 page re-test and other hosts not claimed",
     "runtimeFiles": [
       {
         "path": "lib/index.js",
@@ -160,53 +193,61 @@
         "sha256": "db33f1af31feb477714b573a4b63b8be62208850f6a4888ff9938083f5083a0e"
       }
     ],
-    "archive": "missher-dsh-output-renderer-0.2.1.tgz",
-    "sha256": "5b2aea887df0467a53b584e0884b8e1ea093ceacb485cc6f6710da173a454a89",
-    "bytes": 49327,
-    "members": 10,
-    "validation": "130 tests in 11 files, host/client type checks, isolated build and browser mock group-DOM checks (one thinking row while running, answer-only conclusion). Desktop profile installed 0.2.1; user confirmed the actual page behavior on 2026-11-03 after a page reload.",
-    "installation": {
-      "profile": "desktop",
-      "version": "0.2.1",
-      "installedClientSha256": "db33f1af31feb477714b573a4b63b8be62208850f6a4888ff9938083f5083a0e",
-      "otherPluginsUnchanged": true,
-      "backup": "~/.dsh/backups/output-renderer-0.2.0-20261103-005051",
-      "hostChanged": false,
-      "restartRequired": false,
-      "webUiVerified": true,
-      "hostRestarted": false,
-      "pageReloaded": true,
-      "verification": "User confirmed 0.2.1 behavior on the actual page at 2026-11-03T01:23:09+08:00: no process control and one thinking row while running."
-    }
-  },
-  "previousRelease": {
-    "version": "0.1.5",
-    "date": "2026-10-22",
-    "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
-    "sourceBaseCommit": "186aadd5644c6671c87b581b29138bff9bbcb19d",
-    "status": "formal Release published; Ubuntu daily installation and active plugin verified; other native platforms unverified",
-    "runtimeFiles": [
-      {
-        "path": "lib/index.js",
-        "sha256": "5a68c88922e5215c4ada28286ea60628d195226d2e024bd60b8166eaa04db603"
-      },
-      {
-        "path": "lib/client.js",
-        "sha256": "e83726c8eed246266dd7fcce9f1d0bdd1d7930b703d707cedb4dd5532afde3f6"
+    "validation": "130 tests in 11 files, host/client type checks, isolated build and mock group-DOM checks passed. 0.2.1 actual page confirmed on DSH 0.2.1-rc.4; 0.2.2 adds the 9f9f882 type-safety fix and was not separately re-tested in the real page. Settings-save failure observed once on rc.4 remains unroot-caused.",
+    "previousDelivery": {
+      "version": "0.1.3",
+      "date": "2026-10-17",
+      "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
+      "sourceBaseCommit": "161ddeb5b4756a3504650ee9c91c959cfe3a8eea",
+      "status": "accepted source and runtime; regular Release and device installation are separate steps",
+      "acceptedPackageSha256": "a4de6d8be26842f38aa643c379eb336ca13f6068e678fba656d1e144f9c7b1ec",
+      "packageBytes": 39125,
+      "runtimeFiles": [
+        {
+          "path": "lib/index.js",
+          "sha256": "5a68c88922e5215c4ada28286ea60628d195226d2e024bd60b8166eaa04db603"
+        },
+        {
+          "path": "lib/client.js",
+          "sha256": "fbe18ee6afc02245bf0af1b8d1285a6955d74b43b754101f4783c38b83406c44"
+        }
+      ],
+      "sourceTag": "v0.1.3",
+      "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.3",
+      "publicationChanges": "Neutral documentation and immutable screenshot links only after acceptance. All ten final archive files match this export; runtime bytes and package manifest unchanged.",
+      "validation": "53 focused tests, types/build, six real Host cases and controlled real SlotRegistry checks, actual Web UI on official npm alpha.5 and community rc.2. Current community alpha.2/native desktop/Windows/macOS/real-provider limits are explicit in VALIDATION.md.",
+      "previousDelivery": {
+        "version": "0.1.3-rc.5",
+        "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
+        "sourceBaseCommit": "23a7cdf0a872e8d47368a5ecdcd3a6e1a911b200",
+        "status": "source-for-prerelease",
+        "acceptedPackageSha256": "902bbef203352494345c2ceefa262c1a8e6244734d05c712e3a1c4b57643f095",
+        "runtimeFiles": [
+          {
+            "path": "lib/index.js",
+            "sha256": "f9228fd3020670cca0d33eede8c7d283ebec519c53ab59d363dfb52336b6309a"
+          },
+          {
+            "path": "lib/client.js",
+            "sha256": "21b1abfaa2d769b56dd1686b9c2a90c10f77c5ce36f9f54568b797d583b5de4b"
+          }
+        ],
+        "sourceTag": "v0.1.3-rc.5",
+        "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.3-rc.5",
+        "publicationChanges": "Documentation only after frozen package acceptance; original runtime archive preserved."
       }
-    ],
-    "validation": "35 focused tests, Host/client types, build and actual installed-community RC.2 Web UI on 0.1.4 candidate; identical runtime reused. Not proven unmodified official RC.2 or native/all-platform acceptance.",
-    "sourceTag": "v0.1.5",
-    "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.1.5",
+    },
+    "sourceTag": "v0.2.2",
+    "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.2",
     "supersededSourceTag": {
       "tag": "v0.1.4",
       "commit": "186aadd5644c6671c87b581b29138bff9bbcb19d",
       "releasePublished": false,
       "reason": "Correct unsupported official-host provenance wording without rewriting public tag"
     },
-    "archive": "missher-dsh-output-renderer-0.1.5.tgz",
-    "sha256": "78e44b45e723c41e59f45c35b4312d182fdf217a937ff7e06236ff918dcc1e0d",
-    "bytes": 42103,
+    "archive": "missher-dsh-output-renderer-0.2.2.tgz",
+    "sha256": "fd24c6cd2d9bc07c53e164a9bbc3ba8e465b1fe5ae51a9853bb64d854bbf8bc4",
+    "bytes": 49708,
     "members": 10,
     "published": true,
     "release": {
@@ -231,6 +272,58 @@
       "scope": "Local installed community RC.2; not a claim for unmodified official Host or every platform"
     },
     "sourceCandidate": {
+      "version": "0.2.2",
+      "date": "2026-11-03",
+      "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
+      "sourceBaseCommit": "9f9f882b2e2164b747b9417f48e1999d79427faa",
+      "status": "formal Release v0.2.2 asset; desktop profile 0.2.2 installed",
+      "runtimeFiles": [
+        {
+          "path": "lib/index.js",
+          "sha256": "5a68c88922e5215c4ada28286ea60628d195226d2e024bd60b8166eaa04db603"
+        },
+        {
+          "path": "lib/client.js",
+          "sha256": "db33f1af31feb477714b573a4b63b8be62208850f6a4888ff9938083f5083a0e"
+        }
+      ],
+      "archive": "missher-dsh-output-renderer-0.2.2.tgz",
+      "sha256": "fd24c6cd2d9bc07c53e164a9bbc3ba8e465b1fe5ae51a9853bb64d854bbf8bc4",
+      "bytes": 49708,
+      "members": 10,
+      "sourceTag": "v0.2.2",
+      "releaseUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.2",
+      "validation": "130 tests in 11 files, host/client type checks, isolated build and mock group-DOM checks; 0.2.2 type-safety fix only. 0.2.1 actual page confirmed; 0.2.2 real-page re-test and other hosts not claimed.",
+      "installation": {
+        "profile": "desktop",
+        "version": "0.2.2",
+        "installedClientSha256": "db33f1af31feb477714b573a4b63b8be62208850f6a4888ff9938083f5083a0e",
+        "backup": "~/.dsh/backups/output-renderer-0.2.1-20261103-133405",
+        "pageReloaded": true,
+        "hostRestarted": false,
+        "webUiVerified": false
+      },
+      "releaseCommit": "46359b2",
+      "releaseAssets": [
+        {
+          "name": "missher-dsh-output-renderer-0.2.2.tgz",
+          "id": 704447195,
+          "size": 49708,
+          "digest": "sha256:fd24c6cd2d9bc07c53e164a9bbc3ba8e465b1fe5ae51a9853bb64d854bbf8bc4",
+          "state": "uploaded"
+        },
+        {
+          "name": "missher-dsh-output-renderer-0.2.2.tgz.sha256",
+          "id": 704447303,
+          "size": 104,
+          "digest": "sha256:f5b09ae02c0fc82722942a1d6705171e9f34d3c0fadff1386b485ff21a5d7ed1",
+          "state": "uploaded"
+        }
+      ],
+      "releaseVerification": "Public release draft=false, prerelease=false; both assets uploaded; re-downloaded tgz sha256 matches fd24c6cd...; size 49708.",
+      "downloadUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz"
+    },
+    "previousSourceCandidate": {
       "version": "0.2.1",
       "date": "2026-11-03",
       "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
@@ -265,38 +358,26 @@
         "verification": "User confirmed 0.2.1 behavior on the actual page at 2026-11-03T01:23:09+08:00: no process control and one thinking row while running."
       }
     },
-    "previousSourceCandidate": {
-      "version": "0.2.0",
-      "date": "2026-11-02",
-      "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
-      "sourceBaseCommit": "e1cd9a6ad878b863da29e4de5de5fc07b86fc243",
-      "status": "source and local desktop-profile installation; formal GitHub Release not published",
-      "runtimeFiles": [
-        {
-          "path": "lib/index.js",
-          "sha256": "5a68c88922e5215c4ada28286ea60628d195226d2e024bd60b8166eaa04db603"
-        },
-        {
-          "path": "lib/client.js",
-          "sha256": "a9bdfa7e3cb66998b0eceeb6f783b77e6589af44a67b372c42862589664f08c4"
-        }
-      ],
-      "archive": "missher-dsh-output-renderer-0.2.0.tgz",
-      "sha256": "b2297f3ac85e159dfb05b06bd2d69652a98345ce3de195ce8e367a68d8a947fe",
-      "bytes": 48830,
-      "members": 10,
-      "validation": "130 tests in 11 files, host/client type checks, isolated build and browser mock group-DOM checks. Desktop profile installed 0.2.0; host restart/reload and real Web UI interaction not yet verified.",
-      "installation": {
-        "profile": "desktop",
-        "version": "0.2.0",
-        "installedClientSha256": "a9bdfa7e3cb66998b0eceeb6f783b77e6589af44a67b372c42862589664f08c4",
-        "otherPluginsUnchanged": true,
-        "backup": "~/.dsh/backups/output-renderer-0.1.5-20261102-235550",
-        "hostChanged": false,
-        "restartRequired": true,
-        "webUiVerified": false
+    "releaseCommit": "46359b2",
+    "downloadUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz",
+    "checksumUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz.sha256",
+    "releaseAssets": [
+      {
+        "name": "missher-dsh-output-renderer-0.2.2.tgz",
+        "id": 704447195,
+        "size": 49708,
+        "digest": "sha256:fd24c6cd2d9bc07c53e164a9bbc3ba8e465b1fe5ae51a9853bb64d854bbf8bc4",
+        "state": "uploaded"
+      },
+      {
+        "name": "missher-dsh-output-renderer-0.2.2.tgz.sha256",
+        "id": 704447303,
+        "size": 104,
+        "digest": "sha256:f5b09ae02c0fc82722942a1d6705171e9f34d3c0fadff1386b485ff21a5d7ed1",
+        "state": "uploaded"
       }
-    }
+    ],
+    "releaseVerification": "Public release draft=false, prerelease=false; both assets uploaded; re-downloaded tgz sha256 matches fd24c6cd...; size 49708."
   },
   "releaseCommit": "46359b2",
   "downloadUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz",

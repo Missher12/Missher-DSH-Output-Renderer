@@ -2,16 +2,16 @@
 
 [English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **0.2.2**。这是可卸载的界面插件，需要已有 DSH 宿主。
+为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **0.2.3**。这是可卸载的界面插件，需要已有 DSH 宿主。
 
-`0.2.2` 保留两项输出界面能力，并把结论模式收敛为“只留结论”：
+`0.2.3` 保留两项输出界面能力，并把结论模式收敛为“只留结论”：
 
-- **Web 搜索来源卡片**：宿主 `web_search` 的根调用显示来源胶囊与卡片，默认 3 张 + “还有 N 个来源”，可展开全部；只使用宿主已记录的 `meta.sources`，不抓取 favicon、不新增搜索后端。宿主没有 `tool.call.toolview` 时保留原生行，`web_fetch` 与 PTC 子调用不走富卡片。
-- **简洁对话结论模式**：最终答案步骤完成后只保留最终答复，不显示“查看过程”；思考、普通工具行、web_search 来源卡片及同组中间步骤都收起。运行中仍显示过程，但同一组只保留一个“已思考”行；中断和其他三种布局保持原行为。
+- **Web 搜索来源卡片**：宿主 `web_search` 的根调用显示来源胶囊，默认折叠；点击展开 3 张来源卡片 + “还有 N 个来源”，可继续展开全部。只使用宿主已记录的 `meta.sources`，不抓取 favicon、不新增搜索后端。宿主没有 `tool.call.toolview` 时保留原生行，`web_fetch` 与 PTC 子调用不走富卡片。
+- **简洁对话结论模式**：最终答案步骤完成后只保留最终答复，不显示“查看过程”；思考、普通工具行和同组中间步骤收起，但 **web_search 来源胶囊保留且默认折叠**，点击仍可展开来源网页。运行中仍显示过程，但同一组只保留一个“已思考”行；中断和其他三种布局保持原行为。
 
-0.2.2 已正式发布，安装包见 [v0.2.2 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.2)。0.2.0/0.2.1 的本地安装和更早历史保留在 [VALIDATION.md](./VALIDATION.md)。
+0.2.3 已正式发布，安装包见 [v0.2.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3)。0.2.0/0.2.1/0.2.2 的本地安装和更早历史保留在 [VALIDATION.md](./VALIDATION.md)。
 
-本次实现通过两端类型检查、130 项测试、隔离副本构建，以及浏览器分组 DOM 的结论隐藏和单思考行检查；0.2.2 已安装到本机 `desktop` profile；实际页面行为已在 0.2.1 上确认，0.2.2 增加 Assistant 类型安全修正。完整证据及旧版兼容记录见 [VALIDATION.md](./VALIDATION.md)。
+本次实现通过两端类型检查、131 项测试、隔离副本构建，以及浏览器分组 DOM 的结论隐藏、单思考行和搜索胶囊保留检查；0.2.3 已安装到本机 `desktop` profile；结论行为已在 0.2.1 上确认，0.2.2 为类型安全修正，0.2.3 增加搜索默认折叠和结论保留来源。完整证据及旧版兼容记录见 [VALIDATION.md](./VALIDATION.md)。
 
 下面两张图片保留自0.1.3，展示设置入口和“深想简答”布局；其中“柔和卡片”现已替换。
 
@@ -40,9 +40,9 @@
 
 ## 安装、启停与卸载
 
-推荐使用 [v0.2.2 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.2) 的预构建包：[直接下载 tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz.sha256)。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
+推荐使用 [v0.2.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3) 的预构建包：[直接下载 tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.3/missher-dsh-output-renderer-0.2.3.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.3/missher-dsh-output-renderer-0.2.3.tgz.sha256)。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
 
-1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.2.2.tgz.sha256` 核对下载字节。
+1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.2.3.tgz.sha256` 核对下载字节。
 2. 桌面版进入 **插件 → 添加插件**，填入下载文件的完整路径，安装并启用本插件。按宿主提示重新加载后，进入 **设置 → 输出外观**。
 3. 在插件管理中关闭本插件的启用开关即可停用；重新打开可启用。停用后恢复宿主原生输出。
 4. 在插件管理中选择本插件并点击 **卸载** 可移除。升级请优先使用当前 Missher 桌面端的“更新插件”入口，选择新版 tgz；先备份 profile 配置并保留原版本 tgz。较早宿主若没有更新入口，可按该宿主支持的替换或重新安装流程操作，并保留配置备份；缺少更新按钮不表示插件只支持新宿主。卸载后的偏好保留行为由宿主管理。
@@ -50,7 +50,7 @@
 Web/自建 profile 使用目标宿主的正式 CLI，替换下面的 profile 和文件路径：
 
 ```sh
-dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.2.2.tgz
+dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.2.3.tgz
 dsh plugin --profile my-web remove @missher/dsh-output-renderer
 ```
 
@@ -66,7 +66,7 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 | 检查范围 | 证据与限制 |
 | --- | --- |
-| 本机 DSH `0.2.1-rc.4` | 0.2.2：双端类型检查、130 项测试、隔离构建和 mock 分组 DOM 的结论隐藏/单思考行检查通过；`tool.call.toolview` 与 `turn-process` 投影已按该版本契约实现。已安装到本机 `desktop` profile（0.2.2）；0.2.1 实际页面行为已由用户确认，0.2.2 仅增加类型安全修正。 |
+| 本机 DSH `0.2.1-rc.4` | 0.2.3：双端类型检查、131 项测试、隔离构建和 mock 分组 DOM 的结论隐藏/单思考行/搜索胶囊保留检查通过；`tool.call.toolview` 与 `turn-process` 投影已按该版本契约实现。已安装到本机 `desktop` profile（0.2.3）；0.2.1 的结论行为已由用户确认，0.2.3 的搜索默认折叠和结论保留来源仍未在真实页面单独复测。 |
 | 本机社区发行版 `0.2.1-rc.2` | 0.1.4已验：折叠与键盘操作、流中展开保持、实际状态和中断、正文/图片/原生工具、设置预览/保存/刷新/失败回退、暗色窄栏、停用恢复。浏览器使用隔离的本地合成数据。 |
 | 官方 npm alpha.5（`0.2.1-alpha.5`，Cordis `4.0.5` / Schemastery `3.18.5`） | 0.1.3历史证据：已通过真实 Loader 与设置；服务场景含正常保存、缺少 settings、缺少 configure；真实前端 SlotRegistry 受控生命周期；真实 Web 页面复核四布局、图片、原生放大/工具展开、保存失败回退、停止保留、36 轮历史加载、流式淡入与滚离底部；390 px 设置面板与 1280 px 词语分行均复验 |
 | Missher 社区扩展 rc.2（`0.2.0-rc.2`，Cordis `4.0.4` / Schemastery `3.18.4`） | 0.1.3历史证据：已通过同一组真实 Loader/设置场景、受控插槽生命周期与真实 Web 页面复核（四布局内容一致、刷新持久化、原生图片放大、窄屏与卸载） |
@@ -77,7 +77,7 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 插件依赖 `conversation.chat.node` 的 `assistant-step`、`settings.section`、原生 Markdown 与文件回调，以及聊天 DOM 标记；图片优先使用 Chat 提供的 `renderMessageImages` 闭包，其次使用宿主发布的 `conversation.images.content` Factory，两者都不存在时在正文位置显示明确提示而不是丢图。调用宿主能力前会检查 `slots.inject/register`、`locale.register/bind` 与 `configForms.get` 是否存在，缺失时给出诊断并保持原生输出可见。React、Schemastery 及 DSH 客户端模块由宿主提供；开发 SDK 链接不会进入运行包。升级宿主后需重新核验这些接口，若设置页不出现，检查插件启用状态和宿主加载错误。
 
-完整证据见 [VALIDATION.md](./VALIDATION.md)。0.2.2 的 130 项测试、类型检查、隔离构建与 mock 分组 DOM 检查属于源码/组件级证据，不等同于实际 DSH Web UI 验收；真实 profile 安装和 Web 交互已由用户在实际页面确认；DOM 分组细节未单独探测。原生桌面点击、Windows/当前 macOS 与持续硬件满帧率均未据此宣称通过。
+完整证据见 [VALIDATION.md](./VALIDATION.md)。0.2.3 的 131 项测试、类型检查、隔离构建与 mock 分组 DOM 检查属于源码/组件级证据，不等同于实际 DSH Web UI 验收；真实 profile 安装和 Web 交互已由用户在实际页面确认；DOM 分组细节未单独探测。原生桌面点击、Windows/当前 macOS 与持续硬件满帧率均未据此宣称通过。
 
 ## 开发与署名
 

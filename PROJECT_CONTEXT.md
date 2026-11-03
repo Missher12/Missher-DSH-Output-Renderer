@@ -1,4 +1,8 @@
-# 当前维护：0.2.2 正式发布
+# 当前维护：0.2.3 搜索默认折叠并在结论保留来源
+
+2026-11-03：0.2.3 把 `web_search` 来源胶囊默认改为折叠，点击展开来源卡片；简洁对话最终答案 settle 后，唯一保留的工具行是包含 `.dsh-output-websearch` 的搜索胶囊，其他工具行仍隐藏。组件测试改为默认折叠覆盖，新增结论 CSS 例外静态检查；双端 typecheck、131 项测试、隔离构建通过；`lib/client.js` 94,295 bytes，SHA-256 `e7fdfeb1…`。GitHub Release `v0.2.3` 提供 tgz（50,580 bytes，SHA-256 `df2dff9cef1d…`）与 sha256；desktop profile 已安装 0.2.3（客户端哈希 `e7fdfeb1…`），旧 0.2.2 备份于 `~/.dsh/backups/output-renderer-0.2.2-20261103-190212`。0.2.1 的结论行为已由用户确认；0.2.3 的搜索折叠/结论保留来源尚未在真实页面单独复测。设置保存失败曾在 rc.4 出现一次通用回滚提示，未定位根因，发布说明保留该边界。
+
+## 历史：0.2.2 正式发布
 
 2026-11-03：0.2.2 基于 9f9f882 发布，包含 Assistant 类型安全修正；运行行为与 0.2.1 相同（只留结论、运行中单已思考、web_search 来源卡片）。双端 typecheck、130 项测试、隔离构建通过；`lib/client.js` 93,987 bytes，SHA-256 `db33f1af…`。GitHub Release `v0.2.2` 提供 tgz（49,708 bytes，SHA-256 `fd24c6cd2d9b…`）与 sha256；desktop profile 已安装 0.2.2（客户端哈希 `db33f1af…`），旧 0.2.1 备份于 `~/.dsh/backups/output-renderer-0.2.1-20261103-133405`；0.2.1 的实际页面行为已由用户确认，0.2.2 未单独重做页面验收。GitHub Release 已公开，Release 公共 URL 下载的 tgz 哈希与发布资产一致。设置保存失败曾在 rc.4 出现一次通用回滚提示，未定位到插件根因，发布说明保留该边界。
 

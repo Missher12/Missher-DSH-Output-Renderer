@@ -61,6 +61,8 @@ html[data-dsh-output-renderer="cards"] [data-chat-group-key] [data-chat-flow-kin
 html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion]) > div:first-child { display: none !important; }
 html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion]) > [data-step-process-body] { display: block !important; content-visibility: visible !important; max-height: none; overflow: visible; mask-image: none; scrollbar-gutter: auto; }
 html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion]) [data-chat-flow-kind="tool-call"] { display: none !important; }
+/* The search capsule stays reachable after the answer settles; it is still collapsed by default. */
+html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion]) [data-chat-flow-kind="tool-call"]:has(.dsh-output-websearch) { display: block !important; }
 html[data-dsh-output-renderer="cards"] [data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion]) [data-chat-flow-kind="assistant-step"]:not(:has(.dsh-output-assistant[data-output-conclusion])) { display: none !important; }
 html[data-dsh-output-renderer="process"] [data-chat-group-key]:has(.dsh-output-reasoning),
 .dsh-output-preview-process[data-output-layout="process"] { padding-left: 16px; border-left: 2px solid var(--dsw-alias-border-l2); }

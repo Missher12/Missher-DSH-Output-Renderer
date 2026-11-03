@@ -1,7 +1,7 @@
 # Web 搜索来源界面 · 设计需求（草案）
 
 - 日期：2026-11-02
-- 状态：**已选定方案 A，进入实现**；Demo 已交付，插件源码开始修改
+- 状态：方案 A 已实现；2026-11-03 按用户反馈改为**默认折叠**（保留卡片网格作为展开内容），0.2.3 生效
 - 关联 Demo：`docs/websearch-demo.html`
 - 关联插件：`@missher/dsh-output-renderer` 0.1.5
 
@@ -100,7 +100,7 @@
 - 实现成本最高：需要把回答 Markdown 里的链接映射到同一次搜索的 sources，并处理无匹配、同 URL 多引用、流式输出时 chip 晚到等情况。
 - 建议作为 A 之后的第二阶段，而不是首版必选。
 
-**已选定**：首版做 A（卡片置顶）。B 仅保留为 Demo 备选，C 留作第二阶段；首版不新增设置项，停用插件即可恢复原生 WebRow。
+**已选定**：首版做 A（卡片置顶）后，按用户反馈采用“A 的卡片 + B 的默认收起”：默认只显示搜索胶囊，点击展开卡片网格；首版不新增设置项，停用插件即可恢复原生 WebRow。C 留作第二阶段。
 
 ## 5. 数据映射
 
@@ -122,16 +122,16 @@
 ### 状态
 
 - **搜索中**：胶囊标签轻微 shimmer；方案 A/C 显示 3 个骨架卡片；不逐秒播报。
-- **完成**：胶囊显示“已搜索 N 个站点”+ 图标堆叠；卡片可展开。
+- **完成**：胶囊显示“已搜索 N 个站点”+ 图标堆叠；默认折叠，点击展开卡片。
 - **无结果**：不渲染空卡片网格；一行“没有找到来源”，保留查询。
 - **失败**：显示“搜索失败”+ 截断后的错误原因；不自动重试。
 - **中断**：工具块本身没有独立的 interrupted 阶段；若宿主保留 start 且没有 result，本组件沿用原生 running 语义，不自行判断已停止。
 - **截断**：来源数后可加“结果已截断”提示；详情中显示。
-- **回放**：历史消息只读展示，不重新搜索；展开状态可按轮次记录或默认展开。
+- **回放**：历史消息只读展示，不重新搜索；默认折叠，展开状态按轮次记录。
 
 ### 交互
 
-- 整个胶囊是按钮：`aria-expanded`、`aria-controls`；Enter/Space 可切换。
+- 整个胶囊是按钮：`aria-expanded`、`aria-controls`；Enter/Space 可切换；初始 `aria-expanded=false`，body hidden。
 - 来源卡片是真实链接：新标签打开，`rel="noreferrer noopener"`。
 - “还有 N 个来源”展开全部，再点“收起”恢复前 3 个。
 - 方案 C 的 chip：`aria-label="来源 3：developer.mozilla.org"`；悬停/聚焦高亮；点击滚动到卡片。
@@ -194,7 +194,7 @@ Web 搜索来源            [卡片] [胶囊] [关闭]
 
 ## 11. 已确定的首版边界
 
-1. 选定 A（卡片置顶）；默认展开 3 张来源卡片 + “还有 N 个来源”，展开后显示全部。
+1. 选定 A 的卡片 + B 的默认收起；默认只显示胶囊，点击展开 3 张来源卡片 + “还有 N 个来源”，再展开显示全部。
 2. 不做新设置项；插件启用即接管 `web_search`，停用即恢复原生 WebRow。
 3. 只处理根调用；PTC 子调用保持通用紧凑行。`web_fetch` 继续用原生行。
 4. C 的内联引用留到第二阶段，不进入首版。
@@ -211,14 +211,14 @@ Demo：`docs/websearch-demo.html`（单文件，无外部依赖，直接双击�
 - 截图：`images/websearch-demo-a.png`、`images/websearch-demo-b.png`、`images/websearch-demo-c.png`。
 - Demo 使用合成来源与合成回答；不代表 DSH 真实搜索结果，也不代表插件已接入宿主。
 
-实施状态：首版 A 已实现；B/C 仅保留在 Demo 中，C 留作第二阶段。
+实施状态：首版 A 已实现；2026-11-03 按用户反馈把默认状态改为 B（收起），卡片网格保留；0.2.3 已实现并加入结论态保留，C 留作第二阶段。
 
 ## 13. 源码实现结果（2026-11-02）
 
 按方案 A 完成插件源码，未安装到日常 profile、未重启 DSH：
 
 - `src/client/websearch.ts`：纯投影，校验 `meta.sources` / `truncated` / `answer`，只把 http(s) 暴露为外链；域名、首字母色块、稳定色相均由 URL 派生。
-- `src/client/WebSearch.tsx`：默认展开 3 张卡片 + “还有 N 个来源”；展开全部、收起、焦点随控件移动；搜索中骨架、准备中、失败、空结果、截断、PTC 子调用与畸形 meta 回退。
+- `src/client/WebSearch.tsx`：0.2.3 起默认折叠；点击胶囊展开 3 张卡片 + “还有 N 个来源”，展开全部、收起、焦点随控件移动；搜索中骨架、准备中、失败、空结果、截断、PTC 子调用与畸形 meta 回退。
 - `src/client/index.ts`：在 `tool.call.toolview` 注册 `web_search`，`priority: -10`（内置 WebRow 为默认 0；ui-slots 规则为同 key 最低 priority 渲染），`locale: NS`。
 - `src/client/locales.ts`、`src/client/styles.css`：中英文案与 DSH 主题变量样式；窄容器 1 列。
 - `tests/websearch-model.test.ts`、`tests/websearch-view.test.tsx`、`tests/client-lifecycle.test.ts`：新增投影、渲染、键盘焦点、危险 URL、回退与注册生命周期覆盖。

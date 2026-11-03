@@ -1,9 +1,9 @@
-# Output Renderer 0.2.2
+# Output Renderer 0.2.3
 
-正式发布，2026-11-03。[下载与校验](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.2)。安装包 SHA-256：`fd24c6cd2d9bc07c53e164a9bbc3ba8e465b1fe5ae51a9853bb64d854bbf8bc4`，49,708 bytes。
+正式发布，2026-11-03。[下载与校验](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3)。安装包 SHA-256：`df2dff9cef1daf3a1e3762ef1cf7bc354f34f8946728151d857e1a4d4ce4df37`，50,580 bytes。
 
-0.2.2 在 0.2.1 的“只留结论 + 运行中单已思考 + web_search 来源卡片”基础上，合入 9f9f882 的 Assistant 类型安全修正。双端 TypeScript 检查、11 个测试文件 130 项测试、隔离构建和 mock 分组 DOM 检查通过；构建 `lib/client.js` 93,987 bytes，SHA-256 `db33f1af…`。
+0.2.3 把 `web_search` 来源胶囊改为默认折叠，点击展开来源卡片；简洁对话最终答案 settle 后仍保留搜索胶囊（默认折叠），其他工具行、非最终步骤和组头继续隐藏。来源数据仍来自宿主持久化的 `meta.sources`，不新增搜索后端或 favicon 请求。
 
-0.2.1 的实际页面行为已在 DSH 0.2.1-rc.4 desktop profile 确认；0.2.2 仅做类型安全修正，未单独重做真实页面验收。实际宿主 DOM 分组细节、旧版 alpha.5/rc.2、设置保存失败根因及正式发布之外的平台均未据此宣称通过。
+验证：双端 TypeScript 检查、11 个测试文件 131 项、隔离构建和浏览器 mock 分组 DOM 通过；构建 `lib/client.js` 94,295 bytes，SHA-256 `e7fdfeb1…`。0.2.1 的结论行为已由用户在实际页面确认；0.2.3 的搜索默认折叠和结论保留来源未单独重做真实页面验收。旧版宿主、DOM 分组细节和设置保存失败的根因未据此宣称通过。
 
-Git 标签固定源码，运行包单独校验；安装包与源码包用途不同，普通用户选择 `.tgz` 运行包并核对同名 `.sha256`。
+Git 标签固定源码，运行包单独校验；普通用户选择 `.tgz` 运行包并核对同名 `.sha256`。

@@ -1,4 +1,4 @@
-/** Render the built-in web_search call as default-open source cards; other tools stay native. */
+/** Render the built-in web_search call as a default-collapsed source capsule; other tools stay native. */
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, RefObject } from 'react'
 import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
@@ -21,7 +21,7 @@ type Status = 'preparing' | 'searching' | 'done' | 'empty' | 'error' | 'fallback
  */
 export function WebSearchRow({ phase, block, t }: Props) {
   const model = useMemo(() => readWebSearch(phase, block), [phase, block])
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [focusIntent, setFocusIntent] = useState<'more' | 'collapse' | null>(null)
   const bodyId = useId()

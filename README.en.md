@@ -2,16 +2,16 @@
 
 [简体中文](./README.md) · [Prebuilt downloads](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [Desktop app](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [Issues](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **0.2.2**. This removable UI plugin requires an existing DSH host.
+Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **0.2.3**. This removable UI plugin requires an existing DSH host.
 
-`0.2.2` keeps the two output-surface features and tightens conclusion mode to answer-only:
+`0.2.3` keeps the two output-surface features and tightens conclusion mode to answer-only:
 
-- **Web search source cards**: a root `web_search` call shows a source pill and default-open cards (three plus "more sources"), expandable to all. It reads only persisted `meta.sources`, adds no search backend and fetches no favicons. Hosts without `tool.call.toolview` keep the native row; `web_fetch` and PTC child calls keep the generic presentation.
-- **Concise conclusion mode**: after the final answer step settles, Concise conversation keeps only the final answer and no process control. Thinking, ordinary tool rows, web-search sources and other steps in the same group are hidden. While running, the process remains visible with at most one "Thought" row per group; interrupted and the other three layouts keep their previous behavior.
+- **Web search source cards**: a root `web_search` call shows a source pill that is collapsed by default; click to expand three cards plus "more sources", then expand to all. It reads only persisted `meta.sources`, adds no search backend and fetches no favicons. Hosts without `tool.call.toolview` keep the native row; `web_fetch` and PTC child calls keep the generic presentation.
+- **Concise conclusion mode**: after the final answer step settles, Concise conversation keeps only the final answer and no process control. Thinking, ordinary tool rows and other steps in the same group are hidden, but the `web_search` source pill remains available, collapsed by default and expandable on click. While running, the process remains visible with at most one "Thought" row per group; interrupted and the other three layouts keep their previous behavior.
 
-0.2.2 is formally published; see the [v0.2.2 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.2). The initial 0.2.0/0.2.1 local installations and earlier history remain in [VALIDATION.md](./VALIDATION.md).
+0.2.3 is formally published; see the [v0.2.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3). The 0.2.0/0.2.1/0.2.2 local installations and earlier history remain in [VALIDATION.md](./VALIDATION.md).
 
-Host/client type checks, 130 tests, an isolated build and browser checks of conclusion hiding and the single thinking row passed. 0.2.2 is installed in the local `desktop` profile; the actual-page behavior was confirmed on 0.2.1, while 0.2.2 adds an Assistant type-safety fix. See [VALIDATION.md](./VALIDATION.md).
+Host/client type checks, 131 tests, an isolated build and browser checks of conclusion hiding, the single thinking row and the retained search capsule passed. 0.2.3 is installed in the local `desktop` profile; conclusion behavior was confirmed on 0.2.1, 0.2.2 adds a type-safety fix, and 0.2.3 adds collapsed-by-default search with a retained source capsule in conclusion mode. See [VALIDATION.md](./VALIDATION.md).
 
 The two screenshots below are retained from 0.1.3 and show the settings entry and process layout. The Soft cards option shown there has since been replaced.
 
@@ -40,9 +40,9 @@ Use **Settings → Output appearance** to choose the layout, 14/16 px text, comf
 
 ## Install, enable, disable and uninstall
 
-Use the prebuilt package from the [v0.2.2 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.2): [download tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz.sha256). Check the installed version on each device against the downloaded asset. The installation steps below use the downloaded tgz directly and do not depend on npm package-name resolution.
+Use the prebuilt package from the [v0.2.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3): [download tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.3/missher-dsh-output-renderer-0.2.3.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.3/missher-dsh-output-renderer-0.2.3.tgz.sha256). Check the installed version on each device against the downloaded asset. The installation steps below use the downloaded tgz directly and do not depend on npm package-name resolution.
 
-1. Download the chosen tgz and checksum file. Verify with `shasum -a 256 -c missher-dsh-output-renderer-0.2.2.tgz.sha256`.
+1. Download the chosen tgz and checksum file. Verify with `shasum -a 256 -c missher-dsh-output-renderer-0.2.3.tgz.sha256`.
 2. In the desktop app, open **Plugins → Add plugin**, enter the downloaded file's full path, then install and enable the plugin. Follow any reload prompt and open **Settings → Output appearance**.
 3. Turn the plugin's enable switch off in plugin management to disable it, or on to enable it again. Disabling restores native output rendering.
 4. Choose **Uninstall** on this plugin to remove it. To upgrade, use Update plugin in the current Missher desktop app and choose the new tgz. Back up the profile configuration and retain the old tgz first. If an older host lacks this action, use its supported replacement or reinstall flow and retain the configuration backup. A missing update button does not restrict the plugin to newer hosts; the host controls preference retention on uninstall.
@@ -50,7 +50,7 @@ Use the prebuilt package from the [v0.2.2 Release](https://github.com/Missher12/
 For a Web or custom profile, use the target host's official CLI and replace the profile name and file path:
 
 ```sh
-dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.2.2.tgz
+dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.2.3.tgz
 dsh plugin --profile my-web remove @missher/dsh-output-renderer
 ```
 
@@ -66,7 +66,7 @@ It reads existing assistant content for display, creates no separate session dat
 
 | Scope | Evidence and limits |
 | --- | --- |
-| Local DSH `0.2.1-rc.4` | 0.2.2: host/client type checks, 130 tests, isolated build and mock group-DOM conclusion/single-thinking checks passed; `tool.call.toolview` and the `turn-process` projection are implemented against this version's contract. Installed in the local `desktop` profile (0.2.2); actual-page behavior was confirmed on 0.2.1, and 0.2.2 only adds a type-safety fix. |
+| Local DSH `0.2.1-rc.4` | 0.2.3: host/client type checks, 131 tests, isolated build and mock group-DOM conclusion/single-thinking/retained-search checks passed; `tool.call.toolview` and the `turn-process` projection are implemented against this version's contract. Installed in the local `desktop` profile (0.2.3); conclusion behavior was confirmed on 0.2.1; the 0.2.3 collapsed search and retained sources were not separately re-tested in the real page. |
 | Installed community `0.2.1-rc.2` | 0.1.4: disclosure, in-flight choice retention, real state/interruption, native tools/images, settings preview/save/refresh/failure rollback, dark narrow layout and disable restoration on isolated synthetic data. |
 | Official npm alpha.5 (`0.2.1-alpha.5`, Cordis `4.0.5` / Schemastery `3.18.5`) | 0.1.3 historical evidence: the real Loader checks passed, including and settings, service scenarios covering normal saving, a missing settings service and a missing `configure`, controlled front-end SlotRegistry lifecycles, and real-page review of all four layouts, images, native zoom/tool expansion, save-failure rollback, stop-with-partial retention, 36-turn history loading, streaming fade and scroll-away stability; the 390 px settings panel and the 1280 px word wrapping were re-checked |
 | Missher community-extended rc.2 (`0.2.0-rc.2`, Cordis `4.0.4` / Schemastery `3.18.4`) | 0.1.3 historical evidence: the same real Loader/settings scenarios, controlled slot lifecycles and real-page review (identical four-layout content, refresh persistence, native image zoom, narrow width and unload) |
@@ -77,7 +77,7 @@ It reads existing assistant content for display, creates no separate session dat
 
 The renderer uses `conversation.chat.node` / `assistant-step`, `settings.section`, native Markdown and file callbacks, and version-related chat DOM markers. Images prefer the Chat-provided `renderMessageImages` closure and otherwise use the host-published `conversation.images.content` Factory; when neither exists the answer shows an explicit note instead of dropping the picture. Before calling any host face it checks `slots.inject/register`, `locale.register/bind` and `configForms.get`, reports what is missing and leaves native output visible. The host supplies React, Schemastery and DSH client modules; development SDK links are excluded from the runtime package. Recheck these interfaces after host upgrades. If the settings entry is absent, check whether the plugin is enabled and inspect host loading errors.
 
-See [VALIDATION.md](./VALIDATION.md) for dated evidence. The 0.2.2 130 tests, type checks, isolated build and mock group-DOM checks are source/component evidence, not an actual DSH Web UI acceptance. Real-profile installation and Web interaction are confirmed by the user in the actual page; DOM group details were not separately probed. Native desktop clicking, Windows/current macOS and sustained hardware frame rates are not claimed on this basis.
+See [VALIDATION.md](./VALIDATION.md) for dated evidence. The 0.2.3 131 tests, type checks, isolated build and mock group-DOM checks are source/component evidence, not an actual DSH Web UI acceptance. Real-profile installation and Web interaction are confirmed by the user in the actual page; DOM group details were not separately probed. Native desktop clicking, Windows/current macOS and sustained hardware frame rates are not claimed on this basis.
 
 ## Development and attribution
 
