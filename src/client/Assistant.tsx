@@ -18,7 +18,7 @@ export interface OutputInjected {
 }
 type ChatProps = ChatNodeViewProps<'assistant-step'> & InjectFace<OutputInjected>
 /** Image group currency the running Chat owner hands down; identical in both supported hosts. */
-type ImageGroup = Parameters<ChatProps['renderMessageImages']>[0]['images']
+type ImageGroup = Parameters<ChatProps['renderMessageImages']>[0] extends { images: infer I } ? I : unknown
 /**
  * The one shared-gallery call this file needs. The host seat stays generic — it is typed for the
  * Factory names its own SDK registers, and the pinned rc.2 development SDK does not register
@@ -34,7 +34,7 @@ type SharedGalleryCall = (
   props: { images: ImageGroup; loadImage: ChatProps['loadImage']; align: 'start' | 'end' },
   options: { fallback: ReactNode },
 ) => ReactNode
-type Props = ChatProps & { renderFactorySlot?: unknown }
+type Props = ChatProps & { renderFactorySlot?: unknown; sessionId?: string }
 
 export const Assistant = memo(function Assistant({ node, groupPart, sessionId, useTurnData, openFile, renderMessageImages,
   renderFactorySlot, loadImage, fileMentions, useOutputPreferences, outputText, t }: Props) {
