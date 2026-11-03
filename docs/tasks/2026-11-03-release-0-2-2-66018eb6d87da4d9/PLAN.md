@@ -1,0 +1,40 @@
+[project-ops-v1]: <data:application/json;base64,eyJyZWNvcmQiOnsiZm9ybWF0IjoxLCJ0YXNrSWQiOiIyMDI2LTExLTAzLXJlbGVhc2UtMC0yLTItNjYwMThlYjZkODdkYTRkOSIsInNlc3Npb25JZCI6InNlc3Npb24tZDI3YmQ2MTAtOWYyOS00NzI3LWEzMDktY2UxNWIwMGNlNmE3Iiwib3JpZ2luQ2FsbElkIjoiY2FsbF8wMF9RODZnOGdtbUNHeWxIYjNEMmMxTTQ1MDciLCJjcmVhdGVkIjoiMjAyNi0xMS0wM1QwNTozMjo0MS42MjFaIiwicmV2aXNpb24iOjEsInN0YXR1cyI6ImFjdGl2ZSIsInBsYW4iOnsidGl0bGUiOiIwLjIuMiBHaXRIdWIgUmVsZWFzZSIsInJlcXVpcmVtZW50cyI6IueUqOaIt+imgeaxguaKiuacgOaWsOmhueebruaJk+WMheW5tuWPkeW4g++8jOino+WGs+WPpuS4gOWPsCBEU0gg5om+5LiN5Yiw5a6J6KOF5YyF55qE6Zeu6aKY44CC5Y+R5biDIDAuMi4y77ya5YyF5ZCrIDlmOWY4ODIg55qEIEFzc2lzdGFudCDnsbvlnovlronlhajkv67mraPjgIEwLjIuMSDnmoTlj6rnlZnnu5Porrov5Y2V5bey5oCd6ICD6KGM5ZKMIHdlYl9zZWFyY2gg5p2l5rqQ5Y2h54mH77yb5o+Q5L6bIHRneiDkuI4gU0hBMjU277yb5pu05paw5paH5qGj77ybR2l0SHViIFJlbGVhc2Ug5Y+v5LiL6L2944CCIiwiZGVzaWduIjoi5bCG5b2T5YmNIEhFQUTvvIg5ZjlmODgy77yJ5L2c5Li6IDAuMi4yIOWPkeW4g++8mueJiOacrOWPt+OAgVJFQURNRS/pqozmlLborrDlvZXlkowgR0lUX0RFTElWRVJZIOabtOaWsO+8m+malOemu+aehOW7uuW5tuaJk+WMhSB0Z3ogKyBzaGEyNTbvvJvlpIfku73lubblronoo4UgZGVza3RvcCBwcm9maWxl77yb5o+Q5LqkIG1haW7jgIHmiZMgdjAuMi4yIHRhZyDmjqjpgIHvvJvnlKjmnKzmnLogZ2l0IGNyZWRlbnRpYWwg55qEIEdpdEh1YiB0b2tlbiDosIMgUkVTVCBBUEkg5Yib5bu65q2j5byPIFJlbGVhc2Ug5bm25LiK5LygIHRnei9zaGEyNTbjgILlj5HluIPor7TmmI7mmI7noa4gMC4yLjIg5Y+q5ZyoIDAuMi4xLXJjLjQg5a6e6ZmF6aqM6K+B77yM5pen54mI5pyq5aSN5rWL44CCIiwic3RlcHMiOlsi5Y2HIHBhY2thZ2Ug5LiO5paH5qGj5YiwIDAuMi4yIiwi6L+Q6KGMIHR5cGVjaGVjay90ZXN0IOW5tumalOemu+aehOW7uiIsIuaJk+WMhSB0Z3ogKyBzaGEyNTbvvIzlronoo4XliLAgZGVza3RvcCBwcm9maWxlIOmqjOivgSIsIkdpdCBjb21taXQvdGFnL3B1c2giLCJHaXRIdWIgQVBJIOWIm+W7uiBSZWxlYXNlIOW5tuS4iuS8oOi1hOS6pyIsIumqjOivgSBSZWxlYXNlIOi1hOS6p+W5tuWbnuWGmeaWh+ahoy9HSVRfREVMSVZFUlkiXSwiYWNjZXB0YW5jZSI6WyIwLjIuMiDmupDnoIHniYjmnKzjgIFsaWIg5LiO5omT5YyF5riF5Y2V5LiA6Ie0IiwiMTMwIOmhuea1i+ivleOAgeWPjOerryB0eXBlY2hlY2sg5ZKM6ZqU56a75p6E5bu66YCa6L+HIiwidGd6IOS4jiAuc2hhMjU2IOeUn+aIkOW5tuWuieijheWIsOacrOacuiBkZXNrdG9wIHByb2ZpbGUg6aqM6K+BIiwiR2l0IG1haW4g5LiOIHYwLjIuMiB0YWcg5bey5o6o6YCBIiwiR2l0SHViIFJlbGVhc2UgdjAuMi4yIOWIm+W7uu+8jHRneiDlkowgc2hhMjU2IOi1hOS6p+S4iuS8oOW5tuWPr+S4i+i9vSIsIlJFQURNRS9SRUFETUUuZW4vVkFMSURBVElPTi9ERUxJVkVSWS9TSEEyNTZTVU1TL0dJVF9ERUxJVkVSWSDorrDlvZXlj5HluIPkuovlrp7kuI7mnKrpqozor4HovrnnlYwiXSwicHJvZ3Jlc3MiOiLlvIDlp4vvvJrlvZPliY0gSEVBRCA5ZjlmODgy77yMcGFja2FnZSAwLjIuMe+8jOW3suehruiupCBHaXRIdWIgdG9rZW4g5a+55LuT5bqT5pyJIGFkbWluIOadg+mZkO+8m+WHhuWkh+WNhyAwLjIuMuOAgeaehOW7uuOAgeaJk+WMheOAgeWuieijheOAgeaJkyB0YWcg5ZKM5Yib5bu6IFJlbGVhc2XjgIIifX0sImJvZHlIYXNoIjoiMzMyOWQyNWMyYzU3MDcxMDJiOTUyZWU1ZTE0ODE1NzYyMDgxMzZhMDY5ZTdiNjZlZTg0Njk4ZTQ3YWMzNDMzZSJ9>
+
+# Project Ops · 0.2.2 GitHub Release
+
+任务：2026-11-03-release-0-2-2-66018eb6d87da4d9
+会话：session-d27bd610-9f29-4727-a309-ce15b00ce6a7
+创建调用：call_00_Q86g8gmmCGylHb3D2c1M4507
+状态：active；修订：1
+
+## 需求
+
+用户要求把最新项目打包并发布，解决另一台 DSH 找不到安装包的问题。发布 0.2.2：包含 9f9f882 的 Assistant 类型安全修正、0.2.1 的只留结论/单已思考行和 web_search 来源卡片；提供 tgz 与 SHA256；更新文档；GitHub Release 可下载。
+
+## 方案
+
+将当前 HEAD（9f9f882）作为 0.2.2 发布：版本号、README/验收记录和 GIT_DELIVERY 更新；隔离构建并打包 tgz + sha256；备份并安装 desktop profile；提交 main、打 v0.2.2 tag 推送；用本机 git credential 的 GitHub token 调 REST API 创建正式 Release 并上传 tgz/sha256。发布说明明确 0.2.2 只在 0.2.1-rc.4 实际验证，旧版未复测。
+
+## 步骤
+
+- 升 package 与文档到 0.2.2
+- 运行 typecheck/test 并隔离构建
+- 打包 tgz + sha256，安装到 desktop profile 验证
+- Git commit/tag/push
+- GitHub API 创建 Release 并上传资产
+- 验证 Release 资产并回写文档/GIT_DELIVERY
+
+## 验收标准
+
+- 0.2.2 源码版本、lib 与打包清单一致
+- 130 项测试、双端 typecheck 和隔离构建通过
+- tgz 与 .sha256 生成并安装到本机 desktop profile 验证
+- Git main 与 v0.2.2 tag 已推送
+- GitHub Release v0.2.2 创建，tgz 和 sha256 资产上传并可下载
+- README/README.en/VALIDATION/DELIVERY/SHA256SUMS/GIT_DELIVERY 记录发布事实与未验证边界
+
+## 实际进展与下一步
+
+开始：当前 HEAD 9f9f882，package 0.2.1，已确认 GitHub token 对仓库有 admin 权限；准备升 0.2.2、构建、打包、安装、打 tag 和创建 Release。
+
+尚未生成交付记录。生成方案后继续已授权开发，不增加审批步骤。
