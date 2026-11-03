@@ -123,7 +123,26 @@
       "pageReloaded": false,
       "hostRestarted": false,
       "webUiVerified": false
-    }
+    },
+    "releaseCommit": "87d61c9",
+    "releaseAssets": [
+      {
+        "name": "missher-dsh-output-renderer-0.2.3.tgz",
+        "id": 705293305,
+        "size": 50580,
+        "digest": "sha256:df2dff9cef1daf3a1e3762ef1cf7bc354f34f8946728151d857e1a4d4ce4df37",
+        "state": "uploaded"
+      },
+      {
+        "name": "missher-dsh-output-renderer-0.2.3.tgz.sha256",
+        "id": 705293457,
+        "size": 104,
+        "digest": "sha256:a69e283d9d13e8a1846a61791ec98ff7f2e7f4c0e261150b890cb783cc1b7a21",
+        "state": "uploaded"
+      }
+    ],
+    "releaseVerification": "Release creation HTTP 201; both assets uploaded; public URL re-download of the tgz matched sha256 df2dff9cef1daf3a1e3762ef1cf7bc354f34f8946728151d857e1a4d4ce4df37 and size 50580. A later release-metadata API check timed out; upload responses and public download are the evidence.",
+    "downloadUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.3/missher-dsh-output-renderer-0.2.3.tgz"
   },
   "previousSourceCandidate": {
     "version": "0.2.2",
@@ -379,24 +398,24 @@
     ],
     "releaseVerification": "Public release draft=false, prerelease=false; both assets uploaded; re-downloaded tgz sha256 matches fd24c6cd...; size 49708."
   },
-  "releaseCommit": "46359b2",
-  "downloadUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz",
-  "checksumUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.2/missher-dsh-output-renderer-0.2.2.tgz.sha256",
+  "releaseCommit": "87d61c9",
+  "downloadUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.3/missher-dsh-output-renderer-0.2.3.tgz",
+  "checksumUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.3/missher-dsh-output-renderer-0.2.3.tgz.sha256",
   "releaseAssets": [
     {
-      "name": "missher-dsh-output-renderer-0.2.2.tgz",
-      "id": 704447195,
-      "size": 49708,
-      "digest": "sha256:fd24c6cd2d9bc07c53e164a9bbc3ba8e465b1fe5ae51a9853bb64d854bbf8bc4",
+      "name": "missher-dsh-output-renderer-0.2.3.tgz",
+      "id": 705293305,
+      "size": 50580,
+      "digest": "sha256:df2dff9cef1daf3a1e3762ef1cf7bc354f34f8946728151d857e1a4d4ce4df37",
       "state": "uploaded"
     },
     {
-      "name": "missher-dsh-output-renderer-0.2.2.tgz.sha256",
-      "id": 704447303,
+      "name": "missher-dsh-output-renderer-0.2.3.tgz.sha256",
+      "id": 705293457,
       "size": 104,
-      "digest": "sha256:f5b09ae02c0fc82722942a1d6705171e9f34d3c0fadff1386b485ff21a5d7ed1",
+      "digest": "sha256:a69e283d9d13e8a1846a61791ec98ff7f2e7f4c0e261150b890cb783cc1b7a21",
       "state": "uploaded"
     }
   ],
-  "releaseVerification": "Public release draft=false, prerelease=false; both assets uploaded; re-downloaded tgz sha256 matches fd24c6cd...; size 49708."
+  "releaseVerification": "Release creation HTTP 201; both assets uploaded; public URL re-download of the tgz matched sha256 df2dff9cef1daf3a1e3762ef1cf7bc354f34f8946728151d857e1a4d4ce4df37 and size 50580. A later release-metadata API check timed out; upload responses and public download are the evidence."
 }

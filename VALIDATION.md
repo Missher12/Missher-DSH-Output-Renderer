@@ -6,6 +6,7 @@
 - 浏览器 mock 分组 DOM（静态胶囊 + 插件样式）验证：cards 结论态组头 none、组体 block、web_search 行 block、普通工具 none、非最终步骤 none、最终答复 block；胶囊初始 aria-expanded=false 且 body hidden。点击行为由 jsdom 组件测试覆盖。
 - 0.2.1 的实际页面结论行为已由用户确认；0.2.3 新增的搜索默认折叠和结论保留来源未单独在真实 DSH 页面复测。
 - 打包 `missher-dsh-output-renderer-0.2.3.tgz`（50,580 bytes，SHA-256 `df2dff9cef1daf3a1e3762ef1cf7bc354f34f8946728151d857e1a4d4ce4df37`）与 `.tgz.sha256`；desktop profile 已从 0.2.2 升到 0.2.3，安装后客户端哈希 `e7fdfeb1…`；旧 0.2.2 的 profile 包、锁文件、插件目录和 tgz 备份在 `~/.dsh/backups/output-renderer-0.2.2-20261103-190212`。其他插件数量随当前 profile 状态变化，本次未逐包作字节比对。
+- GitHub Release `v0.2.3` 已创建并上传 tgz/sha256；从 Release 公共 URL 重新下载的 tgz 哈希与 `df2dff9cef1daf3a1e3762ef1cf7bc354f34f8946728151d857e1a4d4ce4df37` 一致，资产 size 50,580 bytes（Release 元数据 API 复核一次超时，上传响应和公共下载校验成功）。
 
 ## 2026-11-03 · 0.2.2 正式发布
 
