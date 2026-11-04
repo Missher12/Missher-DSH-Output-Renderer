@@ -35,7 +35,7 @@ export interface WebSearchModel {
   isChild: boolean
   /** Short settled failure reason, already trimmed and capped. */
   errorDetail?: string
-  /** Flattened result text for the malformed-meta fallback; capped by the model. */
+  /** Capped fallback text; valid root searches render sources and leave this empty. */
   output: string
 }
 
@@ -88,10 +88,7 @@ const ERROR_LIMIT = 240
 export function readWebSearch(phase: WebSearchPhase, block: WebSearchBlock): WebSearchModel {
   const isChild = block.parentCallId !== undefined
   const query = phase === 'preparing' ? '' : readQuery(block, phase)
-  if (phase === 'preparing') {
-    return { phase, query, sources: [], truncated: false, valid: false, isError: false, isChild, output: '' }
-  }
-  if (phase === 'start') {
+  if (phase !== 'result') {
     return { phase, query, sources: [], truncated: false, valid: false, isError: false, isChild, output: '' }
   }
   const isError = block.isError === true
@@ -106,7 +103,7 @@ export function readWebSearch(phase: WebSearchPhase, block: WebSearchBlock): Web
     isError,
     isChild,
     ...(errorDetail === undefined ? {} : { errorDetail }),
-    output: flattenContent(block.content),
+    output: isChild || meta === undefined ? flattenContent(block.content) : '',
   }
 }
 
@@ -179,16 +176,22 @@ function readError(block: WebSearchBlock): string | undefined {
 
 function flattenContent(content: readonly unknown[] | undefined): string {
   if (content === undefined) return ''
-  const parts: string[] = []
+  let output = ''
+  let separator = ''
   for (const block of content) {
-    if (isRecord(block) && block.type === 'text' && typeof block.text === 'string') parts.push(block.text)
+    let text: string
+    if (isRecord(block) && block.type === 'text' && typeof block.text === 'string') text = block.text
     else {
-      try { parts.push(JSON.stringify(block, null, 2)) }
-      catch (_error) { /* A non-serializable block contributes no fallback text. */ }
+      try { text = JSON.stringify(block, null, 2) ?? '' }
+      catch (_error) { continue }
     }
+    const remaining = OUTPUT_LIMIT - output.length
+    const addition = separator + text.slice(0, remaining + 1)
+    output += addition.slice(0, remaining)
+    if (addition.length > remaining) return `${output}…`
+    separator = '\n'
   }
-  const output = parts.join('\n')
-  return output.length > OUTPUT_LIMIT ? `${output.slice(0, OUTPUT_LIMIT)}…` : output
+  return output
 }
 
 /** Accept only an external URL the Browser can open without a script or local-file capability. */

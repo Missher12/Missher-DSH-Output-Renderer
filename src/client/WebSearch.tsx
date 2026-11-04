@@ -23,7 +23,7 @@ export function WebSearchRow({ phase, block, t }: Props) {
   const model = useMemo(() => readWebSearch(phase, block), [phase, block])
   const [open, setOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
-  const [focusIntent, setFocusIntent] = useState<'more' | 'collapse' | null>(null)
+  const focusIntent = useRef<'more' | 'collapse' | null>(null)
   const bodyId = useId()
   const moreRef = useRef<HTMLButtonElement>(null)
   const collapseRef = useRef<HTMLButtonElement>(null)
@@ -38,22 +38,22 @@ export function WebSearchRow({ phase, block, t }: Props) {
   // Expanding replaces the clicked button with the footer action. Move focus with the control
   // instead of dropping it on <body>, and keep the same contract for the reverse action.
   useEffect(() => {
-    if (focusIntent === 'more') moreRef.current?.focus()
-    else if (focusIntent === 'collapse') collapseRef.current?.focus()
-    if (focusIntent !== null) setFocusIntent(null)
-  }, [focusIntent, expanded])
+    if (focusIntent.current === 'more') moreRef.current?.focus()
+    else if (focusIntent.current === 'collapse') collapseRef.current?.focus()
+    focusIntent.current = null
+  }, [expanded])
 
   const toggle = (): void => {
     if (open) setExpanded(false)
     setOpen(value => !value)
   }
   const expandAll = (): void => {
+    focusIntent.current = 'collapse'
     setExpanded(true)
-    setFocusIntent('collapse')
   }
   const collapseAll = (): void => {
+    focusIntent.current = 'more'
     setExpanded(false)
-    setFocusIntent('more')
   }
 
   const label = statusLabel(model, t)

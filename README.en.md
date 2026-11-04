@@ -2,16 +2,16 @@
 
 [简体中文](./README.md) · [Prebuilt downloads](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [Desktop app](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [Issues](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **0.2.3**. This removable UI plugin requires an existing DSH host.
+Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **1.0.0**. This removable UI plugin requires an existing DSH host.
 
-`0.2.3` keeps the two output-surface features and tightens conclusion mode to answer-only:
+`1.0.0` optimizes search-result processing and source expansion while keeping these output-surface features:
 
 - **Web search source cards**: a root `web_search` call shows a source pill that is collapsed by default; click to expand three cards plus "more sources", then expand to all. It reads only persisted `meta.sources`, adds no search backend and fetches no favicons. Hosts without `tool.call.toolview` keep the native row; `web_fetch` and PTC child calls keep the generic presentation.
 - **Concise conclusion mode**: after the final answer step settles, Concise conversation keeps only the final answer and no process control. Thinking, ordinary tool rows and other steps in the same group are hidden, but the `web_search` source pill remains available, collapsed by default and expandable on click. While running, the process remains visible with at most one "Thought" row per group; interrupted and the other three layouts keep their previous behavior.
 
-0.2.3 is formally published; see the [v0.2.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3). The 0.2.0/0.2.1/0.2.2 local installations and earlier history remain in [VALIDATION.md](./VALIDATION.md).
+1.0.0 updates the source, prebuilt `lib` and Git tag; this round does not create a GitHub Release or upgrade the local installation. The latest published installer remains the [v0.2.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3). The 0.2.0/0.2.1/0.2.2 local installations and earlier history remain in [VALIDATION.md](./VALIDATION.md).
 
-Host/client type checks, 131 tests, an isolated build and browser checks of conclusion hiding, the single thinking row and the retained search capsule passed. 0.2.3 is installed in the local `desktop` profile; conclusion behavior was confirmed on 0.2.1, 0.2.2 adds a type-safety fix, and 0.2.3 adds collapsed-by-default search with a retained source capsule in conclusion mode. See [VALIDATION.md](./VALIDATION.md).
+1.0.0 passed host/client type checks, 134 tests in 11 files and an isolated build. Valid root searches skip unused raw result content; fallback text stops processing later blocks once it exceeds the 4,000-character display limit. Source expansion uses a focus ref to avoid an extra render just to clear focus state. The actual DSH page and installation were not re-tested this round; see [VALIDATION.md](./VALIDATION.md) for historical evidence.
 
 The two screenshots below are retained from 0.1.3 and show the settings entry and process layout. The Soft cards option shown there has since been replaced.
 
@@ -32,7 +32,7 @@ The two screenshots are real Web pages of official npm DSH `0.2.1-alpha.5`. Thei
 
 Use **Settings → Output appearance** to choose the layout, 14/16 px text, comfortable/compact spacing and streaming effect. Changes save automatically. Equal-height cards become a single column in a narrow panel; **Replay output** previews the effect.
 
-- Concise conversation folds thinking while running and keeps at most one Thought row per group. After the final answer it hides the same group's tools and other steps without a process control. Other layouts retain their presentation; individual tools and tool-only groups still fold independently.
+- Concise conversation folds thinking while running and keeps at most one Thought row per group. After the final answer it hides the same group's ordinary tools and other steps, keeps the search source pill, and provides no process control. Other layouts retain their presentation; individual tools and tool-only groups still fold independently.
 - Web search source cards appear only when the host declares `tool.call.toolview`; source titles and links stay plain text or safe http(s) links.
 - Code, tables, images and file actions use native host components. The process layout does not summarize or truncate answers. A checklist's output-complete state does not mean that a tool or task succeeded.
 - Frame-synchronized output uses `requestAnimationFrame` without a fixed 30/60 fps cap. Fade-in affects only arriving text. Reduced-motion settings are respected, and stopping, finishing or hiding the page clears buffers and animations.
@@ -66,7 +66,8 @@ It reads existing assistant content for display, creates no separate session dat
 
 | Scope | Evidence and limits |
 | --- | --- |
-| Local DSH `0.2.1-rc.4` | 0.2.3: host/client type checks, 131 tests, isolated build and mock group-DOM conclusion/single-thinking/retained-search checks passed; `tool.call.toolview` and the `turn-process` projection are implemented against this version's contract. Installed in the local `desktop` profile (0.2.3); conclusion behavior was confirmed on 0.2.1; the 0.2.3 collapsed search and retained sources were not separately re-tested in the real page. |
+| Current source `1.0.0` | Host/client type checks, 134 tests and an isolated build passed; no installation or real DSH page acceptance in this round. |
+| Local DSH `0.2.1-rc.4` (historical) | 0.2.3: host/client type checks, 131 tests, isolated build and mock group-DOM conclusion/single-thinking/retained-search checks passed; `tool.call.toolview` and the `turn-process` projection are implemented against this version's contract. Installed in the local `desktop` profile (0.2.3); conclusion behavior was confirmed on 0.2.1; the 0.2.3 collapsed search and retained sources were not separately re-tested in the real page. |
 | Installed community `0.2.1-rc.2` | 0.1.4: disclosure, in-flight choice retention, real state/interruption, native tools/images, settings preview/save/refresh/failure rollback, dark narrow layout and disable restoration on isolated synthetic data. |
 | Official npm alpha.5 (`0.2.1-alpha.5`, Cordis `4.0.5` / Schemastery `3.18.5`) | 0.1.3 historical evidence: the real Loader checks passed, including and settings, service scenarios covering normal saving, a missing settings service and a missing `configure`, controlled front-end SlotRegistry lifecycles, and real-page review of all four layouts, images, native zoom/tool expansion, save-failure rollback, stop-with-partial retention, 36-turn history loading, streaming fade and scroll-away stability; the 390 px settings panel and the 1280 px word wrapping were re-checked |
 | Missher community-extended rc.2 (`0.2.0-rc.2`, Cordis `4.0.4` / Schemastery `3.18.4`) | 0.1.3 historical evidence: the same real Loader/settings scenarios, controlled slot lifecycles and real-page review (identical four-layout content, refresh persistence, native image zoom, narrow width and unload) |
@@ -77,7 +78,7 @@ It reads existing assistant content for display, creates no separate session dat
 
 The renderer uses `conversation.chat.node` / `assistant-step`, `settings.section`, native Markdown and file callbacks, and version-related chat DOM markers. Images prefer the Chat-provided `renderMessageImages` closure and otherwise use the host-published `conversation.images.content` Factory; when neither exists the answer shows an explicit note instead of dropping the picture. Before calling any host face it checks `slots.inject/register`, `locale.register/bind` and `configForms.get`, reports what is missing and leaves native output visible. The host supplies React, Schemastery and DSH client modules; development SDK links are excluded from the runtime package. Recheck these interfaces after host upgrades. If the settings entry is absent, check whether the plugin is enabled and inspect host loading errors.
 
-See [VALIDATION.md](./VALIDATION.md) for dated evidence. The 0.2.3 131 tests, type checks, isolated build and mock group-DOM checks are source/component evidence, not an actual DSH Web UI acceptance. Real-profile installation and Web interaction are confirmed by the user in the actual page; DOM group details were not separately probed. Native desktop clicking, Windows/current macOS and sustained hardware frame rates are not claimed on this basis.
+See [VALIDATION.md](./VALIDATION.md) for dated evidence. The 1.0.0 134 tests, type checks and isolated build are source/component evidence, not actual DSH Web UI acceptance. The 0.2.1 conclusion behavior has historical user confirmation; the 0.2.3 collapsed search and retained sources were not separately re-tested on the actual page. The earlier single settings-save failure on rc.4 remains unexplained.
 
 ## Development and attribution
 

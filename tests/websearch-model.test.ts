@@ -123,3 +123,25 @@ test('flattened fallback output is capped', () => {
   expect(model.output).toHaveLength(4001)
   expect(model.output.endsWith('…')).toBe(true)
 })
+
+test('a valid root search does not read unused fallback content', () => {
+  const block = result({ meta: meta() })
+  Object.defineProperty(block, 'content', { get() { throw new Error('unused fallback content was read') } })
+  expect(readWebSearch('result', block)).toMatchObject({ valid: true, output: '' })
+})
+
+test('fallback truncation does not read blocks beyond the displayed prefix', () => {
+  const unread = { type: 'text', get text(): string { throw new Error('truncated block was read') } }
+  const model = readWebSearch('result', result({ content: [{ type: 'text', text: 'x'.repeat(5000) }, unread] }))
+  expect(model.output).toBe(`${'x'.repeat(4000)}…`)
+})
+
+test('fallback text preserves empty blocks and exact-limit separators', () => {
+  const output = (texts: string[]) => readWebSearch('result', result({
+    content: texts.map(text => ({ type: 'text', text })),
+  })).output
+  expect(output(['', 'value', ''])).toBe('\nvalue\n')
+  expect(output(['x'.repeat(4000)])).toBe('x'.repeat(4000))
+  expect(output(['x'.repeat(4000), ''])).toBe(`${'x'.repeat(4000)}…`)
+  expect(output(['x'.repeat(3999), 'value'])).toBe(`${'x'.repeat(3999)}\n…`)
+})
