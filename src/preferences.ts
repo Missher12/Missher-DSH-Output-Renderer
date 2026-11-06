@@ -5,15 +5,18 @@ export const LEGACY_LAYOUTS = ['timeline', 'split', 'compact'] as const
 export const MOTIONS = ['smooth', 'fade'] as const
 export const DENSITIES = ['comfortable', 'tight'] as const
 export const TEXT_SIZES = ['standard', 'large'] as const
+export const SEARCH_SOURCES = ['manual', 'auto', 'hidden'] as const
+export type SearchSources = typeof SEARCH_SOURCES[number]
 export type Layout = typeof LAYOUTS[number]
 export type Motion = typeof MOTIONS[number]
 export interface Preferences {
   layout: Layout
+  searchSources: SearchSources
   motion: Motion
   density: typeof DENSITIES[number]
   textSize: typeof TEXT_SIZES[number]
 }
-export const DEFAULTS: Readonly<Preferences> = { layout: 'reader', motion: 'fade', density: 'comfortable', textSize: 'standard' }
+export const DEFAULTS: Readonly<Preferences> = { layout: 'reader', searchSources: 'manual', motion: 'fade', density: 'comfortable', textSize: 'standard' }
 export const ENTRY_ID = 'output-renderer'
 export const PACKAGE_ID = '@missher/dsh-output-renderer'
 
@@ -26,6 +29,7 @@ export function preferences(value: unknown): Preferences {
   const record = value as Record<string, unknown>
   return {
     layout: LAYOUTS.includes(record.layout as Layout) ? record.layout as Layout : DEFAULTS.layout,
+    searchSources: SEARCH_SOURCES.includes(record.searchSources as SearchSources) ? record.searchSources as SearchSources : DEFAULTS.searchSources,
     motion: MOTIONS.includes(record.motion as Motion) ? record.motion as Motion : DEFAULTS.motion,
     density: DENSITIES.includes(record.density as Preferences['density']) ? record.density as Preferences['density'] : DEFAULTS.density,
     textSize: TEXT_SIZES.includes(record.textSize as Preferences['textSize']) ? record.textSize as Preferences['textSize'] : DEFAULTS.textSize,

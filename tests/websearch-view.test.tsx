@@ -5,6 +5,7 @@ import type { ComponentProps } from 'react'
 import { afterEach, expect, test } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { WebSearchRow } from '../src/client/WebSearch.tsx'
+import { DEFAULTS, type Layout, type SearchSources } from '../src/preferences.ts'
 import { zh } from '../src/client/locales.ts'
 import type { WebSearchBlock } from '../src/client/websearch.ts'
 
@@ -34,8 +35,9 @@ function result(meta: Record<string, unknown> | undefined = { sources: [source(1
   }
 }
 
-function view(block: WebSearchBlock = result(), phase: Props['phase'] = 'result') {
-  return <WebSearchRow callId="call-1" toolName="web_search" phase={phase} block={block} t={t} />
+function view(block: WebSearchBlock = result(), phase: Props['phase'] = 'result', searchSources: SearchSources = 'manual', layout: Layout = 'cards') {
+  return <WebSearchRow callId="call-1" toolName="web_search" phase={phase} block={block} t={t}
+    useOutputPreferences={select => select({ value: { ...DEFAULTS, layout, searchSources }, status: 'ready', writable: true, ready: true, saving: false, error: false })} />
 }
 
 const cards = (root: HTMLElement) => root.querySelectorAll('.dsh-output-websearch-card')
@@ -52,7 +54,7 @@ test('a completed search starts collapsed, then expands to three cards and all m
   expect(pill(container).getAttribute('aria-expanded')).toBe('false')
   expect(body(container).hasAttribute('hidden')).toBe(true)
   expect(pill(container).getAttribute('aria-controls')).toBe(body(container).id)
-  expect(screen.getByText('已搜索 6 个站点')).toBeTruthy()
+  expect(screen.getByText('找到 6 个来源')).toBeTruthy()
   expect(screen.getByText('“React 19”')).toBeTruthy()
   expect(container.querySelectorAll('.dsh-output-websearch-stack .dsh-output-websearch-fav')).toHaveLength(4)
   fireEvent.click(pill(container))
@@ -97,7 +99,7 @@ test('expanding all sources and collapsing restores the compact set with focus',
 
 test('a single source uses the singular label and no more control', () => {
   const { container } = render(view(result({ sources: [source(1)], truncated: false })))
-  expect(screen.getByText('已搜索 1 个站点')).toBeTruthy()
+  expect(screen.getByText('找到 1 个来源')).toBeTruthy()
   expand(container)
   expect(cards(container)).toHaveLength(1)
   expect(container.querySelector('.dsh-output-websearch-more')).toBeNull()
@@ -173,8 +175,31 @@ test('preparing has a stable collapsed disclosure and an explicit waiting hint',
 test('conclusion mode keeps the web_search row while hiding other tools', () => {
   const css = readFileSync(resolve(process.cwd(), 'src/client/styles.css'), 'utf8')
   const hide = '[data-chat-flow-kind="tool-call"] { display: none !important; }'
-  const keep = '[data-chat-flow-kind="tool-call"]:has(.dsh-output-websearch) { display: block !important; }'
+  const keep = '[data-chat-flow-kind="tool-call"]:has(.dsh-output-websearch:not([hidden])) { display: block !important; }'
   expect(css).toContain(hide)
   expect(css).toContain(keep)
   expect(css.indexOf(hide)).toBeLessThan(css.indexOf(keep))
+})
+
+test('automatic sources wait for results and can be collapsed for the rest of the call', () => {
+  const page = render(view({ argsRaw: '{"query":"React 19"}' }, 'start', 'auto'))
+  expect(pill(page.container).getAttribute('aria-expanded')).toBe('false')
+  page.rerender(view(result(), 'result', 'auto'))
+  expect(screen.getAllByRole('link')).toHaveLength(3)
+  fireEvent.click(pill(page.container))
+  page.rerender(view(result(), 'result', 'auto'))
+  expect(screen.queryAllByRole('link')).toHaveLength(0)
+})
+
+test('hidden sources apply to concise results and keep failures and other layouts available', () => {
+  const page = render(view(result(), 'result', 'hidden'))
+  expect(screen.queryByRole('button')).toBeNull()
+  expect(screen.queryAllByRole('link')).toHaveLength(0)
+  page.rerender(view(result(undefined, { isError: true }), 'result', 'hidden'))
+  expect(screen.getByRole('button', { name: /搜索失败/ })).toBeTruthy()
+  page.rerender(view(result(), 'result', 'hidden', 'reader'))
+  expand(page.container)
+  expect(screen.getAllByRole('link')).toHaveLength(3)
+  page.rerender(view(result(), 'result', 'manual'))
+  expect(pill(page.container).getAttribute('aria-expanded')).toBe('false')
 })

@@ -2,14 +2,14 @@
 
 [English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **1.0.0**。这是可卸载的界面插件，需要已有 DSH 宿主。
+为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **1.0.1**。这是可卸载的界面插件，需要已有 DSH 宿主。
 
 `1.0.0` 优化搜索结果处理和来源展开，保留以下输出界面能力：
 
 - **Web 搜索来源卡片**：宿主 `web_search` 的根调用显示来源胶囊，默认折叠；点击展开 3 张来源卡片 + “还有 N 个来源”，可继续展开全部。只使用宿主已记录的 `meta.sources`，不抓取 favicon、不新增搜索后端。宿主没有 `tool.call.toolview` 时保留原生行，`web_fetch` 与 PTC 子调用不走富卡片。
 - **简洁对话结论模式**：最终答案步骤完成后只保留最终答复，不显示“查看过程”；思考、普通工具行和同组中间步骤收起，但 **web_search 来源胶囊保留且默认折叠**，点击仍可展开来源网页。运行中仍显示过程，但同一组只保留一个“已思考”行；中断和其他三种布局保持原行为。
 
-1.0.0 更新源码、预构建 `lib` 和 Git 标签；本轮未创建 GitHub Release，也未升级本机插件。最近的正式安装包仍见 [v0.2.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3)。0.2.0/0.2.1/0.2.2 的本地安装和更早历史保留在 [VALIDATION.md](./VALIDATION.md)。
+当前发布 **1.0.1** 同步最新设置、搜索来源与 DSH 原生界面。安装包见 [v1.0.1 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.1)；历史验证见 [VALIDATION.md](./VALIDATION.md)。
 
 1.0.0 通过两端类型检查、11 个测试文件的 134 项测试和隔离构建。正常搜索不再读取未使用的原始结果；回退文本超出 4,000 字符显示上限后停止处理后续块；来源展开与收起使用焦点引用，避免为清除焦点状态再渲染一次。真实 DSH 页面及安装状态本轮未复测；历史记录见 [VALIDATION.md](./VALIDATION.md)。
 
@@ -66,7 +66,7 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 | 检查范围 | 证据与限制 |
 | --- | --- |
-| 当前源码 `1.0.0` | 双端类型检查、134 项测试与隔离构建通过；本轮未安装、未运行真实 DSH 页面验收。 |
+| 历史版本 `1.0.0` | 双端类型检查、134 项测试与隔离构建通过；本轮未安装、未运行真实 DSH 页面验收。 |
 | 本机 DSH `0.2.1-rc.4`（历史记录） | 0.2.3：双端类型检查、131 项测试、隔离构建和 mock 分组 DOM 的结论隐藏/单思考行/搜索胶囊保留检查通过；`tool.call.toolview` 与 `turn-process` 投影已按该版本契约实现。已安装到本机 `desktop` profile（0.2.3）；0.2.1 的结论行为已由用户确认，0.2.3 的搜索默认折叠和结论保留来源仍未在真实页面单独复测。 |
 | 本机社区发行版 `0.2.1-rc.2` | 0.1.4已验：折叠与键盘操作、流中展开保持、实际状态和中断、正文/图片/原生工具、设置预览/保存/刷新/失败回退、暗色窄栏、停用恢复。浏览器使用隔离的本地合成数据。 |
 | 官方 npm alpha.5（`0.2.1-alpha.5`，Cordis `4.0.5` / Schemastery `3.18.5`） | 0.1.3历史证据：已通过真实 Loader 与设置；服务场景含正常保存、缺少 settings、缺少 configure；真实前端 SlotRegistry 受控生命周期；真实 Web 页面复核四布局、图片、原生放大/工具展开、保存失败回退、停止保留、36 轮历史加载、流式淡入与滚离底部；390 px 设置面板与 1280 px 词语分行均复验 |

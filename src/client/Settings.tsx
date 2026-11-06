@@ -4,7 +4,7 @@ import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-cli
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { OutputInjected } from './Assistant.tsx'
 import type { PreferencesController } from './settings.ts'
-import { LAYOUTS, MOTIONS, DENSITIES, TEXT_SIZES } from '../preferences.ts'
+import { LAYOUTS, MOTIONS, DENSITIES, TEXT_SIZES, SEARCH_SOURCES } from '../preferences.ts'
 import { StreamMarkdown } from './stream.tsx'
 import { StepLabel } from './StepLabel.tsx'
 import { ThinkingDisclosure, useThinkingOpen } from './Thinking.tsx'
@@ -64,34 +64,41 @@ export function Settings({ useOutputPreferences, setPreference, t }: Props) {
           disabled={disabled} onClick={() => { void setPreference('layout', layout) }} className="dsh-output-choice" data-choice={layout}>
           <span className="dsh-output-mini" aria-hidden="true"><i /><i /><i /></span>
           <span className="dsh-output-choice-copy">
-            <span className="dsh-output-choice-name">{t(layout)}</span>
+            <span className="dsh-output-choice-name">{t(layout)}{state.value.layout === layout && <span aria-hidden="true"> ✓</span>}</span>
             <span className="dsh-output-description">{t(`${layout}Hint`)}</span>
           </span>
         </Button>)}
       </div>
     </fieldset>
     <div className="dsh-output-fields">
+      {concise && <div className="dsh-output-field" role="group" aria-label={t('searchSources')}>
+        <span>{t('searchSources')}</span>
+        <div className="dsh-output-controls">
+          {SEARCH_SOURCES.map(mode => <Button key={mode} variant="outline" size="sm" disabled={disabled}
+            aria-pressed={state.value.searchSources === mode} onClick={() => { void setPreference('searchSources', mode) }}>{t(mode)}</Button>)}
+        </div>
+      </div>}
       <div className="dsh-output-field"><div><span>{t('thinking')}</span><p className="dsh-output-description">{t(concise ? 'thinkingHintConcise' : 'thinkingHint')}</p></div><Tag tone="neutral">{t(concise ? 'collapsedDefault' : 'alwaysOpen')}</Tag></div>
-      <fieldset className="dsh-output-field" disabled={disabled}>
-        <legend>{t('density')}</legend>
+      <div className="dsh-output-field" role="group" aria-label={t('density')}>
+        <span>{t('density')}</span>
         <div className="dsh-output-controls">
           {DENSITIES.map(density => <Button key={density} variant="outline" size="sm" disabled={disabled}
             aria-pressed={state.value.density === density} onClick={() => { void setPreference('density', density) }}>{t(density)}</Button>)}
         </div>
-      </fieldset>
-      <fieldset className="dsh-output-field" disabled={disabled}>
-        <legend>{t('textSize')}</legend>
+      </div>
+      <div className="dsh-output-field" role="group" aria-label={t('textSize')}>
+        <span>{t('textSize')}</span>
         <div className="dsh-output-controls">
           {TEXT_SIZES.map(size => <Button key={size} variant="outline" size="sm" disabled={disabled}
             aria-pressed={state.value.textSize === size} onClick={() => { void setPreference('textSize', size) }}>{t(size)}</Button>)}
         </div>
-      </fieldset>
+      </div>
     </div>
     <fieldset disabled={disabled}><legend>{t('motion')}</legend>
       <div className="dsh-output-motions">
         {MOTIONS.map(motion => <Button key={motion} variant="outline" disabled={disabled} aria-pressed={state.value.motion === motion}
           onClick={() => { void setPreference('motion', motion) }} className="dsh-output-choice">
-          <span className="dsh-output-choice-name">{t(motion)}</span>
+          <span className="dsh-output-choice-name">{t(motion)}{state.value.motion === motion && <span aria-hidden="true"> ✓</span>}</span>
           <span className="dsh-output-description">{t(`${motion}Hint`)}</span>
         </Button>)}
       </div>

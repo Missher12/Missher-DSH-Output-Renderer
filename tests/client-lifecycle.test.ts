@@ -2,6 +2,7 @@
 import { afterEach, expect, test, vi } from 'vitest'
 import { DEFAULTS, PACKAGE_ID } from '../src/preferences.ts'
 import { apply } from '../src/client/index.ts'
+import type { OutputInjected } from '../src/client/Assistant.tsx'
 
 vi.mock('../src/client/styles.css', () => ({ default: '/* inert during this lifecycle unit */' }))
 vi.mock('../src/client/Assistant.tsx', () => ({ Assistant: () => null }))
@@ -40,7 +41,7 @@ function host(overrides: Overrides = {}) {
   const waits = new Map<string, () => SlotInjectionEffect>()
   const contributions = new Map<string, (() => void)[]>()
   const registered: string[] = []
-  const registrations: { name: string; key?: string; priority?: number; locale?: string }[] = []
+  const registrations: { name: string; key?: string; priority?: number; locale?: string; inject?: () => OutputInjected }[] = []
   let unloaded = false
 
   const form = {
@@ -85,7 +86,7 @@ function host(overrides: Overrides = {}) {
       effects.push(dispose)
       return dispose
     },
-    register: (options: { name: string; key?: string; priority?: number; locale?: string }) => {
+    register: (options: { name: string; key?: string; priority?: number; locale?: string; inject?: () => OutputInjected }) => {
       registered.push(options.name)
       registrations.push(options)
       let live = true
@@ -266,7 +267,10 @@ test('the web search view shadows its keyed Tool slot at a lower priority and le
   const created = boot()
   created.declare('tool.call.toolview')
   expect(created.registered).toEqual(['tool.call.toolview'])
-  expect(created.registrations).toEqual([{ name: 'tool.call.toolview', key: 'web_search', priority: -10, locale: 'missher.output-renderer' }])
+  expect(created.registrations).toEqual([{ name: 'tool.call.toolview', key: 'web_search', priority: -10, locale: 'missher.output-renderer', inject: expect.any(Function) }])
+  const store = created.registrations[0]!.inject!().hooks.outputPreferences
+  created.sync({ value: { ...DEFAULTS, layout: 'cards', searchSources: 'hidden' } })
+  expect(store.getSnapshot().value.searchSources).toBe('hidden')
   // The Tool view does not participate in the assistant takeover marker.
   expect(document.documentElement.hasAttribute(MARKER)).toBe(false)
   created.collapse('tool.call.toolview')

@@ -1,12 +1,14 @@
 /** Render the built-in web_search call as a default-collapsed source capsule; other tools stay native. */
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, RefObject } from 'react'
-import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
+import type { InjectFace, PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
+import type { SearchSources } from '../preferences.ts'
+import type { OutputInjected } from './Assistant.tsx'
 import { NS } from './locales.ts'
 import { readWebSearch, type WebSearchModel, type WebSearchOwner, type WebSearchSource } from './websearch.ts'
 
 /** Props the keyed Tool slot supplies once this entry declares the Bundle locale. */
-type Props = WebSearchOwner & PropsLocale<typeof NS>
+type ToolProps = WebSearchOwner & PropsLocale<typeof NS>
 /** Cards shown before the "more sources" control. */
 const CARD_LIMIT = 3
 /** Fallback result text is already capped by the model; this is only a render guard. */
@@ -19,9 +21,14 @@ type Status = 'preparing' | 'searching' | 'done' | 'empty' | 'error' | 'fallback
  * `tool.call.toolview`, or malformed metadata keeps a compact text row instead of
  * rendering nothing; all non-web tools never reach this component.
  */
-export function WebSearchRow({ phase, block, t }: Props) {
+export function WebSearchRow({ useOutputPreferences, ...props }: ToolProps & InjectFace<Pick<OutputInjected, 'hooks'>>) {
+  const mode = useOutputPreferences(state => state.value.layout === 'cards' ? state.value.searchSources : null)
+  return <SearchDisclosure key={`${props.callId}:${mode ?? 'standard'}`} {...props} mode={mode} />
+}
+
+function SearchDisclosure({ phase, block, t, mode }: ToolProps & { mode: SearchSources | null }) {
   const model = useMemo(() => readWebSearch(phase, block), [phase, block])
-  const [open, setOpen] = useState(false)
+  const [userOpen, setUserOpen] = useState<boolean | null>(null)
   const [expanded, setExpanded] = useState(false)
   const focusIntent = useRef<'more' | 'collapse' | null>(null)
   const bodyId = useId()
@@ -29,6 +36,8 @@ export function WebSearchRow({ phase, block, t }: Props) {
   const collapseRef = useRef<HTMLButtonElement>(null)
   const status = statusOf(model)
   const rich = !model.isChild && model.valid && !model.isError
+  const hasSources = rich && model.sources.length > 0
+  const open = userOpen ?? (mode === 'auto' && hasSources)
   const visible = expanded ? model.sources : model.sources.slice(0, CARD_LIMIT)
   const remaining = model.sources.length - CARD_LIMIT
   const more = rich && !expanded && remaining > 0
@@ -45,7 +54,7 @@ export function WebSearchRow({ phase, block, t }: Props) {
 
   const toggle = (): void => {
     if (open) setExpanded(false)
-    setOpen(value => !value)
+    setUserOpen(!open)
   }
   const expandAll = (): void => {
     focusIntent.current = 'collapse'
@@ -56,10 +65,11 @@ export function WebSearchRow({ phase, block, t }: Props) {
     setExpanded(false)
   }
 
+  if (mode === 'hidden' && hasSources) return <section className="dsh-output-websearch" hidden />
   const label = statusLabel(model, t)
   const stack = rich && model.sources.length > 0 ? model.sources.slice(0, 4) : []
   const extra = rich && model.sources.length > 4 ? model.sources.length - 4 : 0
-  return <section className="dsh-output-websearch" data-websearch-status={status} data-websearch-phase={phase}
+  return <section className="dsh-output-websearch" data-websearch-status={status} data-websearch-phase={phase} data-concise={mode !== null || undefined}
     aria-label={t('webSearchLabel')}>
     <button type="button" className="dsh-output-websearch-pill" aria-expanded={open} aria-controls={bodyId}
       onClick={toggle}>
@@ -72,7 +82,7 @@ export function WebSearchRow({ phase, block, t }: Props) {
       </span>
       <span className="dsh-output-websearch-copy">
         <span className="dsh-output-websearch-label" aria-live="polite">{label}</span>
-        {model.query === '' ? null : <span className="dsh-output-websearch-query">{`“${model.query}”`}</span>}
+        {open || model.query === '' ? null : <span className="dsh-output-websearch-query">{`“${model.query}”`}</span>}
       </span>
       {stack.length === 0 ? null : <span className="dsh-output-websearch-stack" aria-hidden="true">
         {stack.map((source, index) => <Favicon key={`${source.url}:${index}`} source={source} />)}
@@ -81,6 +91,7 @@ export function WebSearchRow({ phase, block, t }: Props) {
       <Chevron />
     </button>
     <div id={bodyId} className="dsh-output-websearch-body" hidden={!open}>
+      {open && model.query && <p className="dsh-output-websearch-query-full">{`“${model.query}”`}</p>}
       {model.isError ? <p className="dsh-output-websearch-error">{model.errorDetail ?? t('webSearchFailedDetail')}</p>
         : model.isChild ? <Fallback model={model} text={t('webSearchNoDetails')} />
           : phase === 'preparing' ? <p className="dsh-output-websearch-muted">{t('webSearchPreparingHint')}</p>
@@ -113,7 +124,7 @@ function statusOf(model: WebSearchModel): Status {
   return model.sources.length === 0 ? 'empty' : 'done'
 }
 
-function statusLabel(model: WebSearchModel, t: Props['t']): string {
+function statusLabel(model: WebSearchModel, t: ToolProps['t']): string {
   if (model.isError) return t('webSearchFailed')
   if (model.isChild) return t('webSearchFallback')
   if (model.phase === 'preparing') return t('webSearchPreparing')
@@ -124,7 +135,7 @@ function statusLabel(model: WebSearchModel, t: Props['t']): string {
   return t('webSearchSearched', { count: model.sources.length })
 }
 
-function Card({ source, index, t }: { source: WebSearchSource; index: number; t: Props['t'] }) {
+function Card({ source, index, t }: { source: WebSearchSource; index: number; t: ToolProps['t'] }) {
   const title = source.title ?? (source.domain || t('webSearchUntitled'))
   const content = <>
     <span className="dsh-output-websearch-card-title">{title}</span>
@@ -151,7 +162,7 @@ function MoreSources({ sources, remaining, buttonRef, onClick, t }: {
   remaining: number
   buttonRef: RefObject<HTMLButtonElement>
   onClick: () => void
-  t: Props['t']
+  t: ToolProps['t']
 }) {
   return <button ref={buttonRef} type="button" className="dsh-output-websearch-more" onClick={onClick}>
     <span className="dsh-output-websearch-more-favs" aria-hidden="true">

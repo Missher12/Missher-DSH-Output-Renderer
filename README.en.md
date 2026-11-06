@@ -2,14 +2,14 @@
 
 [简体中文](./README.md) · [Prebuilt downloads](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [Desktop app](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [Issues](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **1.0.0**. This removable UI plugin requires an existing DSH host.
+Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **1.0.1**. This removable UI plugin requires an existing DSH host.
 
 `1.0.0` optimizes search-result processing and source expansion while keeping these output-surface features:
 
 - **Web search source cards**: a root `web_search` call shows a source pill that is collapsed by default; click to expand three cards plus "more sources", then expand to all. It reads only persisted `meta.sources`, adds no search backend and fetches no favicons. Hosts without `tool.call.toolview` keep the native row; `web_fetch` and PTC child calls keep the generic presentation.
 - **Concise conclusion mode**: after the final answer step settles, Concise conversation keeps only the final answer and no process control. Thinking, ordinary tool rows and other steps in the same group are hidden, but the `web_search` source pill remains available, collapsed by default and expandable on click. While running, the process remains visible with at most one "Thought" row per group; interrupted and the other three layouts keep their previous behavior.
 
-1.0.0 updates the source, prebuilt `lib` and Git tag; this round does not create a GitHub Release or upgrade the local installation. The latest published installer remains the [v0.2.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3). The 0.2.0/0.2.1/0.2.2 local installations and earlier history remain in [VALIDATION.md](./VALIDATION.md).
+Current release **1.0.1** includes the latest settings, search-source fixes and native DSH styling. Download the installer from [v1.0.1](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.1); dated validation remains in [VALIDATION.md](./VALIDATION.md).
 
 1.0.0 passed host/client type checks, 134 tests in 11 files and an isolated build. Valid root searches skip unused raw result content; fallback text stops processing later blocks once it exceeds the 4,000-character display limit. Source expansion uses a focus ref to avoid an extra render just to clear focus state. The actual DSH page and installation were not re-tested this round; see [VALIDATION.md](./VALIDATION.md) for historical evidence.
 
@@ -66,7 +66,7 @@ It reads existing assistant content for display, creates no separate session dat
 
 | Scope | Evidence and limits |
 | --- | --- |
-| Current source `1.0.0` | Host/client type checks, 134 tests and an isolated build passed; no installation or real DSH page acceptance in this round. |
+| Previous version `1.0.0` | Host/client type checks, 134 tests and an isolated build passed; no installation or real DSH page acceptance in this round. |
 | Local DSH `0.2.1-rc.4` (historical) | 0.2.3: host/client type checks, 131 tests, isolated build and mock group-DOM conclusion/single-thinking/retained-search checks passed; `tool.call.toolview` and the `turn-process` projection are implemented against this version's contract. Installed in the local `desktop` profile (0.2.3); conclusion behavior was confirmed on 0.2.1; the 0.2.3 collapsed search and retained sources were not separately re-tested in the real page. |
 | Installed community `0.2.1-rc.2` | 0.1.4: disclosure, in-flight choice retention, real state/interruption, native tools/images, settings preview/save/refresh/failure rollback, dark narrow layout and disable restoration on isolated synthetic data. |
 | Official npm alpha.5 (`0.2.1-alpha.5`, Cordis `4.0.5` / Schemastery `3.18.5`) | 0.1.3 historical evidence: the real Loader checks passed, including and settings, service scenarios covering normal saving, a missing settings service and a missing `configure`, controlled front-end SlotRegistry lifecycles, and real-page review of all four layouts, images, native zoom/tool expansion, save-failure rollback, stop-with-partial retention, 36-turn history loading, streaming fade and scroll-away stability; the 390 px settings panel and the 1280 px word wrapping were re-checked |

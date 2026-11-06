@@ -130,7 +130,7 @@ export function apply(ctx: Context): void {
   // never runs. On 0.2.1-rc.4 the built-in web_search row sits at priority 0, so -10 is the
   // shadowing slot rather than a same-priority duplicate that would throw at load.
   ctx.slots.inject(TOOL_SLOT, () => ctx.slots.register({
-    name: TOOL_SLOT, key: 'web_search', priority: -10, locale: NS,
+    name: TOOL_SLOT, key: 'web_search', priority: -10, locale: NS, inject: injectOutput,
   }, WebSearchRow))
   // The settings page never touches native output, so it keeps its own independent declaration.
   ctx.slots.inject(SETTINGS_SLOT, () => ctx.slots.register({

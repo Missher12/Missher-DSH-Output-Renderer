@@ -31,14 +31,18 @@ test('layout, motion, spacing and type size persist independently through the na
   await control.set('motion', 'smooth')
   await control.set('density', 'tight')
   await control.set('textSize', 'large')
-  const saved = { layout: 'cards', motion: 'smooth', density: 'tight', textSize: 'large' }
+  await control.set('searchSources', 'hidden')
+  const saved = { searchSources: 'hidden', layout: 'cards', motion: 'smooth', density: 'tight', textSize: 'large' }
   expect(control.store.getSnapshot().value).toEqual(saved)
-  expect(host.writes).toEqual([['layout', 'cards'], ['motion', 'smooth'], ['density', 'tight'], ['textSize', 'large']])
+  expect(host.writes).toEqual([['layout', 'cards'], ['motion', 'smooth'], ['density', 'tight'], ['textSize', 'large'], ['searchSources', 'hidden']])
   control.dispose()
   const reloaded = createPreferences(host.api)
   expect(reloaded.store.getSnapshot().value).toEqual(saved)
   reloaded.dispose()
   expect(host.subscribers.size).toBe(0)
+})
+test.each(['manual', 'auto', 'hidden'] as const)('host accepts concise source mode %s', mode => {
+  expect(Config({ searchSources: mode }).searchSources.get()).toBe(mode)
 })
 test('a refused write restores accepted appearance and exposes failure', async () => {
   const host = form(false)
@@ -57,7 +61,7 @@ test.each(['process', 'checklist'] as const)('%s is accepted by the Host and sur
   await control.set('layout', layout)
   control.dispose()
   const reloaded = createPreferences(host.api)
-  expect(reloaded.store.getSnapshot().value).toEqual({ layout, motion: 'smooth', density: 'tight', textSize: 'large' })
+  expect(reloaded.store.getSnapshot().value).toEqual({ searchSources: 'manual', layout, motion: 'smooth', density: 'tight', textSize: 'large' })
   reloaded.dispose()
 })
 test('read-only settings do not make promises about persistence', async () => {
@@ -91,13 +95,13 @@ test('a missing namespace ends loading and a later accepted snapshot restores sa
   control.dispose()
 })
 test('malformed persisted values fall back inside the owning namespace', () => {
-  expect(preferences({ layout: 'unknown', motion: [], density: 0, textSize: 'huge' })).toEqual(DEFAULTS)
+  expect(preferences({ layout: 'unknown', motion: [], density: 0, textSize: 'huge', searchSources: 'invalid' })).toEqual(DEFAULTS)
   expect(preferences(null)).toEqual(DEFAULTS)
 })
 test.each(['split', 'timeline', 'compact'] as const)('legacy %s loads in the Host and reads as reader without changing saved values', layout => {
   const stored = { layout, motion: 'smooth', density: 'tight', textSize: 'large' } as const
   const accepted = Config(stored)
-  expect(preferences(stored)).toEqual({ layout: 'reader', motion: 'smooth', density: 'tight', textSize: 'large' })
+  expect(preferences(stored)).toEqual({ searchSources: 'manual', layout: 'reader', motion: 'smooth', density: 'tight', textSize: 'large' })
   expect(stored.layout).toBe(layout)
   expect(accepted.layout.get()).toBe(layout)
   expect(accepted.motion.get()).toBe('smooth')

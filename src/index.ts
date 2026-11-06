@@ -2,10 +2,11 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-settings'
 import z from '@deepseek-ai/schemastery'
-import { DEFAULTS, ENTRY_ID, LAYOUTS, LEGACY_LAYOUTS, MOTIONS, DENSITIES, TEXT_SIZES, PACKAGE_ID } from './preferences.ts'
+import { DEFAULTS, ENTRY_ID, LAYOUTS, LEGACY_LAYOUTS, SEARCH_SOURCES, MOTIONS, DENSITIES, TEXT_SIZES, PACKAGE_ID } from './preferences.ts'
 
 export const Config = z.object({
   layout: z.union([...LAYOUTS, ...LEGACY_LAYOUTS]).default(DEFAULTS.layout).volatile(),
+  searchSources: z.union([...SEARCH_SOURCES]).default(DEFAULTS.searchSources).volatile(),
   motion: z.union([...MOTIONS]).default(DEFAULTS.motion).volatile(),
   density: z.union([...DENSITIES]).default(DEFAULTS.density).volatile(),
   textSize: z.union([...TEXT_SIZES]).default(DEFAULTS.textSize).volatile(),
