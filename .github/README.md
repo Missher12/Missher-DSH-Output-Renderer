@@ -2,6 +2,8 @@
 
 <h1>DSH Output Renderer · 输出外观</h1>
 
+<p><img src="../docs/images/overview.svg" alt="Output Renderer 功能示意" width="100%"></p>
+
 <p>让回答、思考过程和搜索来源各有清楚的位置。</p>
 
 <p>
@@ -14,6 +16,10 @@
 </div>
 
 ---
+
+<!-- current-source -->
+当前开发源码：**1.0.1** · [分支 `main`](https://github.com/Missher12/Missher-DSH-Output-Renderer/tree/main)。安装包以实际 Release 为准。
+<!-- /current-source -->
 
 ## 功能一览
 
