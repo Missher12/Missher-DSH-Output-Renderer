@@ -7,7 +7,7 @@
 <p>让回答、思考过程和搜索来源各有清楚的位置。</p>
 
 <p>
-  <a href="https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.1"><img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-1.0.1-4D6BFE?style=flat-square" alt="版本: 1.0.1"></a>
+  <a href="https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.2"><img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-1.0.1-4D6BFE?style=flat-square" alt="版本: 1.0.1"></a>
   <a href="https://github.com/Missher12/Missher-DSH-Output-Renderer"><img src="https://img.shields.io/badge/%E6%96%87%E6%A1%A3-%E4%B8%AD%E6%96%87-4D6BFE?style=flat-square" alt="文档: 中文"></a>
 </p>
 
@@ -32,7 +32,7 @@
 
 ## 快速开始
 
-1. 从 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.1) 下载对应版本的 `.tgz` 安装包。
+1. 从 [Releases](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.2) 下载对应版本的 `.tgz` 安装包。
 2. 在 DSH **插件 → 添加插件** 中选择下载的文件，安装并启用；按宿主提示重新加载或正常重启。
 3. 打开 **设置 → 输出外观**，选择适合自己的阅读布局。
 

@@ -2,14 +2,14 @@
 
 [English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **1.0.1**。这是可卸载的界面插件，需要已有 DSH 宿主。
+为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **1.0.2**。这是可卸载的界面插件，需要已有 DSH 宿主。
 
 `1.0.0` 优化搜索结果处理和来源展开，保留以下输出界面能力：
 
 - **Web 搜索来源卡片**：宿主 `web_search` 的根调用显示来源胶囊，默认折叠；点击展开 3 张来源卡片 + “还有 N 个来源”，可继续展开全部。只使用宿主已记录的 `meta.sources`，不抓取 favicon、不新增搜索后端。宿主没有 `tool.call.toolview` 时保留原生行，`web_fetch` 与 PTC 子调用不走富卡片。
 - **简洁对话结论模式**：最终答案步骤完成后只保留最终答复，不显示“查看过程”；思考、普通工具行和同组中间步骤收起，但 **web_search 来源胶囊保留且默认折叠**，点击仍可展开来源网页。运行中仍显示过程，但同一组只保留一个“已思考”行；中断和其他三种布局保持原行为。
 
-当前发布 **1.0.1** 同步最新设置、搜索来源与 DSH 原生界面。安装包见 [v1.0.1 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.1)；历史验证见 [VALIDATION.md](./VALIDATION.md)。
+当前发布 **1.0.1** 同步最新设置、搜索来源与 DSH 原生界面。安装包见 [v1.0.1 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.2)；历史验证见 [VALIDATION.md](./VALIDATION.md)。
 
 1.0.0 通过两端类型检查、11 个测试文件的 134 项测试和隔离构建。正常搜索不再读取未使用的原始结果；回退文本超出 4,000 字符显示上限后停止处理后续块；来源展开与收起使用焦点引用，避免为清除焦点状态再渲染一次。真实 DSH 页面及安装状态本轮未复测；历史记录见 [VALIDATION.md](./VALIDATION.md)。
 
