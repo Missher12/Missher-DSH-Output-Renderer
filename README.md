@@ -9,7 +9,7 @@
 - **Web 搜索来源卡片**：宿主 `web_search` 的根调用显示来源胶囊，默认折叠；点击展开 3 张来源卡片 + “还有 N 个来源”，可继续展开全部。只使用宿主已记录的 `meta.sources`，不抓取 favicon、不新增搜索后端。宿主没有 `tool.call.toolview` 时保留原生行，`web_fetch` 与 PTC 子调用不走富卡片。
 - **简洁对话结论模式**：最终答案步骤完成后只保留最终答复，不显示“查看过程”；思考、普通工具行和同组中间步骤收起，但 **web_search 来源胶囊保留且默认折叠**，点击仍可展开来源网页。运行中仍显示过程，但同一组只保留一个“已思考”行；中断和其他三种布局保持原行为。
 
-当前发布 **1.0.1** 同步最新设置、搜索来源与 DSH 原生界面。安装包见 [v1.0.1 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.2)；历史验证见 [VALIDATION.md](./VALIDATION.md)。
+当前发布 **1.0.2** 同步最新设置、搜索来源与 DSH 原生界面。安装包见 [v1.0.2 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.2)；历史验证见 [VALIDATION.md](./VALIDATION.md)。
 
 1.0.0 通过两端类型检查、11 个测试文件的 134 项测试和隔离构建。正常搜索不再读取未使用的原始结果；回退文本超出 4,000 字符显示上限后停止处理后续块；来源展开与收起使用焦点引用，避免为清除焦点状态再渲染一次。真实 DSH 页面及安装状态本轮未复测；历史记录见 [VALIDATION.md](./VALIDATION.md)。
 
@@ -40,9 +40,9 @@
 
 ## 安装、启停与卸载
 
-推荐使用 [v0.2.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3) 的预构建包：[直接下载 tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.3/missher-dsh-output-renderer-0.2.3.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.3/missher-dsh-output-renderer-0.2.3.tgz.sha256)。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
+推荐使用 [v1.0.2 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.2) 的预构建包：[直接下载 tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.2/missher-dsh-output-renderer-1.0.2.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.2/SHA256SUMS)。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
 
-1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c missher-dsh-output-renderer-0.2.3.tgz.sha256` 核对下载字节。
+1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c SHA256SUMS` 核对下载字节。
 2. 桌面版进入 **插件 → 添加插件**，填入下载文件的完整路径，安装并启用本插件。按宿主提示重新加载后，进入 **设置 → 输出外观**。
 3. 在插件管理中关闭本插件的启用开关即可停用；重新打开可启用。停用后恢复宿主原生输出。
 4. 在插件管理中选择本插件并点击 **卸载** 可移除。升级请优先使用当前 Missher 桌面端的“更新插件”入口，选择新版 tgz；先备份 profile 配置并保留原版本 tgz。较早宿主若没有更新入口，可按该宿主支持的替换或重新安装流程操作，并保留配置备份；缺少更新按钮不表示插件只支持新宿主。卸载后的偏好保留行为由宿主管理。
@@ -50,7 +50,7 @@
 Web/自建 profile 使用目标宿主的正式 CLI，替换下面的 profile 和文件路径：
 
 ```sh
-dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.2.3.tgz
+dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-1.0.2.tgz
 dsh plugin --profile my-web remove @missher/dsh-output-renderer
 ```
 
