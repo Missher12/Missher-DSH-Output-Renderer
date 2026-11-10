@@ -1,5 +1,7 @@
 # Missher DSH Output Renderer
 
+![Output Renderer · 输出排版（品牌插画）](docs/images/cover-v2.png)
+
 [简体中文](./README.md) · [Prebuilt downloads](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [Desktop app](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [Issues](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
 Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **1.0.1**. This removable UI plugin requires an existing DSH host.

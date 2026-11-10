@@ -2,7 +2,7 @@
 
 <h1>DSH Output Renderer · 输出外观</h1>
 
-<p><img src="../docs/images/overview.svg" alt="Output Renderer 功能示意" width="100%"></p>
+<p><img src="../docs/images/cover-v2.png" alt="Output Renderer · 输出排版（品牌插画）" width="100%"></p>
 
 <p>让回答、思考过程和搜索来源各有清楚的位置。</p>
 

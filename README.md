@@ -1,5 +1,7 @@
 # Missher DSH Output Renderer · 输出外观
 
+![Output Renderer · 输出排版（品牌插画）](docs/images/cover-v2.png)
+
 [English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
 为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **1.0.2**。这是可卸载的界面插件，需要已有 DSH 宿主。
