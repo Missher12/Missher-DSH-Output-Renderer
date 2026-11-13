@@ -54,7 +54,9 @@ html[data-dsh-output-renderer] [data-chat-group-key][hidden] { display: block !i
 html[data-dsh-output-renderer] [data-chat-flow-kind="turn-process"] { display: none !important; }
 html[data-dsh-output-renderer] [data-chat-group-key]:has(.dsh-output-reasoning) > div:first-child { display: none; }
 html[data-dsh-output-renderer] [data-chat-group-key]:has(.dsh-output-reasoning) > [data-step-process-body] { display: block !important; content-visibility: visible !important; max-height: none; overflow: visible; mask-image: none; scrollbar-gutter: auto; }
-/* Conclusion mode: after the final answer settles, only that answer remains. The native tool rows,
+/* Group-local fallback for hosts without a conversation session scope. Assistant also supplies
+   session-and-Turn-scoped rules, since questions and steering can split one Turn across groups.
+   After the final answer settles, only that answer remains. The native tool rows,
    non-final assistant steps and the group header in this group are hidden; the group body stays open
    so the answer itself remains visible. No toggle, host row mutation or query is involved. */
 html[data-dsh-output-renderer="cards"] [data-chat-group-key] [data-chat-flow-kind="assistant-step"]:has(~ [data-chat-flow-kind="assistant-step"] .dsh-output-thinking) .dsh-output-thinking { display: none !important; }

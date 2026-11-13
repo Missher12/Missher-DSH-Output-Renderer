@@ -36,6 +36,19 @@ type SharedGalleryCall = (
 ) => ReactNode
 type Props = ChatProps & { renderFactorySlot?: unknown; sessionId?: string }
 
+/** A Turn can span several process groups, separated by questions or steering input. */
+function conclusionStyles(sessionId: string, turn: number): string {
+  const session = sessionId.replace(/[^A-Za-z0-9_-]/gu, character => `\\${character.codePointAt(0)!.toString(16)} `)
+  const row = `html[data-dsh-output-renderer="cards"] [data-conversation-session="${session}"][data-conversation-region="chat"] [data-chat-turn="${turn}"]`
+  return `
+${row}[data-chat-group-key]:not(:has(.dsh-output-assistant[data-output-conclusion] .dsh-output-answer, .dsh-output-websearch:not([hidden]))),
+${row}[data-chat-group-key] > div:first-child,
+${row}[data-chat-flow-kind="tool-call"]:not(:has(.dsh-output-websearch:not([hidden]))),
+${row}[data-chat-flow-kind="assistant-step"]:not(:has(.dsh-output-assistant[data-output-conclusion] .dsh-output-answer)) { display: none !important; }
+${row}[data-chat-group-key] > [data-step-process-body] { display: block !important; content-visibility: visible !important; max-height: none; overflow: visible; mask-image: none; scrollbar-gutter: auto; }
+`
+}
+
 export const Assistant = memo(function Assistant({ node, groupPart, sessionId, useTurnData, openFile, renderMessageImages,
   renderFactorySlot, loadImage, fileMentions, useOutputPreferences, outputText, t }: Props) {
   const { motion, layout, density, textSize } = useOutputPreferences(state => state.value)
@@ -153,6 +166,7 @@ export const Assistant = memo(function Assistant({ node, groupPart, sessionId, u
     data-output-density={density} data-output-text-size={textSize}
     data-output-both={reasoning.length > 0 && response.length > 0 || undefined} data-output-running={running || undefined}
     data-output-conclusion={conclusion || undefined}>
+    {conclusion && response.length > 0 && sessionId && <style>{conclusionStyles(sessionId, data.turn)}</style>}
     {checklistStep && <StepLabel step={data.step} status={data.status} text={outputText} />}
     {!conclusion && reasoning.length > 0 && (concise
         // The row carries the interruption only when the reasoning itself stopped there; otherwise it

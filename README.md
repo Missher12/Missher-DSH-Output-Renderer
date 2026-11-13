@@ -4,14 +4,14 @@
 
 [English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **1.0.2**。这是可卸载的界面插件，需要已有 DSH 宿主。
+为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **1.0.3**。这是可卸载的界面插件，需要已有 DSH 宿主。
 
 `1.0.0` 优化搜索结果处理和来源展开，保留以下输出界面能力：
 
 - **Web 搜索来源卡片**：宿主 `web_search` 的根调用显示来源胶囊，默认折叠；点击展开 3 张来源卡片 + “还有 N 个来源”，可继续展开全部。只使用宿主已记录的 `meta.sources`，不抓取 favicon、不新增搜索后端。宿主没有 `tool.call.toolview` 时保留原生行，`web_fetch` 与 PTC 子调用不走富卡片。
 - **简洁对话结论模式**：最终答案步骤完成后只保留最终答复，不显示“查看过程”；思考、普通工具行和同组中间步骤收起，但 **web_search 来源胶囊保留且默认折叠**，点击仍可展开来源网页。运行中仍显示过程，但同一组只保留一个“已思考”行；中断和其他三种布局保持原行为。
 
-当前发布 **1.0.2** 同步最新设置、搜索来源与 DSH 原生界面。安装包见 [v1.0.2 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.2)；历史验证见 [VALIDATION.md](./VALIDATION.md)。
+当前发布 **1.0.3** 修复历史会话中同一轮被拆成多个过程分组时，前面的工具与中间回复未收起的问题；简洁对话按整轮保留最终答复，搜索来源仍遵循显示设置。安装包见 [v1.0.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.3)；历史验证见 [VALIDATION.md](./VALIDATION.md)。
 
 1.0.0 通过两端类型检查、11 个测试文件的 134 项测试和隔离构建。正常搜索不再读取未使用的原始结果；回退文本超出 4,000 字符显示上限后停止处理后续块；来源展开与收起使用焦点引用，避免为清除焦点状态再渲染一次。真实 DSH 页面及安装状态本轮未复测；历史记录见 [VALIDATION.md](./VALIDATION.md)。
 
@@ -42,7 +42,7 @@
 
 ## 安装、启停与卸载
 
-推荐使用 [v1.0.2 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.2) 的预构建包：[直接下载 tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.2/missher-dsh-output-renderer-1.0.2.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.2/SHA256SUMS)。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
+推荐使用 [v1.0.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.3) 的预构建包：[直接下载 tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.3/missher-dsh-output-renderer-1.0.3.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.3/SHA256SUMS)。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
 
 1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c SHA256SUMS` 核对下载字节。
 2. 桌面版进入 **插件 → 添加插件**，填入下载文件的完整路径，安装并启用本插件。按宿主提示重新加载后，进入 **设置 → 输出外观**。
@@ -52,7 +52,7 @@
 Web/自建 profile 使用目标宿主的正式 CLI，替换下面的 profile 和文件路径：
 
 ```sh
-dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-1.0.2.tgz
+dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-1.0.3.tgz
 dsh plugin --profile my-web remove @missher/dsh-output-renderer
 ```
 

@@ -3,6 +3,7 @@ import { act } from 'react'
 import type { ComponentProps, ReactElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { renderToStaticMarkup } from 'react-dom/server'
+import styles from '../src/client/styles.css?raw'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { Assistant } from '../src/client/Assistant.tsx'
 import { DEFAULTS, type Layout } from '../src/preferences.ts'
@@ -299,4 +300,64 @@ test('non-concise layouts never enter conclusion mode even with a final answer p
     { kind: 'reasoning', text: '完整思考。' }, { kind: 'text', text: '完整答复。' }] })} groupPart="reasoning" />)
   expect(html).not.toContain('data-output-conclusion')
   expect(html).toContain('完整思考。')
+})
+
+test('a completed Turn folds every process group, including tool-only groups, within its own session', async () => {
+  const stylesheet = document.createElement('style')
+  stylesheet.textContent = styles
+  document.head.append(stylesheet)
+  document.documentElement.setAttribute('data-dsh-output-renderer', 'cards')
+  const finalProps = props({ turnProcess: process(2), blocks: [{ kind: 'text', text: '最终结论。' }] })
+  const view = (layout: Layout) => <>
+    <div data-conversation-session="synthetic-concise" data-conversation-region="chat">
+      <div id="user-input" data-chat-turn="1" data-chat-flow-kind="user">用户补充</div>
+      <div id="early-group" data-chat-turn="1" data-chat-group-key="early">
+        <div>过程分组一</div><div data-step-process-body="true">
+          <div data-chat-turn="1" data-chat-flow-kind="assistant-step"><Assistant {...props({
+            layout, step: 1, turnProcess: process(2), blocks: [{ kind: 'text', text: '中间回复。' }],
+          })} /></div>
+          <div data-chat-turn="1" data-chat-flow-kind="tool-call">早期工具</div>
+        </div>
+      </div>
+      <div id="tool-only-group" data-chat-turn="1" data-chat-group-key="tools">
+        <div>过程分组二</div><div data-step-process-body="true">
+          <div data-chat-turn="1" data-chat-flow-kind="tool-call">独立工具</div>
+        </div>
+      </div>
+      <div id="search-group" data-chat-turn="1" data-chat-group-key="search">
+        <div id="search-header">搜索分组</div><div data-step-process-body="true">
+          <div id="visible-search" data-chat-turn="1" data-chat-flow-kind="tool-call"><div className="dsh-output-websearch">搜索来源</div></div>
+          <div id="hidden-search" data-chat-turn="1" data-chat-flow-kind="tool-call"><div className="dsh-output-websearch" hidden>隐藏来源</div></div>
+        </div>
+      </div>
+      <div data-chat-turn="1" data-chat-group-key="answer">
+        <div>最终分组</div><div data-step-process-body="true">
+          <div id="answer" data-chat-turn="1" data-chat-flow-kind="assistant-step"><Assistant {...finalProps} useOutputPreferences={selector =>
+            selector({ value: { ...DEFAULTS, layout }, status: 'ready', ready: true, writable: true, saving: false, error: false })} /></div>
+        </div>
+      </div>
+      <div id="other-turn" data-chat-turn="2" data-chat-flow-kind="tool-call">运行中的另一轮</div>
+    </div>
+    <div data-conversation-session="other-session" data-conversation-region="chat">
+      <div id="other-session" data-chat-turn="1" data-chat-flow-kind="tool-call">另一个会话</div>
+    </div>
+  </>
+  const display = (id: string) => getComputedStyle(mount.querySelector(`#${id}`)!).display
+  try {
+    await render(view('cards'))
+    expect(display('early-group')).toBe('none')
+    expect(display('tool-only-group')).toBe('none')
+    expect(display('search-header')).toBe('none')
+    expect(display('hidden-search')).toBe('none')
+    for (const id of ['user-input', 'answer', 'search-group', 'visible-search', 'other-turn', 'other-session']) {
+      expect(display(id), id).not.toBe('none')
+    }
+    document.documentElement.setAttribute('data-dsh-output-renderer', 'reader')
+    await render(view('reader'))
+    expect(display('early-group')).not.toBe('none')
+    expect(display('tool-only-group')).not.toBe('none')
+  } finally {
+    stylesheet.remove()
+    document.documentElement.removeAttribute('data-dsh-output-renderer')
+  }
 })
