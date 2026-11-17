@@ -27,20 +27,24 @@ function props(options: {
   renderMessageImages?: Props['renderMessageImages']
   /** Optional Turn-process projection; without it the old concise behavior stays. */
   turnProcess?: unknown
+  /** Simulate a closed Turn whose last Assistant step is this one. */
+  closedFinalStep?: boolean
 }): Props {
   const { blocks, layout = 'cards', status = 'settled', step = 2, sessionId = 'synthetic-concise',
-    renderMessageImages, turnProcess } = options
+    renderMessageImages, turnProcess, closedFinalStep = false } = options
   const finalNode = { kind: 'assistant' as const, seq: 10, time: 100, turn: 1, step, blocks,
     ...(status === 'interrupted' ? { interrupted: true as const } : {}) }
   const data = { status, turn: 1, step, blocks, time: 100, ...(status === 'running' ? {} : { finalNode }) }
   // This fixture publishes only the keys a test opts into; other merged keys have no value.
   const useTurnData = ((key: string) => key === 'turn-process' ? turnProcess : undefined) as Props['useTurnData']
+  const finalStep = { data: { get: (key: string) => key === 'assistant-step' ? data : undefined } }
+  const steps = closedFinalStep ? [finalStep] as unknown as Props['node']['location']['turn']['steps'] : []
   return {
     node: {
       key: 'assistant-step:1:2', id: '1:2', kind: 'assistant-step', target: 'chat', anchorSeq: 2,
       visibility: 'visible', data,
       location: { kind: 'turn', turn: {
-        turn: 1, start: undefined, end: undefined, status: 'open', steps: [],
+        turn: 1, start: undefined, end: undefined, status: closedFinalStep ? 'closed' : 'open', steps,
         data: { get: useTurnData, source: unused },
       } },
     },
@@ -275,6 +279,18 @@ test('only the Turn answer step enters conclusion mode', async () => {
   expect(root.hasAttribute('data-output-conclusion')).toBe(false)
   expect(mount.querySelector('[data-output-process-toggle]')).toBeNull()
   expect(control()).not.toBeNull()
+})
+
+test('a closed final step with tool calls still enters conclusion when answerStep is null', async () => {
+  await render(<Assistant {...props({ closedFinalStep: true,
+    turnProcess: process(2, { answerStep: null, answerAnchorSeq: null }), blocks: [
+      { kind: 'reasoning', text: '折叠的完整思考。' }, { kind: 'tool-call' }, { kind: 'text', text: '最终结论。' }] })} />)
+  const root = mount.querySelector<HTMLElement>('.dsh-output-assistant')!
+  expect(root.getAttribute('data-output-conclusion')).toBe('true')
+  expect(mount.querySelector('[data-output-process-toggle]')).toBeNull()
+  expect(root.querySelector('.dsh-output-thinking')).toBeNull()
+  expect(root.textContent).not.toContain('折叠的完整思考。')
+  expect(root.querySelector('.dsh-output-answer')?.textContent).toContain('最终结论。')
 })
 
 test('a final answer with prior Turn tools but no local reasoning still keeps only the answer', async () => {

@@ -21,7 +21,7 @@
 1. `layout === "cards"`；
 2. Assistant 步骤 `status === "settled"`；
 3. 当前步骤有最终正文（`hasResponse`）；
-4. 当前步骤是 Turn 的最终答案步骤（`useTurnData('turn-process').answerStep === data.step`；宿主不提供该投影时保持现有简洁行为，不猜测最终答案）。
+4. 当前步骤是 Turn 的最终答案步骤：`useTurnData('turn-process').answerStep === data.step`；在 DSH 0.2.2-rc.3 中，最终 assistant 含 tool-call 时宿主把 `answerStep` 置为 `null`，此时仅当 Turn 已关闭、当前步骤是 `turn.steps` 的最后一个 assistant-step 且 `data.finalNode` 存在，才按最终答案处理；宿主不提供 `turn-process` 时保持旧简洁行为，不猜测。
 
 中断（`interrupted`）不进入结论模式，保留停止原因和过程，避免把失败包装成“干净结论”。
 
@@ -38,7 +38,8 @@
 
 ## 5. 实现
 
-- `Assistant.tsx`：读取 `turn-process` 投影，计算 `conclusion`、`finalAnswer`；在根节点只写 `data-output-conclusion`。结论态不渲染思考行或过程按钮；运行/中断态继续渲染原有 `ThinkingDisclosure`。
+- `Assistant.tsx`：读取 `turn-process` 投影，计算 `conclusion`、`finalAnswer`；在根节点只写 `data-output-conclusion`。`finalAnswer` 支持 `answerStep` 和上述 0.2.2-rc.3 `answerStep=null` 回退。结论态不渲染思考行或过程按钮；运行/中断态继续渲染原有 `ThinkingDisclosure`。
+- `index.ts`：`injectOutput` 把宿主传入的 `sessionId` 注入组件，确保 1.0.4 的 `data-conversation-session` + `data-chat-turn` 作用域样式真正生成；没有 session 时仍保留 group-local 回退。
 - `styles.css`：
   - `[data-chat-group-key]:has(.dsh-output-assistant[data-output-conclusion])` 隐藏组头、强制组体可见，并隐藏同组 `[data-chat-flow-kind="tool-call"]` 与非最终 `[data-chat-flow-kind="assistant-step"]`。
   - 在隐藏规则后追加例外：`[data-chat-flow-kind="tool-call"]:has(.dsh-output-websearch)` 恢复 `display: block`；只恢复搜索行，其他工具继续隐藏。WebSearchRow 自身默认 `open=false`，所以恢复的只是胶囊，不自动展开。
@@ -57,13 +58,14 @@
 ## 7. 验收
 
 - 单步 Turn：settle 后只剩答复；不出现“查看过程/已思考”行；普通工具行隐藏；web_search 胶囊保留且默认折叠，点击可展开来源。
-- 多步 Turn：只保留 `answerStep` 的最终答案；其他步骤和普通工具隐藏，且没有过程按钮；web_search 胶囊保留。
+- 含 tool-call 的最终步骤（宿主 `answerStep=null`）：Turn 关闭后仍进入结论态，只保留最终答复和普通工具/思考隐藏。
+- 多步 Turn：只保留 `answerStep` 或最后一 step 回退认定的最终答案；其他步骤和普通工具隐藏，且没有过程按钮；web_search 胶囊保留。
 - 运行中：同一组只出现一个“已思考”行；中断：仍显示一个思考行，不进入结论态。
 - 非 cards 布局：行为不变，思考完整展示。
 - 切换布局、停用插件：原生工具/步骤恢复。
 - 组件级 jsdom 测试验证根标记、无过程按钮/思考行、运行/中断/非最终/非 cards 分支；浏览器静态 DOM 验证分组隐藏、单思考行去重和布局切换。
 
-当前验证：0.2.3 的 131 项测试、双端 typecheck、隔离构建和浏览器 mock 分组 DOM 通过；结论态组头 none、组体 block、web_search 行 block、普通工具 none、非最终步骤 none、最终答复 block，胶囊初始 `aria-expanded=false` 且 body hidden。0.2.1 的实际页面结论行为已由用户确认；0.2.3 的搜索默认折叠/结论保留来源仍需真实页面复核。
+当前验证：1.0.6 已新增 0.2.2-rc.3 `answerStep=null` 回退与 session 注入的组件测试；双端 typecheck、147 项测试和构建通过。用户已在 0.2.1 实际页面确认早期结论行为；1.0.6 的最新宿主页面仍需安装并重载后复核。
 
 ## 8. 风险
 
@@ -72,3 +74,4 @@
 - `:has()` 需要宿主 Chromium；DSH Web 已使用该选择器。
 - 这是“只留结论”的产品选择；如果以后要恢复过程回看，需要重新增加显式入口，不能用隐藏状态假装可访问。
 - 旧宿主没有 `turn-process` 投影时保持原简洁行为，不猜测最终答案。
+- 0.2.2-rc.3 的 `answerStep=null` 回退依赖 Turn 已关闭和最后一个 assistant-step；如果宿主把最终答复合并到含 tool-call 的非最后步骤，回退不会命中，需要按真实 DOM 再调整。

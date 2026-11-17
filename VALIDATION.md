@@ -1,3 +1,11 @@
+## 2026-11-17 · 1.0.6 最新宿主含工具最终步骤回退
+
+- 核对宿主 DSH 0.2.2-rc.3 的 `turn-process` 源码：`latestAnswer` 只接受最后一个 Assistant step 的 `finalNode` 且该 step 不含 tool-call；否则 `answerStep` 为 null。1.0.5 的结论判定只认 `answerStep === data.step`，因此含工具调用的最终步骤不会写 `data-output-conclusion`，插件强制展开的宿主折叠组继续显示所有运行命令和思考行。
+- 修复：Turn 已关闭、`answerStep === null`、当前步是 `turn.steps` 最后一个 assistant-step 且 `data.finalNode` 存在时，回退认定最终答案；`injectOutput` 同时注入宿主 sessionId，使 1.0.4 的 `data-conversation-session` + `data-chat-turn` 作用域结论 CSS 真正生成，group-local CSS 保留为回退。
+- 新增回归：最终步骤含 tool-call 且 `answerStep=null` 时仍进入结论态，思考行不渲染、只保留答复。既有 146 项测试全部通过，共 11 个文件、147 项；Host/Client TypeScript 检查通过。构建 `lib/client.js` 102,630 bytes，SHA-256 `cd74221446ec517dd2ff8058a47eba80215663f7eb3e993da24435bee4f0bdee`。
+- 打包 `missher-dsh-output-renderer-1.0.6.tgz`（55,449 bytes，SHA-256 `2e6bb9dd0bd9923e65748317d49a4eb5d1f343537d9276398ce7c6b34fb0db51`）；desktop profile 已从 1.0.5 升到 1.0.6，安装后 `lib/client.js` 哈希 `cd74221446ec517dd2ff8058a47eba80215663f7eb3e993da24435bee4f0bdee`；旧 1.0.5 备份在 `~/.dsh/backups/output-renderer-1.0.5-20261117-181218`。
+- 限制：本轮先在源码/组件层验证；真实 DSH 0.2.2-rc.3 页面需要安装 1.0.6 后重载并观察含工具调用的完成回合。若宿主仍不生成结论标记，需按真实 DOM/turn 投影再调整。
+
 ## 2026-11-17 · 1.0.5 文件引用右键菜单透传
 
 - 修复 0.2.2-rc.3 原生文件菜单参数未贯通的问题：Assistant 从可选公开菜单 hook 获取触发器，注册层将其交给 chatFileMentions.forClosing；文件地址跟随宿主当前工作目录并保留会话目录回退。

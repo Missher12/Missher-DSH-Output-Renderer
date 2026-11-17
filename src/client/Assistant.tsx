@@ -19,6 +19,8 @@ type FileMentions = (owner: Parameters<ChatNodeViewProps<'assistant-step'>['file
 export interface OutputInjected {
   hooks: { outputPreferences: ObservableSnapshot<ReturnType<PreferencesController['store']['getSnapshot']>> }
   outputText: Translate
+  /** Viewed Session injected by the host; drives turn-scoped conclusion CSS. */
+  sessionId?: string
   /** Newer Chat owners expose this through the deliverables service, rather than common props. */
   fileMentions?: FileMentions
   resolveFilePath?: (path: string) => string
@@ -91,6 +93,12 @@ export const Assistant = memo(function Assistant({ node, groupPart, sessionId, u
   const turn = node.location.kind === 'turn' || node.location.kind === 'step' ? node.location.turn : undefined
   const tail = useTurnData('turn-tail')
   const turnProcess = useTurnData('turn-process')
+  const finalStep = turn?.steps.at(-1)?.data.get('assistant-step')
+  // DSH 0.2.2-rc.3 publishes answerStep=null when the final Assistant step contains a tool-call
+  // block. The closed Turn's last Assistant step is still the host-owned final answer boundary.
+  const finalAnswer = turnProcess?.answerStep === data.step
+    || (turnProcess !== undefined && turnProcess.answerStep === null
+      && turn?.status === 'closed' && data.finalNode !== undefined && finalStep?.step === data.step)
   const owner = useMemo<TurnTailOwnerProps | undefined>(() => {
     if (turn?.status !== 'closed' || !data.finalNode || tail?.closing?.finalNode.seq !== data.finalNode.seq) return undefined
     return { turn, seq: data.finalNode.seq, openFile }
@@ -163,7 +171,6 @@ export const Assistant = memo(function Assistant({ node, groupPart, sessionId, u
     : block.kind !== 'reasoning' && block.kind !== 'tool-call')
   // A settled final answer keeps only the answer. `turn-process` is the host's own final-answer
   // boundary; without it, keep the previous concise behavior instead of guessing.
-  const finalAnswer = turnProcess?.answerStep === data.step
   const conclusion = concise && data.status === 'settled' && hasResponse && finalAnswer
   // Exactly one interruption notice. The fold row owns it only when the reasoning itself was the
   // last real block of an interrupted step — the same phase test as `reasoningActive`, not "no answer

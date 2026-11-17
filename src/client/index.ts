@@ -129,6 +129,7 @@ export function apply(ctx: Context): void {
       } } } | undefined
     } | undefined : undefined
     return { hooks: { outputPreferences: controller.store }, outputText,
+      ...(sessionId !== undefined ? { sessionId } : {}),
       // Newer Chat owners keep this face on the native Assistant registration. A shadow
       // owns its own registration, so bind the public service to this session too.
       ...(sessionId !== undefined && typeof service?.forClosing === 'function'

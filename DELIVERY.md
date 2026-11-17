@@ -1,7 +1,7 @@
-# Output Renderer 1.0.0
+# Output Renderer 1.0.6
 
-2026-11-05：源码、预构建 lib 和 v1.0.0 Git 标签交付。GitHub Release 与本机安装不在本轮范围内；此前正式安装包仍为 v0.2.3。
+2026-11-17：修复 DSH 0.2.2-rc.3 中含工具调用的最终步骤不进入结论态的问题。Turn 关闭后按最后一个 assistant-step 与宿主 `finalNode` 回退，完成态隐藏工具、思考和其他步骤，只保留最终答复；sessionId 注入确保会话/Turn 作用域 CSS 生效。
 
-搜索结果只生成需要显示的回退正文，超出显示上限后停止处理后续块；来源展开/收起移除一次多余渲染并保留键盘焦点行为。四种布局和搜索来源样式沿用现有实现。
+安装包 SHA-256：`2e6bb9dd0bd9923e65748317d49a4eb5d1f343537d9276398ce7c6b34fb0db51`，55,449 bytes；运行件 `lib/client.js` SHA-256 `cd74221446ec517dd2ff8058a47eba80215663f7eb3e993da24435bee4f0bdee`，102,630 bytes。桌面 profile 已安装 1.0.6，旧 1.0.5 备份在 `~/.dsh/backups/output-renderer-1.0.5-20261117-181218`。
 
-验证：双端 TypeScript 检查、11 个测试文件 134 项、隔离构建通过。新增用例覆盖跳过无用正文、截断后停止读取、空块与精确边界。真实 DSH 页面未复测；此前 rc.4 的一次设置保存失败根因尚未定位。
+验证：双端 TypeScript 检查、11 个测试文件 147 项、构建通过；新增测试覆盖 `answerStep=null` 的含工具最终步骤。真实 DSH 0.2.2-rc.3 页面需重载后复核；旧布局证据和未验证边界见 [VALIDATION.md](./VALIDATION.md)。

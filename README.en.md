@@ -4,16 +4,16 @@
 
 [简体中文](./README.md) · [Prebuilt downloads](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [Desktop app](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [Issues](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **1.0.5**. This removable UI plugin requires an existing DSH host.
+Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **1.0.6**. This removable UI plugin requires an existing DSH host.
 
 `1.0.0` optimizes search-result processing and source expansion while keeping these output-surface features:
 
 - **Web search source cards**: a root `web_search` call shows a source pill that is collapsed by default; click to expand three cards plus "more sources", then expand to all. It reads only persisted `meta.sources`, adds no search backend and fetches no favicons. Hosts without `tool.call.toolview` keep the native row; `web_fetch` and PTC child calls keep the generic presentation.
 - **Concise conclusion mode**: after the final answer step settles, Concise conversation keeps only the final answer and no process control. Thinking, ordinary tool rows and other steps in the same group are hidden, but the `web_search` source pill remains available, collapsed by default and expandable on click. While running, the process remains visible with at most one "Thought" row per group; interrupted and the other three layouts keep their previous behavior.
 
-Current release **1.0.5** restores native context menus for file references on newer hosts, preserving file clicks, current-working-directory resolution and the legacy host path. It retains the layout compatibility fixes from 1.0.4. Download [v1.0.5](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.5); see [VALIDATION.md](./VALIDATION.md) for the verification scope.
+Current release **1.0.6** fixes DSH 0.2.2-rc.3 turns whose final Assistant step contains tool calls: once the Turn is closed, the last Assistant step and the host `finalNode` are used as the answer boundary, so tools, thinking and other steps are hidden and only the final answer remains. Download [v1.0.6](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.6); see [VALIDATION.md](./VALIDATION.md) for the verification scope.
 
-1.0.0 passed host/client type checks, 134 tests in 11 files and an isolated build. Valid root searches skip unused raw result content; fallback text stops processing later blocks once it exceeds the 4,000-character display limit. Source expansion uses a focus ref to avoid an extra render just to clear focus state. The actual DSH page and installation were not re-tested this round; see [VALIDATION.md](./VALIDATION.md) for historical evidence.
+1.0.0 passed host/client type checks, 134 tests in 11 files and an isolated build; 1.0.5 raised this to 146 tests and 1.0.6 to 147, including the DSH 0.2.2-rc.3 fallback test. Valid root searches skip unused raw result content; fallback text stops processing later blocks once it exceeds the 4,000-character display limit. Source expansion uses a focus ref to avoid an extra render just to clear focus state. The actual DSH page and installation were not re-tested this round; see [VALIDATION.md](./VALIDATION.md) for historical evidence.
 
 The two screenshots below are retained from 0.1.3 and show the settings entry and process layout. The Soft cards option shown there has since been replaced.
 
@@ -68,6 +68,7 @@ It reads existing assistant content for display, creates no separate session dat
 
 | Scope | Evidence and limits |
 | --- | --- |
+| Current version `1.0.6` | 147 tests, host/client type checks and build passed; adds a fallback for DSH 0.2.2-rc.3 final steps containing tool calls. Actual host-page acceptance remains pending after installation. |
 | Previous version `1.0.0` | Host/client type checks, 134 tests and an isolated build passed; no installation or real DSH page acceptance in this round. |
 | Local DSH `0.2.1-rc.4` (historical) | 0.2.3: host/client type checks, 131 tests, isolated build and mock group-DOM conclusion/single-thinking/retained-search checks passed; `tool.call.toolview` and the `turn-process` projection are implemented against this version's contract. Installed in the local `desktop` profile (0.2.3); conclusion behavior was confirmed on 0.2.1; the 0.2.3 collapsed search and retained sources were not separately re-tested in the real page. |
 | Installed community `0.2.1-rc.2` | 0.1.4: disclosure, in-flight choice retention, real state/interruption, native tools/images, settings preview/save/refresh/failure rollback, dark narrow layout and disable restoration on isolated synthetic data. |
