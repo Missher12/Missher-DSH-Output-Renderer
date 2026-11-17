@@ -4,6 +4,7 @@ import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type { ConfigForm } from '@deepseek-ai/dsh-client-ui-settings/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-chat/client'
+import { resolveWorkspacePath } from '@deepseek-ai/dsh-util-workspace-path'
 import { ENTRY_ID, PACKAGE_ID, type Preferences } from '../preferences.ts'
 import { createPreferences, type PreferencesController } from './settings.ts'
 import { Assistant, type OutputInjected } from './Assistant.tsx'
@@ -119,13 +120,25 @@ export function apply(ctx: Context): void {
   const injectOutput = (sessionId?: string): OutputInjected => {
     type Mentions = NonNullable<OutputInjected['fileMentions']>
     const service = typeof ctx.get === 'function' ? ctx.get('chatFileMentions') as {
-      forClosing?: (owner: Parameters<Mentions>[0], sessionId: string) => ReturnType<Mentions>
+      forClosing?: (owner: Parameters<Mentions>[0], sessionId: string, getFileTriggerProps?: Parameters<Mentions>[1]) => ReturnType<Mentions>
+    } | undefined : undefined
+    const sessions = typeof ctx.get === 'function' ? ctx.get('sessions') as {
+      list: { getSnapshot(): { byId: Record<string, { cwd?: string } | undefined> } }
+      binding(id: string): { session: { projections: {
+        faceOf(key: 'workingDirectory'): { getSnapshot(): string | undefined }
+      } } } | undefined
     } | undefined : undefined
     return { hooks: { outputPreferences: controller.store }, outputText,
       // Newer Chat owners keep this face on the native Assistant registration. A shadow
       // owns its own registration, so bind the public service to this session too.
       ...(sessionId !== undefined && typeof service?.forClosing === 'function'
-        ? { fileMentions: owner => service.forClosing!(owner, sessionId) } : {}),
+        ? { fileMentions: (owner, trigger) => trigger
+          ? service.forClosing!(owner, sessionId, trigger) : service.forClosing!(owner, sessionId) } : {}),
+      ...(sessionId !== undefined && sessions ? { resolveFilePath: (path: string) => {
+        const cwd = sessions.list.getSnapshot().byId[sessionId]?.cwd
+        const current = sessions.binding(sessionId)?.session.projections.faceOf('workingDirectory').getSnapshot()
+        return resolveWorkspacePath(current ?? cwd, path)
+      } } : {}),
     }
   }
   // The takeover marker shares the assistant declaration's lifetime: `slots.inject` runs this once

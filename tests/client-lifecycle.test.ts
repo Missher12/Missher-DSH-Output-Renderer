@@ -24,6 +24,7 @@ interface Overrides {
   /** Replaces what `configForms.get()` resolves, including `undefined` for "no form at all". */
   form?: unknown
   chatFileMentions?: unknown
+  sessions?: unknown
 }
 
 /**
@@ -104,7 +105,7 @@ function host(overrides: Overrides = {}) {
 
   const faces: Record<string, unknown> = {
     effect: installEffect,
-    get: (name: string) => name === 'chatFileMentions' ? overrides.chatFileMentions : undefined,
+    get: (name: string) => overrides[name as keyof Overrides],
     slots,
     locale: { register: () => () => {}, bind: () => (key: string) => key },
     configForms: { get: () => 'form' in overrides ? overrides.form : form },
@@ -203,6 +204,30 @@ test('legacy hosts keep their common fileMentions prop when no deliverables serv
   created.declare('conversation.chat.node')
   const registration = created.registrations.find(entry => entry.key === 'assistant-step')!
   expect(registration.inject!('synthetic-legacy-host')).not.toHaveProperty('fileMentions')
+})
+
+test('the assistant registration forwards native file menu triggers to the deliverables service', () => {
+  const forClosing = vi.fn(() => undefined)
+  const created = boot({ chatFileMentions: { forClosing } })
+  created.declare('conversation.chat.node')
+  const injected = created.registrations.find(entry => entry.key === 'assistant-step')!.inject!('menu-session')
+  const owner = {} as Parameters<NonNullable<OutputInjected['fileMentions']>>[0]
+  const trigger = () => ({ onContextMenu: vi.fn() })
+  injected.fileMentions!(owner, trigger)
+  expect(forClosing).toHaveBeenCalledWith(owner, 'menu-session', trigger)
+})
+
+test('file menu paths follow the current working directory and fall back to the session directory', () => {
+  let current: string | undefined = '/synthetic/current'
+  const created = boot({ sessions: {
+    list: { getSnapshot: () => ({ byId: { 'path-session': { cwd: '/synthetic/original' } } }) },
+    binding: () => ({ session: { projections: { faceOf: () => ({ getSnapshot: () => current }) } } }),
+  } })
+  created.declare('conversation.chat.node')
+  const injected = created.registrations.find(entry => entry.key === 'assistant-step')!.inject!('path-session')
+  expect(injected.resolveFilePath!('report.md')).toBe('/synthetic/current/report.md')
+  current = undefined
+  expect(injected.resolveFilePath!('report.md')).toBe('/synthetic/original/report.md')
 })
 
 test('a preset document value is restored instead of assumed absent', () => {

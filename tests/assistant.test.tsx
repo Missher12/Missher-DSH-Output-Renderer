@@ -51,6 +51,27 @@ test('a closed answer survives a Host that no longer supplies the legacy fileMen
   expect(html).toContain('完整的最终答复。')
 })
 
+test('a closing answer supplies a native menu trigger for the resolved file and current session', () => {
+  const value = props('cards', [{ kind: 'text', text: 'report.md' }], 'settled', true)
+  let target: (() => unknown) | undefined
+  const contextMenuProps = { onContextMenu: vi.fn() }
+  const getTriggerProps = vi.fn((resolve: () => unknown) => { target = resolve; return contextMenuProps })
+  let received: unknown
+  const fileMentions = (_owner: unknown, trigger?: (path: string) => unknown) => {
+    received = trigger?.('report.md')
+    return undefined
+  }
+  renderToStaticMarkup(<Assistant {...value} {...{
+    useContextMenu: () => ({ getTriggerProps }),
+    resolveFilePath: (path: string) => `/synthetic/current-workspace/${path}`,
+    fileMentions,
+  }} />)
+  expect(received).toBe(contextMenuProps)
+  expect(target?.()).toEqual({ kind: 'file', value: {
+    sessionId: 'synthetic-output-test', path: '/synthetic/current-workspace/report.md',
+  } })
+})
+
 test.each(LAYOUTS)('%s identifies a reasoning-only interruption exactly once', layout => {
   const html = renderToStaticMarkup(<Assistant {...props(layout, [{ kind: 'reasoning', text: '保留已经收到的思考。' }])} groupPart="reasoning" />)
   expect(html).toContain('保留已经收到的思考。')

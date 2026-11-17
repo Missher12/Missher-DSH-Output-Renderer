@@ -4,14 +4,14 @@
 
 [简体中文](./README.md) · [Prebuilt downloads](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [Desktop app](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [Issues](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **1.0.4**. This removable UI plugin requires an existing DSH host.
+Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **1.0.5**. This removable UI plugin requires an existing DSH host.
 
 `1.0.0` optimizes search-result processing and source expansion while keeping these output-surface features:
 
 - **Web search source cards**: a root `web_search` call shows a source pill that is collapsed by default; click to expand three cards plus "more sources", then expand to all. It reads only persisted `meta.sources`, adds no search backend and fetches no favicons. Hosts without `tool.call.toolview` keep the native row; `web_fetch` and PTC child calls keep the generic presentation.
 - **Concise conclusion mode**: after the final answer step settles, Concise conversation keeps only the final answer and no process control. Thinking, ordinary tool rows and other steps in the same group are hidden, but the `web_search` source pill remains available, collapsed by default and expandable on click. While running, the process remains visible with at most one "Thought" row per group; interrupted and the other three layouts keep their previous behavior.
 
-Current release **1.0.4** restores custom output layouts when newer host interfaces would otherwise fall back to native rendering, while preserving layout preferences and file actions. The same installer was checked on an isolated DSH **0.2.1-rc.4** Web host with synthetic local content and the daily **0.2.2-rc.3** host with an existing conversation. Download it from [v1.0.4](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.4); see [VALIDATION.md](./VALIDATION.md) for the test scope.
+Current release **1.0.5** restores native context menus for file references on newer hosts, preserving file clicks, current-working-directory resolution and the legacy host path. It retains the layout compatibility fixes from 1.0.4. Download [v1.0.5](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.5); see [VALIDATION.md](./VALIDATION.md) for the verification scope.
 
 1.0.0 passed host/client type checks, 134 tests in 11 files and an isolated build. Valid root searches skip unused raw result content; fallback text stops processing later blocks once it exceeds the 4,000-character display limit. Source expansion uses a focus ref to avoid an extra render just to clear focus state. The actual DSH page and installation were not re-tested this round; see [VALIDATION.md](./VALIDATION.md) for historical evidence.
 

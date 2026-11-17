@@ -1,6 +1,6 @@
 /** Replace only the public assistant-step seat; all other native seats remain. */
 import { Fragment, memo, useMemo } from 'react'
-import type { ReactNode } from 'react'
+import type { HTMLAttributes, ReactNode } from 'react'
 import type { InjectFace } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ObservableSnapshot } from '@deepseek-ai/dsh-client-store'
 import type { ChatNodeViewProps, TurnTailOwnerProps } from '@deepseek-ai/dsh-client-ui-chat/client'
@@ -12,11 +12,16 @@ import { StreamMarkdown } from './stream.tsx'
 import { StepLabel } from './StepLabel.tsx'
 import { ThinkingDisclosure, useThinkingOpen, type ThinkingStatus } from './Thinking.tsx'
 
+export type FileMenuTrigger = (path: string) => HTMLAttributes<HTMLElement>
+type FileMentions = (owner: Parameters<ChatNodeViewProps<'assistant-step'>['fileMentions']>[0],
+  getFileTriggerProps?: FileMenuTrigger) => ReturnType<ChatNodeViewProps<'assistant-step'>['fileMentions']>
+
 export interface OutputInjected {
   hooks: { outputPreferences: ObservableSnapshot<ReturnType<PreferencesController['store']['getSnapshot']>> }
   outputText: Translate
   /** Newer Chat owners expose this through the deliverables service, rather than common props. */
-  fileMentions?: ChatNodeViewProps<'assistant-step'>['fileMentions']
+  fileMentions?: FileMentions
+  resolveFilePath?: (path: string) => string
 }
 type ChatProps = ChatNodeViewProps<'assistant-step'> & InjectFace<OutputInjected>
 /** Image group currency the running Chat owner hands down; identical in both supported hosts. */
@@ -37,9 +42,13 @@ type SharedGalleryCall = (
   options: { fallback: ReactNode },
 ) => ReactNode
 type Props = Omit<ChatProps, 'fileMentions'> & {
-  fileMentions?: ChatNodeViewProps<'assistant-step'>['fileMentions']
+  fileMentions?: FileMentions
   renderFactorySlot?: unknown
   sessionId?: string
+  /** Optional public hook added after the pinned development SDK. */
+  useContextMenu?: () => { getTriggerProps: (target: () => {
+    kind: 'file'; value: { sessionId: string; path: string }
+  }) => HTMLAttributes<HTMLElement> }
 }
 
 /** A Turn can span several process groups, separated by questions or steering input. */
@@ -56,8 +65,13 @@ ${row}[data-chat-group-key] > [data-step-process-body] { display: block !importa
 }
 
 export const Assistant = memo(function Assistant({ node, groupPart, sessionId, useTurnData, openFile, renderMessageImages,
-  renderFactorySlot, loadImage, fileMentions, useOutputPreferences, outputText, t }: Props) {
+  renderFactorySlot, loadImage, fileMentions, resolveFilePath, useContextMenu, useOutputPreferences, outputText, t }: Props) {
   const { motion, layout, density, textSize } = useOutputPreferences(state => state.value)
+  const getTriggerProps = useContextMenu?.().getTriggerProps
+  const getFileTriggerProps = useMemo<FileMenuTrigger | undefined>(() =>
+    getTriggerProps && resolveFilePath && sessionId ? path => getTriggerProps(() => ({
+      kind: 'file', value: { sessionId, path: resolveFilePath(path) },
+    })) : undefined, [getTriggerProps, resolveFilePath, sessionId])
   const data = node.data
   const running = data.status === 'running'
   // Only the final block can still grow. Earlier blocks are closed by the block after them,
@@ -81,7 +95,8 @@ export const Assistant = memo(function Assistant({ node, groupPart, sessionId, u
     if (turn?.status !== 'closed' || !data.finalNode || tail?.closing?.finalNode.seq !== data.finalNode.seq) return undefined
     return { turn, seq: data.finalNode.seq, openFile }
   }, [turn, data.finalNode, tail, openFile])
-  const mentions = useMemo(() => owner && typeof fileMentions === 'function' ? fileMentions(owner) : undefined, [owner, fileMentions])
+  const mentions = useMemo(() => owner && typeof fileMentions === 'function' ? fileMentions(owner, getFileTriggerProps) : undefined,
+    [owner, fileMentions, getFileTriggerProps])
   const labels = useMemo(() => ({ code: { copyLabel: t('copy'), copiedLabel: t('copied'),
     toolbarLabels: { codeLabel: t('codeBlock.title'), wrapLabel: t('codeBlock.wrap'), unwrapLabel: t('codeBlock.unwrap') } },
     footnotes: t('markdown.footnotes') }), [t])
