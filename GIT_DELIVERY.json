@@ -3,7 +3,7 @@
   "date": "2026-11-17",
   "sourceRepository": "Missher12/Missher-DSH-Output-Renderer",
   "sourceBaseCommit": "392ebd3",
-  "status": "source, package and desktop 1.0.6 prepared; GitHub Release and real-page confirmation pending",
+  "status": "GitHub Release v1.0.6 published; desktop profile 1.0.6 installed; actual page re-test pending",
   "runtimeFiles": [
     {
       "path": "lib/index.js",
@@ -70,7 +70,7 @@
   "sha256": "2e6bb9dd0bd9923e65748317d49a4eb5d1f343537d9276398ce7c6b34fb0db51",
   "bytes": 55449,
   "members": 10,
-  "published": false,
+  "published": true,
   "release": null,
   "installation": {
     "profile": "desktop",
@@ -112,7 +112,27 @@
       "pageReloaded": false,
       "hostRestarted": false,
       "webUiVerified": false
-    }
+    },
+    "releaseCommit": "74b351a",
+    "downloadUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.6/missher-dsh-output-renderer-1.0.6.tgz",
+    "checksumUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.6/SHA256SUMS",
+    "releaseAssets": [
+      {
+        "name": "missher-dsh-output-renderer-1.0.6.tgz",
+        "id": 758560688,
+        "size": 55449,
+        "digest": "sha256:2e6bb9dd0bd9923e65748317d49a4eb5d1f343537d9276398ce7c6b34fb0db51",
+        "state": "uploaded"
+      },
+      {
+        "name": "SHA256SUMS",
+        "id": 758560835,
+        "size": 104,
+        "digest": "sha256:1194aeef7f6cb610622ad96043ac5744dd8918f727a0e4b4be41c4174883f022",
+        "state": "uploaded"
+      }
+    ],
+    "releaseVerification": "Release HTTP 201, draft=false; both assets uploaded; public URL re-download matched sha256 2e6bb9dd0bd9923e65748317d49a4eb5d1f343537d9276398ce7c6b34fb0db51, size 55449."
   },
   "previousSourceCandidate": {
     "version": "1.0.0",
@@ -343,11 +363,26 @@
     ],
     "releaseVerification": "Public release draft=false, prerelease=false; both assets uploaded; re-downloaded tgz sha256 matches fd24c6cd...; size 49708."
   },
-  "releaseCommit": null,
-  "downloadUrl": null,
-  "checksumUrl": null,
-  "releaseAssets": [],
-  "releaseVerification": null,
+  "releaseCommit": "74b351a",
+  "downloadUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.6/missher-dsh-output-renderer-1.0.6.tgz",
+  "checksumUrl": "https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.6/SHA256SUMS",
+  "releaseAssets": [
+    {
+      "name": "missher-dsh-output-renderer-1.0.6.tgz",
+      "id": 758560688,
+      "size": 55449,
+      "digest": "sha256:2e6bb9dd0bd9923e65748317d49a4eb5d1f343537d9276398ce7c6b34fb0db51",
+      "state": "uploaded"
+    },
+    {
+      "name": "SHA256SUMS",
+      "id": 758560835,
+      "size": 104,
+      "digest": "sha256:1194aeef7f6cb610622ad96043ac5744dd8918f727a0e4b4be41c4174883f022",
+      "state": "uploaded"
+    }
+  ],
+  "releaseVerification": "Release HTTP 201, draft=false; both assets uploaded; public URL re-download matched sha256 2e6bb9dd0bd9923e65748317d49a4eb5d1f343537d9276398ce7c6b34fb0db51, size 55449.",
   "previousRelease": {
     "version": "0.2.3",
     "date": "2026-11-03",

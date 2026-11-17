@@ -1,6 +1,6 @@
 # 当前维护：1.0.6 最新宿主结论回退
 
-2026-11-17：针对 DSH 0.2.2-rc.3 修复完成回合不收起的问题。宿主在最终 assistant-step 含 tool-call 时把 `turn-process.answerStep` 置为 null；1.0.6 在 Turn 已关闭、当前步是 `turn.steps` 最后一个 assistant-step 且 `data.finalNode` 存在时回退判定最终答案；同时把宿主 sessionId 注入组件，使会话/Turn 作用域结论 CSS 生成。双端 typecheck、147 项测试和构建通过；`lib/client.js` 102,630 bytes，SHA-256 `cd74221446ec…`。GitHub Release v1.0.6 提供 tgz（55,449 bytes，SHA-256 `2e6bb9dd0bd9…`）与 SHA256SUMS；desktop profile 已安装 1.0.6（客户端哈希 `cd74221446ec…`），旧 1.0.5 备份在 `~/.dsh/backups/output-renderer-1.0.5-20261117-181218`。真实 0.2.2-rc.3 页面仍需重载后复核。
+2026-11-17：针对 DSH 0.2.2-rc.3 修复完成回合不收起的问题。宿主在最终 assistant-step 含 tool-call 时把 `turn-process.answerStep` 置为 null；1.0.6 在 Turn 已关闭、当前步是 `turn.steps` 最后一个 assistant-step 且 `data.finalNode` 存在时回退判定最终答案；同时把宿主 sessionId 注入组件，使会话/Turn 作用域结论 CSS 生成。双端 typecheck、147 项测试和构建通过；`lib/client.js` 102,630 bytes，SHA-256 `cd74221446ec…`。GitHub Release v1.0.6 提供 tgz（55,449 bytes，SHA-256 `2e6bb9dd0bd9…`）与 SHA256SUMS；desktop profile 已安装 1.0.6（客户端哈希 `cd74221446ec…`），旧 1.0.5 备份在 `~/.dsh/backups/output-renderer-1.0.5-20261117-181218`。GitHub Release 已公开，公共 URL 下载的 tgz 哈希与发布资产一致；真实 0.2.2-rc.3 页面仍需重载后复核。
 
 ## 历史：1.0.5 文件引用右键菜单透传
 
