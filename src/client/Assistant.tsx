@@ -15,6 +15,8 @@ import { ThinkingDisclosure, useThinkingOpen, type ThinkingStatus } from './Thin
 export interface OutputInjected {
   hooks: { outputPreferences: ObservableSnapshot<ReturnType<PreferencesController['store']['getSnapshot']>> }
   outputText: Translate
+  /** Newer Chat owners expose this through the deliverables service, rather than common props. */
+  fileMentions?: ChatNodeViewProps<'assistant-step'>['fileMentions']
 }
 type ChatProps = ChatNodeViewProps<'assistant-step'> & InjectFace<OutputInjected>
 /** Image group currency the running Chat owner hands down; identical in both supported hosts. */
@@ -34,7 +36,11 @@ type SharedGalleryCall = (
   props: { images: ImageGroup; loadImage: ChatProps['loadImage']; align: 'start' | 'end' },
   options: { fallback: ReactNode },
 ) => ReactNode
-type Props = ChatProps & { renderFactorySlot?: unknown; sessionId?: string }
+type Props = Omit<ChatProps, 'fileMentions'> & {
+  fileMentions?: ChatNodeViewProps<'assistant-step'>['fileMentions']
+  renderFactorySlot?: unknown
+  sessionId?: string
+}
 
 /** A Turn can span several process groups, separated by questions or steering input. */
 function conclusionStyles(sessionId: string, turn: number): string {
@@ -75,7 +81,7 @@ export const Assistant = memo(function Assistant({ node, groupPart, sessionId, u
     if (turn?.status !== 'closed' || !data.finalNode || tail?.closing?.finalNode.seq !== data.finalNode.seq) return undefined
     return { turn, seq: data.finalNode.seq, openFile }
   }, [turn, data.finalNode, tail, openFile])
-  const mentions = useMemo(() => owner ? fileMentions(owner) : undefined, [owner, fileMentions])
+  const mentions = useMemo(() => owner && typeof fileMentions === 'function' ? fileMentions(owner) : undefined, [owner, fileMentions])
   const labels = useMemo(() => ({ code: { copyLabel: t('copy'), copiedLabel: t('copied'),
     toolbarLabels: { codeLabel: t('codeBlock.title'), wrapLabel: t('codeBlock.wrap'), unwrapLabel: t('codeBlock.unwrap') } },
     footnotes: t('markdown.footnotes') }), [t])

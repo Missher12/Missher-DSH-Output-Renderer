@@ -116,7 +116,18 @@ export function apply(ctx: Context): void {
     document.head.append(style)
     return () => style.remove()
   })
-  const injectOutput = (): OutputInjected => ({ hooks: { outputPreferences: controller.store }, outputText })
+  const injectOutput = (sessionId?: string): OutputInjected => {
+    type Mentions = NonNullable<OutputInjected['fileMentions']>
+    const service = typeof ctx.get === 'function' ? ctx.get('chatFileMentions') as {
+      forClosing?: (owner: Parameters<Mentions>[0], sessionId: string) => ReturnType<Mentions>
+    } | undefined : undefined
+    return { hooks: { outputPreferences: controller.store }, outputText,
+      // Newer Chat owners keep this face on the native Assistant registration. A shadow
+      // owns its own registration, so bind the public service to this session too.
+      ...(sessionId !== undefined && typeof service?.forClosing === 'function'
+        ? { fileMentions: owner => service.forClosing!(owner, sessionId) } : {}),
+    }
+  }
   // The takeover marker shares the assistant declaration's lifetime: `slots.inject` runs this once
   // the declaration exists and disposes it when that declaration collapses, so a host without the
   // seat — or one that unloads it — keeps rendering its own native turn-process row.

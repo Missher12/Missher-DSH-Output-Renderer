@@ -43,6 +43,14 @@ function props(layout: Layout, blocks: Data['blocks'], status: Data['status'] = 
   }
 }
 
+test('a closed answer survives a Host that no longer supplies the legacy fileMentions prop', () => {
+  const value = props('cards', [{ kind: 'text', text: '完整的最终答复。' }], 'settled', true)
+  delete (value as { fileMentions?: unknown }).fileMentions
+  const html = renderToStaticMarkup(<Assistant {...value} groupPart="response" />)
+  expect(html).toContain('dsh-output-assistant')
+  expect(html).toContain('完整的最终答复。')
+})
+
 test.each(LAYOUTS)('%s identifies a reasoning-only interruption exactly once', layout => {
   const html = renderToStaticMarkup(<Assistant {...props(layout, [{ kind: 'reasoning', text: '保留已经收到的思考。' }])} groupPart="reasoning" />)
   expect(html).toContain('保留已经收到的思考。')

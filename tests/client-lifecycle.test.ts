@@ -23,6 +23,7 @@ interface Overrides {
   configForms?: unknown
   /** Replaces what `configForms.get()` resolves, including `undefined` for "no form at all". */
   form?: unknown
+  chatFileMentions?: unknown
 }
 
 /**
@@ -41,7 +42,7 @@ function host(overrides: Overrides = {}) {
   const waits = new Map<string, () => SlotInjectionEffect>()
   const contributions = new Map<string, (() => void)[]>()
   const registered: string[] = []
-  const registrations: { name: string; key?: string; priority?: number; locale?: string; inject?: () => OutputInjected }[] = []
+  const registrations: { name: string; key?: string; priority?: number; locale?: string; inject?: (sessionId?: string) => OutputInjected }[] = []
   let unloaded = false
 
   const form = {
@@ -86,7 +87,7 @@ function host(overrides: Overrides = {}) {
       effects.push(dispose)
       return dispose
     },
-    register: (options: { name: string; key?: string; priority?: number; locale?: string; inject?: () => OutputInjected }) => {
+    register: (options: { name: string; key?: string; priority?: number; locale?: string; inject?: (sessionId?: string) => OutputInjected }) => {
       registered.push(options.name)
       registrations.push(options)
       let live = true
@@ -103,6 +104,7 @@ function host(overrides: Overrides = {}) {
 
   const faces: Record<string, unknown> = {
     effect: installEffect,
+    get: (name: string) => name === 'chatFileMentions' ? overrides.chatFileMentions : undefined,
     slots,
     locale: { register: () => () => {}, bind: () => (key: string) => key },
     configForms: { get: () => 'form' in overrides ? overrides.form : form },
@@ -182,6 +184,25 @@ test('the marker follows the accepted layout for as long as the seat is live', (
   expect(document.documentElement.getAttribute(MARKER)).toBe('reader')
   created.sync({ value: { ...DEFAULTS, layout: 'cards' } })
   expect(document.documentElement.getAttribute(MARKER)).toBe('cards')
+})
+
+test('the assistant shadow binds the public deliverables service to its own session', () => {
+  const result = { resolve: vi.fn() }
+  const forClosing = vi.fn(() => result)
+  const created = boot({ chatFileMentions: { forClosing } })
+  created.declare('conversation.chat.node')
+  const registration = created.registrations.find(entry => entry.key === 'assistant-step')!
+  const injected = registration.inject!('synthetic-modern-host')
+  const owner = {} as Parameters<NonNullable<OutputInjected['fileMentions']>>[0]
+  expect(injected.fileMentions!(owner)).toBe(result)
+  expect(forClosing).toHaveBeenCalledWith(owner, 'synthetic-modern-host')
+})
+
+test('legacy hosts keep their common fileMentions prop when no deliverables service exists', () => {
+  const created = boot()
+  created.declare('conversation.chat.node')
+  const registration = created.registrations.find(entry => entry.key === 'assistant-step')!
+  expect(registration.inject!('synthetic-legacy-host')).not.toHaveProperty('fileMentions')
 })
 
 test('a preset document value is restored instead of assumed absent', () => {
