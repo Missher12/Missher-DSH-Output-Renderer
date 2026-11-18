@@ -5,11 +5,13 @@ import type { MarkdownFileMentions, MarkdownLabels, MarkdownPathImages } from '@
 import type { Motion } from '../preferences.ts'
 import { FrameText } from './frame-text.ts'
 
-function useReducedMotion(): boolean {
-  const query = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)'), [])
-  const [reduced, setReduced] = useState(query.matches)
+function useReducedMotion(running: boolean): boolean {
+  const query = useMemo(() => running ? window.matchMedia('(prefers-reduced-motion: reduce)') : null, [running])
+  const [reduced, setReduced] = useState(() => query?.matches ?? false)
   useLayoutEffect(() => {
+    if (!query) return
     const change = () => setReduced(query.matches)
+    change()
     query.addEventListener('change', change)
     return () => query.removeEventListener('change', change)
   }, [query])
@@ -51,7 +53,8 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
   text: string; running: boolean; motion: Motion; labels: MarkdownLabels
   mentions?: MarkdownFileMentions | undefined; pathImages?: MarkdownPathImages | undefined; compact?: boolean
 }) {
-  const reduced = useReducedMotion()
+  const reduced = useReducedMotion(running)
+  const fading = running && !reduced && motion === 'fade'
   const [shown, setShown] = useState(text)
   const controller = useRef<FrameText | null>(null)
   const content = useRef<HTMLDivElement>(null)
@@ -79,9 +82,10 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
     }
   }, [])
   useLayoutEffect(() => {
+    if (!running || reduced) return
     const visibility = () => {
       if (!document.hidden) {
-        if (running && !reduced && motion === 'fade' && content.current) {
+        if (fading && content.current) {
           previous.current = readableNodes(content.current).map(node => node.data).join('')
         }
         return
@@ -92,7 +96,7 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
     }
     document.addEventListener('visibilitychange', visibility)
     return () => document.removeEventListener('visibilitychange', visibility)
-  }, [running, motion, reduced, clearFade])
+  }, [running, reduced, fading, clearFade])
   useLayoutEffect(() => {
     controller.current?.update(text, running, motion, reduced || document.hidden)
   }, [text, running, motion, reduced])
@@ -101,7 +105,7 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
     const body = content.current
     const layer = overlay.current
     if (!body || !layer) return
-    if (!running || reduced || document.hidden || motion !== 'fade') {
+    if (!fading || document.hidden) {
       previous.current = null
       clearFade()
       return
@@ -154,26 +158,24 @@ export function StreamMarkdown({ text, running, motion, labels, mentions, pathIm
       offset = end
       if (count >= 64) break
     }
-  }, [shown, running, motion, reduced, clearFade])
+  }, [shown, fading, clearFade])
   useLayoutEffect(() => {
-    const retire = () => {
-      for (const [animation, shade] of [...active.current]) {
-        shade.remove()
-        animation.cancel()
-      }
-      active.current.clear()
-    }
-    let width = content.current?.getBoundingClientRect().width
-    const resize = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(entries => {
+    const body = content.current
+    if (!fading || !body) return
+    if (typeof ResizeObserver === 'undefined') return clearFade
+    let width = body.getBoundingClientRect().width
+    const resize = new ResizeObserver(entries => {
       const next = entries[0]?.contentRect.width
-      if (next === width) return
+      if (next === undefined || next === width) return
       width = next
-      retire()
-      overlay.current?.replaceChildren()
+      clearFade()
     })
-    if (content.current) resize?.observe(content.current)
-    return () => { resize?.disconnect(); retire() }
-  }, [])
+    resize.observe(body)
+    return () => {
+      resize.disconnect()
+      clearFade()
+    }
+  }, [fading, clearFade])
   return <div className="dsh-output-stream" data-output-motion={motion}>
     <div ref={content} data-output-text>
       <MarkdownText text={running && !reduced ? shown : text} streaming={running} labels={labels}

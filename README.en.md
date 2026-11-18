@@ -4,16 +4,16 @@
 
 [简体中文](./README.md) · [Prebuilt downloads](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [Desktop app](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [Issues](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`; the source version is **1.0.6**. This removable UI plugin requires an existing DSH host.
+Four assistant output layouts with full reasoning, independent tool details, and frame-synchronized or fading text for DeepSeek Harness. The package is `@missher/dsh-output-renderer`. This removable UI plugin requires an existing DSH host.
 
 `1.0.0` optimizes search-result processing and source expansion while keeping these output-surface features:
 
 - **Web search source cards**: a root `web_search` call shows a source pill that is collapsed by default; click to expand three cards plus "more sources", then expand to all. It reads only persisted `meta.sources`, adds no search backend and fetches no favicons. Hosts without `tool.call.toolview` keep the native row; `web_fetch` and PTC child calls keep the generic presentation.
 - **Concise conclusion mode**: after the final answer step settles, Concise conversation keeps only the final answer and no process control. Thinking, ordinary tool rows and other steps in the same group are hidden, but the `web_search` source pill remains available, collapsed by default and expandable on click. While running, the process remains visible with at most one "Thought" row per group; interrupted and the other three layouts keep their previous behavior.
 
-Current release **1.0.6** fixes DSH 0.2.2-rc.3 turns whose final Assistant step contains tool calls: once the Turn is closed, the last Assistant step and the host `finalNode` are used as the answer boundary, so tools, thinking and other steps are hidden and only the final answer remains. Download [v1.0.6](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.6); see [VALIDATION.md](./VALIDATION.md) for the verification scope.
+**1.0.7** limits streaming listeners to active replies and observes text width only while fade-in is enabled for an active reply. [v1.0.7 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.7) · [Validation notes](./VALIDATION.md)
 
-1.0.0 passed host/client type checks, 134 tests in 11 files and an isolated build; 1.0.5 raised this to 146 tests and 1.0.6 to 147, including the DSH 0.2.2-rc.3 fallback test. Valid root searches skip unused raw result content; fallback text stops processing later blocks once it exceeds the 4,000-character display limit. Source expansion uses a focus ref to avoid an extra render just to clear focus state. The actual DSH page and installation were not re-tested this round; see [VALIDATION.md](./VALIDATION.md) for historical evidence.
+1.0.6 fixed the conclusion layout in DSH 0.2.2-rc.3 when the final assistant step contains tool calls. See the test scope for earlier versions in [VALIDATION.md](./VALIDATION.md).
 
 The two screenshots below are retained from 0.1.3 and show the settings entry and process layout. The Soft cards option shown there has since been replaced.
 
@@ -42,9 +42,9 @@ Use **Settings → Output appearance** to choose the layout, 14/16 px text, comf
 
 ## Install, enable, disable and uninstall
 
-Use the prebuilt package from the [v0.2.3 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v0.2.3): [download tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.3/missher-dsh-output-renderer-0.2.3.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v0.2.3/missher-dsh-output-renderer-0.2.3.tgz.sha256). Check the installed version on each device against the downloaded asset. The installation steps below use the downloaded tgz directly and do not depend on npm package-name resolution.
+Install from the downloaded tgz and check that the installed version matches the asset. [v1.0.7 package](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.7/missher-dsh-output-renderer-1.0.7.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.7/SHA256SUMS)
 
-1. Download the chosen tgz and checksum file. Verify with `shasum -a 256 -c missher-dsh-output-renderer-0.2.3.tgz.sha256`.
+1. Download the chosen tgz and checksum file. Verify with `shasum -a 256 -c SHA256SUMS`.
 2. In the desktop app, open **Plugins → Add plugin**, enter the downloaded file's full path, then install and enable the plugin. Follow any reload prompt and open **Settings → Output appearance**.
 3. Turn the plugin's enable switch off in plugin management to disable it, or on to enable it again. Disabling restores native output rendering.
 4. Choose **Uninstall** on this plugin to remove it. To upgrade, use Update plugin in the current Missher desktop app and choose the new tgz. Back up the profile configuration and retain the old tgz first. If an older host lacks this action, use its supported replacement or reinstall flow and retain the configuration backup. A missing update button does not restrict the plugin to newer hosts; the host controls preference retention on uninstall.
@@ -52,7 +52,7 @@ Use the prebuilt package from the [v0.2.3 Release](https://github.com/Missher12/
 For a Web or custom profile, use the target host's official CLI and replace the profile name and file path:
 
 ```sh
-dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-0.2.3.tgz
+dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-1.0.7.tgz
 dsh plugin --profile my-web remove @missher/dsh-output-renderer
 ```
 
@@ -68,7 +68,7 @@ It reads existing assistant content for display, creates no separate session dat
 
 | Scope | Evidence and limits |
 | --- | --- |
-| Current version `1.0.6` | 147 tests, host/client type checks and build passed; adds a fallback for DSH 0.2.2-rc.3 final steps containing tool calls. Actual host-page acceptance remains pending after installation. |
+| Current version `1.0.7` | 148 tests, host and client type checks, and an isolated build. Completed replies release streaming listeners and retain the full text. |
 | Previous version `1.0.0` | Host/client type checks, 134 tests and an isolated build passed; no installation or real DSH page acceptance in this round. |
 | Local DSH `0.2.1-rc.4` (historical) | 0.2.3: host/client type checks, 131 tests, isolated build and mock group-DOM conclusion/single-thinking/retained-search checks passed; `tool.call.toolview` and the `turn-process` projection are implemented against this version's contract. Installed in the local `desktop` profile (0.2.3); conclusion behavior was confirmed on 0.2.1; the 0.2.3 collapsed search and retained sources were not separately re-tested in the real page. |
 | Installed community `0.2.1-rc.2` | 0.1.4: disclosure, in-flight choice retention, real state/interruption, native tools/images, settings preview/save/refresh/failure rollback, dark narrow layout and disable restoration on isolated synthetic data. |
@@ -81,7 +81,7 @@ It reads existing assistant content for display, creates no separate session dat
 
 The renderer uses `conversation.chat.node` / `assistant-step`, `settings.section`, native Markdown and file callbacks, and version-related chat DOM markers. Images prefer the Chat-provided `renderMessageImages` closure and otherwise use the host-published `conversation.images.content` Factory; when neither exists the answer shows an explicit note instead of dropping the picture. Before calling any host face it checks `slots.inject/register`, `locale.register/bind` and `configForms.get`, reports what is missing and leaves native output visible. The host supplies React, Schemastery and DSH client modules; development SDK links are excluded from the runtime package. Recheck these interfaces after host upgrades. If the settings entry is absent, check whether the plugin is enabled and inspect host loading errors.
 
-See [VALIDATION.md](./VALIDATION.md) for dated evidence. The 1.0.0 134 tests, type checks and isolated build are source/component evidence, not actual DSH Web UI acceptance. The 0.2.1 conclusion behavior has historical user confirmation; the 0.2.3 collapsed search and retained sources were not separately re-tested on the actual page. The earlier single settings-save failure on rc.4 remains unexplained.
+See the test environments and verification scope by version in [VALIDATION.md](./VALIDATION.md).
 
 ## Development and attribution
 

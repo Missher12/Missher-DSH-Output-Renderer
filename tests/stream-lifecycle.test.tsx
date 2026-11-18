@@ -89,8 +89,8 @@ afterEach(async () => {
   vi.unstubAllGlobals()
 })
 
-async function render(text: string) {
-  await act(async () => root?.render(<StreamMarkdown text={text} running motion="fade"
+async function render(text: string, running = true) {
+  await act(async () => root?.render(<StreamMarkdown text={text} running={running} motion="fade"
     labels={{ code: { copyLabel: 'Copy', copiedLabel: 'Copied', toolbarLabels: { codeLabel: 'Code', wrapLabel: 'Wrap', unwrapLabel: 'Unwrap' } }, footnotes: 'Footnotes' }} />))
 }
 
@@ -108,6 +108,37 @@ async function advanceFrame() {
     pending.forEach(callback => callback(16))
   })
 }
+
+test('settled replies neither start nor keep streaming listeners or resize observers', async () => {
+  const subscribe = vi.spyOn(document, 'addEventListener')
+  const unsubscribe = vi.spyOn(document, 'removeEventListener')
+  const media = vi.fn()
+  const stopMedia = vi.fn()
+  const query = vi.fn(() => ({ matches: false, addEventListener: media, removeEventListener: stopMedia }))
+  const observe = vi.fn()
+  const disconnect = vi.fn()
+  vi.stubGlobal('matchMedia', query)
+  vi.stubGlobal('ResizeObserver', class { observe = observe; disconnect = disconnect })
+
+  await render('已经完成的历史答复。', false)
+  expect(mount.querySelector('[data-output-text]')?.textContent).toBe('已经完成的历史答复。')
+  expect(query).not.toHaveBeenCalled()
+  expect(subscribe.mock.calls.some(([event]) => event === 'visibilitychange')).toBe(false)
+  expect(observe).not.toHaveBeenCalled()
+
+  await render('新的输出')
+  const visibility = subscribe.mock.calls.find(([event]) => event === 'visibilitychange')?.[1]
+  expect(visibility).toBeDefined()
+  expect(media).toHaveBeenCalledOnce()
+  expect(observe).toHaveBeenCalledOnce()
+  await render('新的输出结束。', false)
+  expect(unsubscribe).toHaveBeenCalledWith('visibilitychange', visibility)
+  expect(stopMedia).toHaveBeenCalledWith('change', media.mock.calls[0]?.[1])
+  expect(disconnect).toHaveBeenCalledOnce()
+  expect(frames.size).toBe(0)
+  expect(animations.size).toBe(0)
+  expect(mount.querySelector('[data-output-text]')?.textContent).toBe('新的输出结束。')
+})
 
 test('background output stays complete without fade work and foreground resumes on the new suffix', async () => {
   await render('初始文字')

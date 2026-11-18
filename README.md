@@ -4,16 +4,16 @@
 
 [English](./README.en.md) · [下载预构建包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases) · [桌面端](https://github.com/Missher12/Missher-DeepseekHarness-Desktop) · [问题反馈](https://github.com/Missher12/Missher-DSH-Output-Renderer/issues)
 
-为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **1.0.6**。这是可卸载的界面插件，需要已有 DSH 宿主。
+为 DeepSeek Harness 提供四种助手输出布局、可展开的思考内容，以及刷新率同步或新增文字淡入效果。包名为 `@missher/dsh-output-renderer`，源码版本 **1.0.7**。这是可卸载的界面插件，需要已有 DSH 宿主。
 
 `1.0.0` 优化搜索结果处理和来源展开，保留以下输出界面能力：
 
 - **Web 搜索来源卡片**：宿主 `web_search` 的根调用显示来源胶囊，默认折叠；点击展开 3 张来源卡片 + “还有 N 个来源”，可继续展开全部。只使用宿主已记录的 `meta.sources`，不抓取 favicon、不新增搜索后端。宿主没有 `tool.call.toolview` 时保留原生行，`web_fetch` 与 PTC 子调用不走富卡片。
 - **简洁对话结论模式**：最终答案步骤完成后只保留最终答复，不显示“查看过程”；思考、普通工具行和同组中间步骤收起，但 **web_search 来源胶囊保留且默认折叠**，点击仍可展开来源网页。运行中仍显示过程，但同一组只保留一个“已思考”行；中断和其他三种布局保持原行为。
 
-当前发布 **1.0.6** 修复 DSH 0.2.2-rc.3 中含工具调用的最终步骤不进入结论态的问题：Turn 关闭后按最后一个 assistant-step 与宿主 `finalNode` 回退，完成态隐藏工具/思考/其他步骤，只保留最终答复。安装包见 [v1.0.6 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.6)；验证范围见 [VALIDATION.md](./VALIDATION.md)。
+**1.0.7** 将流式输出的监听限制在答复生成期间。结束后立即释放监听，淡入模式才观察正文宽度。[v1.0.7 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.7) · [验证记录](./VALIDATION.md)
 
-1.0.0 通过两端类型检查、11 个测试文件的 134 项测试和隔离构建；1.0.5 增至 146 项，1.0.6 增至 147 项并新增 DSH 0.2.2-rc.3 回退测试。正常搜索不再读取未使用的原始结果；回退文本超出 4,000 字符显示上限后停止处理后续块；来源展开与收起使用焦点引用，避免为清除焦点状态再渲染一次。真实 DSH 页面及安装状态本轮未复测；历史记录见 [VALIDATION.md](./VALIDATION.md)。
+1.0.6 修复了 DSH 0.2.2-rc.3 在最终助手步骤含工具调用时的结论显示。其他版本的验证范围见 [VALIDATION.md](./VALIDATION.md)。
 
 下面两张图片保留自0.1.3，展示设置入口和“深想简答”布局；其中“柔和卡片”现已替换。
 
@@ -42,7 +42,7 @@
 
 ## 安装、启停与卸载
 
-推荐使用 [v1.0.6 Release](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/tag/v1.0.6) 的预构建包：[直接下载 tgz](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.6/missher-dsh-output-renderer-1.0.6.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.6/SHA256SUMS)。下列安装流程使用下载的 tgz 文件，不依赖 npm 包名解析。各设备请核对已安装版本与所下载资产。
+下列安装流程使用下载的 tgz 文件。各设备请核对已安装版本与所下载资产。[v1.0.7 安装包](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.7/missher-dsh-output-renderer-1.0.7.tgz) · [SHA256](https://github.com/Missher12/Missher-DSH-Output-Renderer/releases/download/v1.0.7/SHA256SUMS)
 
 1. 下载所需版本的 tgz 和校验文件。可运行 `shasum -a 256 -c SHA256SUMS` 核对下载字节。
 2. 桌面版进入 **插件 → 添加插件**，填入下载文件的完整路径，安装并启用本插件。按宿主提示重新加载后，进入 **设置 → 输出外观**。
@@ -52,7 +52,7 @@
 Web/自建 profile 使用目标宿主的正式 CLI，替换下面的 profile 和文件路径：
 
 ```sh
-dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-1.0.6.tgz
+dsh plugin --profile my-web add /path/to/missher-dsh-output-renderer-1.0.7.tgz
 dsh plugin --profile my-web remove @missher/dsh-output-renderer
 ```
 
@@ -68,7 +68,7 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 | 检查范围 | 证据与限制 |
 | --- | --- |
-| 当前版本 `1.0.6` | 147 项测试、双端类型检查和构建通过；针对 DSH 0.2.2-rc.3 的含工具最终步骤增加回退。实际宿主页面在安装后需复核。 |
+| 当前版本 `1.0.7` | 148 项测试、双端类型检查和构建。验证已完成答复释放流式监听并保留完整正文。 |
 | 历史版本 `1.0.0` | 双端类型检查、134 项测试与隔离构建通过；本轮未安装、未运行真实 DSH 页面验收。 |
 | 本机 DSH `0.2.1-rc.4`（历史记录） | 0.2.3：双端类型检查、131 项测试、隔离构建和 mock 分组 DOM 的结论隐藏/单思考行/搜索胶囊保留检查通过；`tool.call.toolview` 与 `turn-process` 投影已按该版本契约实现。已安装到本机 `desktop` profile（0.2.3）；0.2.1 的结论行为已由用户确认，0.2.3 的搜索默认折叠和结论保留来源仍未在真实页面单独复测。 |
 | 本机社区发行版 `0.2.1-rc.2` | 0.1.4已验：折叠与键盘操作、流中展开保持、实际状态和中断、正文/图片/原生工具、设置预览/保存/刷新/失败回退、暗色窄栏、停用恢复。浏览器使用隔离的本地合成数据。 |
@@ -81,7 +81,7 @@ dsh plugin --profile my-web remove @missher/dsh-output-renderer
 
 插件依赖 `conversation.chat.node` 的 `assistant-step`、`settings.section`、原生 Markdown 与文件回调，以及聊天 DOM 标记；图片优先使用 Chat 提供的 `renderMessageImages` 闭包，其次使用宿主发布的 `conversation.images.content` Factory，两者都不存在时在正文位置显示明确提示而不是丢图。调用宿主能力前会检查 `slots.inject/register`、`locale.register/bind` 与 `configForms.get` 是否存在，缺失时给出诊断并保持原生输出可见。React、Schemastery 及 DSH 客户端模块由宿主提供；开发 SDK 链接不会进入运行包。升级宿主后需重新核验这些接口，若设置页不出现，检查插件启用状态和宿主加载错误。
 
-完整证据见 [VALIDATION.md](./VALIDATION.md)。1.0.6 的 147 项测试、类型检查和构建属于源码/组件级证据，不等同于实际 DSH Web UI 验收。0.2.1 的结论行为有历史用户确认；0.2.3 的搜索默认折叠和结论保留来源未单独实机复测。此前 rc.4 的一次设置保存失败仍未定位根因。
+各版本的测试环境和验证范围见 [VALIDATION.md](./VALIDATION.md)。
 
 ## 开发与署名
 
